@@ -1,0 +1,167 @@
+<meta title="上传文件" width="800px" args="folder,multi:true"/>
+<div class="p">
+    <div class="p-b-xs clearfix">
+        <div class="pull-left" style="position: relative; height: 24px; display: inline-block; width: 80px; vertical-align: middle;">
+            <button class="btn btn-xs btn-primary" style="position: absolute;"><i class="fa fa-upload"></i> 选择文件
+            </button>
+            <input autocomplete="off" type="file" class="form-control upload-file" name="file" id="file" s-change="selectFile(this.node)"
+                   style="position: absolute; opacity: 0; width: 90px;height: 25px; left: 0;">
+        </div>
+        <form s="valid" id="uploadForm" class="form-inline pull-right" style="display: inline-block">
+            <label class="s-checkbox">
+                <input autocomplete="off" type="checkbox" id="originalFileName">
+                <span class="s-checkbox-indicator"></span> 保持文件名
+            </label>
+            <input autocomplete="off" type="button" class="btn btn-success btn-xs" disabled value="开始上传" id="uploadBtn"
+                   s-click="return doUpload()"/>
+        </form>
+    </div>
+    <table class="table table-striped table-hover table-bordered" style="width: 100%;">
+        <thead>
+        <tr>
+            <th style="width: 25%;">文件名</th>
+            <th style="width: 15%;">大小</th>
+            <th style="width: 40%;">上传进度</th>
+            <th style="width: 10%;">结果</th>
+            <th style="width: 10%;" class="text-right">操作</th>
+        </tr>
+        </thead>
+        <tbody id="filesGrid" s="loop" s-data="[]">
+        <tr s-loop-role="empty">
+            <td colspan="5">
+                <div class="s-ui-none-data-info text-center"><i class="fa fa-info-circle text-info"></i> 请先选择文件</div>
+            </td>
+        </tr>
+        <tr s-loop-role="row" s="datac,row">
+            <td s s-data-filter="'name'"></td>
+            <td s s-data-filter="'size'"></td>
+            <td>
+                <div class="progress" style="margin-bottom: 0">
+                    <div class="progress-bar progress-bar-warning" style="width: 0%;">0%</div>
+                </div>
+            </td>
+            <td class="upload-tip"></td>
+            <td class="text-right">
+                <a href="javascript:;" class=" btn btn-sm btn-link text-danger remove-btn">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+    folder = folder + "/";
+    var Buffer = window.OSS.Buffer;
+    var OSS = window.OSS.Wrapper;
+    var STS = OSS.STS;
+    S.meta.btns = [
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+    var selectedFiles = [];
+
+    function selectFile(fileNode) {
+        var files = [];
+        if (!multi) {
+            files = fileNode[0].files;
+            selectedFiles = [files[files.length - 1]];
+            files = [files[files.length - 1]];
+        } else {
+            selectedFiles = selectedFiles.concat(fileNode[0].files);
+            files = fileNode[0].files;
+        }
+
+        $filesGrid[multi ? 'addRows' : "data"](files, "append");
+        $uploadBtn.node.prop("disabled", false);
+        $file.node.val("");
+    }
+
+    $filesGrid.node.delegate(".remove-btn", "click", function (e) {
+        var node = $(e.currentTarget);
+        node.parent().parent().remove();
+        if ($filesGrid.node.children().size() == 0) {
+            $filesGrid.data([]);
+            $uploadBtn.node.prop("disabled", true);
+        }
+    });
+
+    function doUpload() {
+        var deferred = $.Deferred();
+        $uploadForm.validate().done(function () {
+            var progressBars = $(".progress-bar:not('.progress-bar-success')", $filesGrid.node);
+            if (progressBars.size() == 0) {
+                S.toast("请先选择要上传的文件", "warning");
+                // deferred.resolve();
+                return;
+            }
+
+            function uploadFile(idx) {
+                if (idx == progressBars.size()) {
+                    S.toast("上传成功", "success");
+                    deferred.resolve();
+                    return;
+                }
+                var bar = $(progressBars.get(idx));
+                var row = bar.parent().parent().parent();
+                var rowSmart = Smart.of(row);
+                var file = rowSmart.data();
+                var uploadTip = $(".upload-tip", rowSmart.node);
+                uploadTip.addClass("text-info").html("正在上传");
+                var progress = function (p) {
+                    return function (done) {
+                        var percent = p * 100;
+                        bar.width(percent + "%").html(percent + "%");
+                        if (percent >= 100) {
+                            uploadTip.addClass("text-success").html("上传成功");
+                            bar.width("100%").html("100%");
+                            uploadFile(idx + 1);
+                        }
+                        done();
+                    }
+                };
+                S.get("/api/aliyun/sts/acs").done(function (rs) {
+                    var credentials = rs.assumeRole.credentials;
+                    var ossConfig = rs.ossConfig;
+                    var client = new OSS({
+                        region: ossConfig.regionId,
+                        accessKeyId: credentials.accessKeyId,
+                        accessKeySecret: credentials.accessKeySecret,
+                        stsToken: credentials.securityToken,
+                        bucket: ossConfig.bucket
+                    });
+                    var filename = file.name;
+                    var key = folder + "/" +filename;
+                    if(!$originalFileName.node.prop("checked")) {
+                        var suffix = "";
+                        if (filename.indexOf(".") != -1) {
+                            suffix = filename.substring(filename.lastIndexOf("."));
+                        }
+                        key = folder + rs.ossObjectKey + suffix;
+                    }
+                    key = key.replace(/\/+/gi, '/');
+                    return client.multipartUpload(key, file, {
+                        progress: progress,
+                        meta: {
+                            filename: encodeURIComponent(filename)
+                        }
+                    });
+                })
+            }
+
+            uploadFile(0);
+        }).fail(function () {
+            deferred.resolve();
+        })
+        return deferred.done(function () {
+            //上传成功
+            S.close(true);
+        });
+    }
+
+    $file.node.prop("multiple", multi);
+</script>

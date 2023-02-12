@@ -1,0 +1,34 @@
+.pagination-sm {
+  margin: 0;
+}
+.btn {
+  font-weight: inherit;
+}
+.vfile-list .vfile {
+  float: left;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  width: 90px;
+  height: 110px;
+  padding: 5px;
+  overflow: hidden;
+}
+.vfile-list .vfile.s-check-checked {
+  background: #ddd;
+}
+.vfile-list .vfile .file-pic {
+  width: 80px;
+  height: 80px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.vfile-list .vfile .file-name {
+  margin-top: 5px;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 12px;
+}
+/*# sourceMappingURL=style.css.map */

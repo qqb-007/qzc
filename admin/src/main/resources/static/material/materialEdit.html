@@ -1,0 +1,87 @@
+<meta title="编辑人群" width="600" args="crowd"/>
+<style>
+</style>
+<form s="valid,form,nda,datac"
+      s-data="crowd"
+      method="put"
+      action="/api/crowd/{crowd.id}"
+      id="form" class="form-horizontal p">
+    <table class="table table-striped table-bordered">
+        <tr>
+            <td>名称</td>
+            <td>
+                <input autocomplete="off" type="text" name="name"
+                       s-valid-error="require()" class="form-control" placeholder="名称">
+            </td>
+        </tr>
+        <tr>
+            <td>最早创建时间</td>
+            <td>
+                <input autocomplete="off" type="text" s="datetimepicker" name="minCreateTime"
+                       class="form-control"/>
+            </td>
+        </tr>
+        <tr>
+            <td>最迟创建时间</td>
+            <td>
+                <input autocomplete="off" type="text" s="datetimepicker" name="maxCreateTime"
+                       class="form-control"/>
+            </td>
+        </tr>
+        <tr>
+            <td>最早活跃时间</td>
+            <td>
+                <input autocomplete="off" type="text" s="datetimepicker" name="minActiveTime"
+                       class="form-control"/>
+            </td>
+        </tr>
+        <tr>
+            <td>最迟活跃时间</td>
+            <td>
+                <input autocomplete="off" type="text" s="datetimepicker" name="maxActiveTime"
+                       class="form-control"/>
+            </td>
+        </tr>
+        <tr>
+            <td>会员级别</td>
+            <td>
+                <select class="form-control input-sm" s="select"
+                        id="userLevel"
+                        name="userLevel"
+                        s-build="S.get('/api/enum/valuesMap/core.enums.UserLevel')">
+                    <option value="">所有级别</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>状态</td>
+            <td>
+                <select class="form-control input-sm" s="select"
+                        name="status"
+                        s-build="S.get('/api/enum/valuesMap/core.enums.CrowdStatus?igNames=DELETED')">
+                </select>
+            </td>
+        </tr>
+    </table>
+</form>
+<script>
+    S.meta.btns = [
+        {
+            name: "确定",
+            style: "btn btn-primary",
+            click: function() {
+                return $form.submit().done(function() {
+                    S.close(true)
+                })
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+
+</script>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.batcloud.wxc.core.mapper.OrderDetailMapper">
+
+  <select id="statByFoodSupplierIdAndOrderIdList"
+          resultType="info.batcloud.wxc.core.mapper.domain.OrderDetailStat">
+    select
+    order_id,
+    sum(supplier_quote_price * (quantity)) as totalMoney,
+    sum(supplier_quote_price * (refund_quantity)) as refundMoney,
+    sum(quantity) as quantity,
+    sum(refund_quantity) as refund_quantity,
+    sum(supplier_quote_price * (quantity - refund_quantity)) as remain_money
+    from order_detail
+    where food_supplier_id = #{foodSupplierId}
+    and order_id in
+    <foreach collection="orderIdList" open="(" close=")" separator="," item="orderId">
+      #{orderId}
+    </foreach>
+    group by order_id
+  </select>
+</mapper>

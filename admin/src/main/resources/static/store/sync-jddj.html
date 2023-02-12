@@ -1,0 +1,32 @@
+<meta title="京东到家门店同步" width="650px"/>
+<form role="form" id="syncForm" s="valid,form"
+      class="form-horizontal"
+      method="post"
+      style="padding: 20px;" action="/api/store/sync/jddj">
+    <div class="form-group" s-valid-role="item">
+        <label class="col-sm-2 control-label">门店id：</label>
+        <div class="col-sm-10">
+            <input autocomplete="off" type="text" name="shopId" class="form-control" placeholder="门店id">
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    S.meta.btns = [
+        {
+            name: "开始同步",
+            style: "btn btn-primary",
+            click: function () {
+                return S.S("#syncForm").submit().done(function (rs) {
+                    S.close(true);
+                });
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+</script>

@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    config:
+     uri: http://localhost:8888/
+     profile: dev
+     name: wxc
+
+
+  freemarker:
+      cache: false
+      expose-request-attributes: true
+      expose-session-attributes: true
+      request-context-attribute: request
+      suffix: .ftlh
+
+server:
+  port: 8080

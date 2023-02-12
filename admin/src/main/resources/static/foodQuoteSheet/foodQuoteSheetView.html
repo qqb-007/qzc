@@ -1,0 +1,134 @@
+<meta title="报价单详情" args="id,data:_model_" model="S.get('/api/food-quote-sheet/' + id)" width="1000"/>
+<div class="p">
+	<div class="" id="foodQuoteSheetsGrid" s='check,datac,nda'
+		 s-data="data.foodQuoteSheet"
+		 style="max-height: 500px; overflow:auto;">
+		<div s="tpl">
+			{%if(this.status == 'VERIFY_FAIL') {%}
+			<div class="alert alert-danger p-sm">{%=this.verifyRemark%}</div>
+			{%}%}
+		</div>
+		<table class="table table-striped table-bordered">
+			<tr>
+				<th>ID</th>
+				<th>报价人</th>
+				<th class="text-right">商品数量</th>
+				<th class="text-center">创建时间</th>
+				<th class="text-center">发布信息</th>
+				<th class="text-center">状态</th>
+				<th class="text-right">操作</th>
+			</tr>
+			<tr>
+				<td name="id"></td>
+				<td>
+					<span name="storeUserName"></span>
+					<div>ID: <span name="storeUserId"></span></div>
+				</td>
+				<td name="foodNum" class="text-right"></td>
+				<td name="createTime" class="text-center"></td>
+				<td s="tpl" class="text-center">
+					<label class="label
+                            {%
+                                switch(this.publishStatus) {
+                                    case 'WAIT': out.print('label-warning'); break;
+                                    case 'SUCCESS': out.print('label-success'); break;
+                                    case 'FAIL': out.print('label-danger'); break;
+                                    default: out.print('label-default');break;
+                                }
+                            %}
+                            ">{%=this.publishStatusTitle%}</label>
+					<div>{%=this.publishTime%}</div>
+				</td>
+				<td class="text-center" s="tpl">
+					<label class="label
+                            {%
+                                switch(this.status) {
+                                    case 'WAIT_VERIFY': out.print('label-warning'); break;
+                                    case 'VERIFY_SUCCESS': out.print('label-success'); break;
+                                    case 'VERIFY_FAIL': out.print('label-danger'); break;
+                                    default: out.print('label-default');break;
+                                }
+                            %}
+                            ">{%=this.statusTitle%}</label>
+				</td>
+				<td class="text-right">
+					<div style="display: inline-block" s="tpl">
+						{%if(this.status == 'VERIFY_SUCCESS') {%}
+						<a href="javascript:;" class="btn btn-warning btn-outline btn-xs" s-click="retrial(this)">返审</a>
+						{%}%}
+					</div>
+				</td>
+			</tr>
+		</table>
+		<table class="table table-striped table-bordered form-inline">
+			<caption>报价明细</caption>
+			<tr>
+				<th>图片</th>
+				<th>商品名</th>
+				<th class="">报价</th>
+				<th class="">售价</th>
+				<th class="text-right">SKU售价</th>
+			</tr>
+			<tbody s="loop" s-data="data.foodQuoteSheetDetailList">
+			<tr s-loop-role="row" class="food-quote-row" s="datac">
+				<td s="tpl">
+					<img src="{%=this.food.picture%}" style="max-width: 80px; max-height: 80px;"/>
+					<input type="hidden" class="detail-id" value="{%=this.id%}"/>
+				</td>
+				<td name="food.name"></td>
+				<td class="text-right" s="tpl">
+					<div class="input-group">
+						<input type="text" class="form-control price" name="price"
+							   style="width: 60px;" s-valid-error="require(),number()" readonly value="{%=this.price%}"/>
+						<span class="input-group-addon">元/{%=this.foodUnit%}</span>
+					</div>
+				</td>
+				<td class="text-center" s="tpl">
+					<div class="input-group">
+						<input type="text" class="form-control sale-price" name="salePrice"
+							   style="width: 60px;" s-valid-error="require(),number()" readonly value="{%=this.salePrice%}"/>
+						<span class="input-group-addon">元/{%=this.foodUnit%}</span>
+					</div>
+				</td>
+				<td class="text-right" s="tpl">
+					{%$.each(this.foodQuoteSkuList, function() {%}
+					<div class="input-group">
+						<span class="input-group-addon">{%=this.spec%}</span>
+						<input type="text" class="form-control sku-price" readonly s-valid-error="require(),number()"
+							   data-sku-id="{%=this.skuId%}" value="{%=this.price%}"
+							   style="width: 60px;"/>
+						<span class="input-group-addon">元</span>
+					</div>
+					{%})%}
+				</td>
+			</tr>
+			</tbody>
+			<tfoot>
+			<tr>
+				<td colspan="5" class="text-right">
+					共有<span s s-data="data.foodQuoteSheetDetailList.length"></span>个数据
+				</td>
+			</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>
+<script type="text/javascript">
+  function retrial() {
+	S.confirm('确定需要返审吗？').done(function() {
+	  S.put('/api/food-quote-sheet/retrial/' + id).done(function() {
+	    S.refresh();
+	  })
+	})
+  }
+
+  S.meta.btns = [
+    {
+      name: "关闭",
+      style: "btn btn-default",
+      click: function () {
+        S.close();
+      }
+    }
+  ]
+</script>

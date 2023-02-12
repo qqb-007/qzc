@@ -1,0 +1,257 @@
+<meta title="仪表盘" icon="fa fa-dashboard"/>
+<div class="container-fluid space-v">
+    <div class="panel">
+        <div class="panel-heading clearfix">
+            <form id="form" class="form-inline pull-left">
+                <input type="text" class="form-control input-sm" name="startDate" id="startDate" placeholder="开始时间" s="datetimepicker" /> -
+                <input type="text" class="form-control input-sm" name="endDate" id="endDate" placeholder="结束时间" s="datetimepicker" />
+                <input type="hidden" id="type" name="type"/>
+                <button type="button" class="btn btn-default btn-sm"
+                        s-click="search()">查询
+                </button>
+                <button type="button" class="btn btn-default btn-sm"
+                        s-click="clear()">清空
+                </button>
+            </form>
+            <div class="pull-right">
+                <input type="button" class="btn btn-sm btn-outline btn-default" value="按下单时间显示" s-click="selectType(0)"/>
+                <input type="button" class="btn btn-sm btn-outline btn-default" value="按送达时间显示" s-click="selectType(1)"/>
+                <input type="button" class="btn btn-sm btn-outline btn-default" value="今天" s-click="selectDate(0)"/>
+                <input type="button" class="btn btn-sm btn-outline btn-default" value="昨天" s-click="selectDate(-1)"/>
+                <input type="button" class="btn btn-sm btn-outline btn-default" value="近7天" s-click="selectDate(7)"/>
+                <input type="button" class="btn btn-sm btn-outline btn-default" value="近30天" s-click="selectDate(30)"/>
+            </div>
+        </div>
+        <div class="list-group" id="bizDataPanel" s="datac,nda">
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-4 biz-plat-title text-orange">
+                        王小菜美团
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-orange" s="tpl">
+                            <span><small>¥</small>{%=(this.MEITUAN.total-this.MEITUAN.refundMoney - this.MEITUAN.costTotal + this.MEITUAN.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效利润</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-info" s="tpl">
+                            <span><small>¥</small>{%=(this.MEITUAN.total-this.MEITUAN.refundMoney).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效营业额</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-warning" s="tpl">
+                            <span><small>¥</small>{%=(this.MEITUAN.costTotal - this.MEITUAN.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效成本</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs" name="MEITUAN.totalNum">-</h3>
+                        <small>有效单量</small>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-4 biz-plat-title text-orange">
+                        菜老板美团
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-orange" s="tpl">
+                            <span><small>¥</small>{%=(this.CLBM.total-this.CLBM.refundMoney - this.CLBM.costTotal + this.CLBM.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效利润</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-info" s="tpl">
+                            <span><small>¥</small>{%=(this.CLBM.total-this.CLBM.refundMoney).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效营业额</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-warning" s="tpl">
+                            <span><small>¥</small>{%=(this.CLBM.costTotal - this.CLBM.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效成本</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs" name="CLBM.totalNum">-</h3>
+                        <small>有效单量</small>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-4 biz-plat-title text-info">
+                        饿百
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-orange" s="tpl">
+                            <span><small>¥</small>{%=(this.ELE.total-this.ELE.refundMoney - this.ELE.costTotal + this.ELE.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效利润</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-info" s="tpl">
+                            <span><small>¥</small>{%=(this.ELE.total-this.ELE.refundMoney).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效营业额</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-warning" s="tpl">
+                            <span><small>¥</small>{%=(this.ELE.costTotal - this.ELE.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效成本</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs" name="ELE.totalNum">-</h3>
+                        <small>有效单量</small>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-4 biz-plat-title text-info">
+                        京东
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-orange" s="tpl">
+                            <span><small>¥</small>{%=(this.JDDJ.total-this.JDDJ.refundMoney - this.JDDJ.costTotal + this.JDDJ.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效利润</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-info" s="tpl">
+                            <span><small>¥</small>{%=(this.JDDJ.total-this.JDDJ.refundMoney).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效营业额</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-warning" s="tpl">
+                            <span><small>¥</small>{%=(this.JDDJ.costTotal - this.JDDJ.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效成本</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs" name="JDDJ.totalNum">-</h3>
+                        <small>有效单量</small>
+                    </div>
+                </div>
+            </div>
+            <div class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-4 biz-plat-title text-success">
+                        总计
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-orange" s="tpl">
+                            <span><small>¥</small>{%=(this.total-this.refundMoney - this.costTotal + this.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效利润</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-info" s="tpl">
+                            <span><small>¥</small>{%=(this.total-this.refundMoney).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效营业额</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs text-warning" s="tpl">
+                            <span><small>¥</small>{%=(this.costTotal - this.costRefund).toFixed(2)%}</span>
+                        </h3>
+                        <small>有效成本</small>
+                    </div>
+                    <div class="col-sm-2">
+                        <h3 class="space-v-xs" name="totalNum">-</h3>
+                        <small>有效单量</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-body">
+            <div s="window" s-window="{href: '/biz-data/storeUserOrderBizDataList.html'}"></div>
+        </div>
+    </div>
+</div>
+<style>
+    .biz-plat-title {
+        font-size: 40px;
+    }
+</style>
+<script type="text/javascript">
+    function search() {
+    	S.get('/api/order-biz-data', $form.node.serialize()).done(rs => {
+    		if (!rs.MEITUAN) {
+    			rs.MEITUAN = {
+						costRefund: 0,
+						costTotal: 0,
+						refundMoney: 0,
+						total: 0,
+						totalNum: 0,
+          }
+        }
+				if (!rs.ELE) {
+					rs.ELE = {
+						costRefund: 0,
+						costTotal: 0,
+						refundMoney: 0,
+						total: 0,
+						totalNum: 0
+					}
+				}
+        if (!rs.JDDJ) {
+            rs.JDDJ = {
+                costRefund: 0,
+                costTotal: 0,
+                refundMoney: 0,
+                total: 0,
+                totalNum: 0
+            }
+        }
+        if (!rs.CLBM) {
+            rs.CLBM = {
+                costRefund: 0,
+                costTotal: 0,
+                refundMoney: 0,
+                total: 0,
+                totalNum: 0
+            }
+        }
+        $bizDataPanel.data(rs)
+      })
+    }
+
+    function selectType(type) {
+        $type.node.val(type)
+        search()
+    }
+
+    function selectDate(val) {
+    	var now = Date.now()
+      let startDate, endDate
+    	if (val > 0) {
+				let start = now - 60 * 60 * 24 * 1000 * (val - 1)
+				start = new Date(start)
+				startDate = $.format.date(start, 'yyyy-MM-dd')
+				endDate = $.format.date(new Date(), 'yyyy-MM-dd')
+      } else {
+    		now += 60 * 60 * 24 * 1000 * val
+        now = new Date(now)
+        startDate = $.format.date(now, 'yyyy-MM-dd')
+        endDate = startDate
+      }
+      $startDate.node.val(startDate)
+      $endDate.node.val(endDate)
+      search()
+    }
+
+    function clear() {
+			$startDate.node.val('')
+			$endDate.node.val('')
+			search()
+    }
+    search()
+</script>

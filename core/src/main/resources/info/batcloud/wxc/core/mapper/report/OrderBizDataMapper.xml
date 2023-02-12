@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.batcloud.wxc.core.mapper.report.OrderBizDataMapper">
+
+    <select id="findOrderBizDataByDateRange"
+            resultType="info.batcloud.wxc.core.mapper.report.domain.OrderBizData">
+        SELECT
+            plat,
+            COUNT(1) AS totalNum,
+            SUM(total) AS total,
+            SUM(refund_money) AS refundMoney,
+            SUM(cost_total) AS costTotal,
+            sum(cost_refund) as costRefund
+        FROM
+            wxc_order
+        WHERE
+            create_time BETWEEN #{startDate} AND #{endDate}
+            and status in ('PAID', 'WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED',  'SHIPPING', 'SHIPPED', 'FINISHED')
+        GROUP BY plat
+    </select>
+
+    <select id="findOrderBizDataByDeliveryDateRange"
+            resultType="info.batcloud.wxc.core.mapper.report.domain.OrderBizData">
+        SELECT
+            plat,
+            COUNT(1) AS totalNum,
+            SUM(total) AS total,
+            SUM(refund_money) AS refundMoney,
+            SUM(cost_total) AS costTotal,
+            sum(cost_refund) as costRefund
+        FROM
+            wxc_order
+        WHERE
+            expected_delivery_time BETWEEN #{startDate} AND #{endDate}
+            and status in ('PAID', 'WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED',  'SHIPPING', 'SHIPPED', 'FINISHED')
+        GROUP BY plat
+    </select>
+
+    <select id="findStoreUserOrderBizDataByDateRange"
+            resultType="info.batcloud.wxc.core.mapper.report.domain.StoreUserOrderBizData">
+        SELECT
+            <if test="param.dimension == 'day'">
+                DATE_FORMAT(o.create_time, '%Y-%m-%d') as `date`,
+            </if>
+            max(o.create_time) as endTime,
+            min(o.create_time) as startTime,
+            u.id as storeUserId,
+            u.name as storeUserName,
+            COUNT(1) AS totalNum,
+            SUM(o.total) AS total,
+            SUM(o.refund_money) AS refundMoney,
+            SUM(o.cost_total) AS costTotal,
+            sum(o.cost_refund) as costRefund
+        from
+            wxc_order o left join store s on s.id=o.store_id left join store_user u on u.id=s.store_user_id
+        WHERE
+            <if test="param.storeUserName != null">
+                u.name like '%${param.storeUserName}%' and
+            </if>
+            <if test="param.storeUserId != null">
+                u.id = #{param.storeUserId} and
+            </if>
+            <if test="param.plat != null">
+                o.plat = #{param.plat, typeHandler=org.apache.ibatis.type.EnumTypeHandler} and
+            </if>
+            o.create_time BETWEEN #{param.startDate} AND #{param.endDate}
+            and o.status in ('PAID', 'WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED',  'SHIPPING', 'SHIPPED', 'FINISHED')
+        GROUP BY store_user_id
+        <choose>
+            <when test="param.dimension == 'day'">
+                ,DATE_FORMAT(o.create_time, '%Y-%m-%d')
+                order by o.create_time desc
+            </when>
+            <otherwise>
+                order by SUM(o.total) - SUM(o.refund_money) - SUM(o.cost_total) + sum(o.cost_refund) desc
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

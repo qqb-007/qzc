@@ -1,0 +1,18 @@
+
+  <view class="container">
+    <view class="caption">最近流水</view>
+    <view class="detail">
+
+    </view>
+    <view class="wallet-flow" bindtap="showDetail"  wx:for="{{walletFlowDetailList}}" data-wpyshowdetail-a="{{item}}">
+      <view class="flow-detail">
+        <view class="flow-title">{{item.typeTitle}}</view>
+        <view class="flow-time">{{item.createTime}}</view>
+      </view>
+      <view class="flow-right">
+        <view class="flow-val {{item.value > 0 ? 'flow-val-income' : ''}}">{{item.value > 0 ? '+ ' + item.valueStr : '- ' + (item.valueStr)}}</view>
+        <view class="flow-status {{item.statusStyle}}" wx:if="{{item.status}}">{{item.statusTitle}}</view>
+      </view>
+      <text class="flow-arrow iconfont icon-arrow-right" wx:if="{{item.type === 'WITHDRAW'}}"/>
+    </view>
+  </view>

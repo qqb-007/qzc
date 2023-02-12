@@ -1,0 +1,60 @@
+<meta title="新增物料" width="600" args="material"/>
+<style>
+</style>
+<div class="p">
+    <form s="valid,form,nda,datac"
+          method="post"
+          s-data="material"
+          action="/api/material"
+          id="form" class="form-horizontal">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <td>名称</td>
+                <td>
+                    <input autocomplete="off" type="text" name="name"
+                           s-valid-error="require()" class="form-control" placeholder="名称">
+                </td>
+            </tr>
+            <tr>
+                <td>状态</td>
+                <td>
+                    <select class="form-control input-sm" s="select"
+                            name="status"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.CrowdStatus?igNames=DELETED')">
+                    </select>
+                </td>
+            </tr>
+            <input type="hidden" id="configJson" name="configJson"/>
+        </table>
+    </form>
+    <div id="configPanel" s="window" s-window="{href: '/material/COMMISSION_ITEM_MATERIAL.html', args: {config: (material || {}).config}}"></div>
+</div>
+<script>
+    if(material) {
+        $form.node.attr('method', 'put').attr('action', '/api/material/' + material.id)
+    }
+    S.meta.btns = [
+        {
+            name: "确定",
+            style: "btn btn-primary",
+            click: function() {
+                $form.validate().done(function() {
+                    $configPanel.getConfig().done(function(config) {
+                        $configJson.node.val(JSON.stringify(config))
+                        $form.submit().done(function() {
+                            S.close(true)
+                        })
+                    })
+                })
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+
+</script>

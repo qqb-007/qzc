@@ -1,0 +1,255 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+
+  .container {
+    background-color: #efeff4;
+    font-size: 16px;
+  }
+
+  .sheet {
+    margin-bottom: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+    &-head {
+      font-size: 14px;
+      background-color: #E7F9F7;
+      color: #000;
+      padding: 8px 10px;
+      border-left: 5px solid #22C0AA;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      &-wait-settle {
+        background-color: #FFF9EC;
+        border-left: 5px solid #E6B73E;
+      }
+    }
+    &-date {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    &-status {
+      font-size: 12px;
+      padding-top: 2px;
+      color: #9BA7A7;
+    }
+    &-amount {
+      text-align: right;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    &-settle {
+      text-align: right;
+      color: #9BA7A7;
+      font-size: 12px;
+    }
+    &-details {
+      padding: 0 10px;
+    }
+    &-detail {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1rpx dashed #ddd;
+      &:last-child {
+        border-bottom: none;
+      }
+      &-date {
+        color: #6C6C6C;
+        font-size: 14px;
+      }
+      &-value {
+        font-size: 14px;
+        &-amount {
+          text-align: right;
+        }
+        &-deduct {
+          text-align: right;
+          color: @color-muted;
+          font-size: 12px;
+          margin-top: 5px;
+        }
+      }
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="sheet">
+      <view class="sheet-head sheet-head-wait-settle flex-row space-between">
+        <view>
+          <view class="sheet-date">本周</view>
+        </view>
+      </view>
+      <view class="sheet-details">
+        <view class="sheet-detail" wx:for="{{weekSheetDetailList}}"
+              wx:for-item="detail" wx:key="{{detail.id}}">
+          <view class="sheet-detail-date">{{detail.date}}</view>
+          <view class="sheet-detail-value">¥{{detail.settlementAmountStr}}</view>
+        </view>
+      </view>
+    </view>
+    <block wx:for="{{sheetList}}" wx:key="{{item.id}}">
+      <view class="sheet" @tap="showDetail({{item.id}})">
+        <view class="sheet-head {{item.settled ? '' : 'sheet-head-wait-settle'}} flex-row space-between">
+          <view>
+            <view class="sheet-date">{{item.date}}</view>
+            <view class="sheet-status">{{item.settled ? '已结算账单' : '待结算账单'}}</view>
+          </view>
+          <view>
+            <view class="sheet-amount">¥ {{item.settlementAmountStr}}</view>
+            <view class="sheet-settle">{{item.settled ? '已汇入余额' : '待汇入余额'}}</view>
+          </view>
+        </view>
+        <view class="sheet-details">
+          <view class="sheet-detail" wx:for="{{item.detailList}}"
+                wx:for-item="detail" wx:key="{{detail.id}}">
+            <view class="sheet-detail-date">{{detail.date}}</view>
+            <view class="sheet-detail-value">
+              <view class="sheet-detail-value-amount">¥{{detail.settlementAmountStr}}</view>
+              <view class="sheet-detail-value-deduct">
+                总: ¥{{detail.orderAmountStr}}
+                退: ¥{{detail.partRefundAmountStr}}
+                扣点: ¥{{detail.deductAmountStr}}
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <i-divider content="我是有底线的" wx:if="{{!hasNext}}"></i-divider>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let Deferred = require('../utils/deferred')
+  let api = require('../utils/api')
+  const DEFAULT_SEARCH_PARAM = {
+    page: 1,
+    pageSize: 5
+  }
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '历史账单',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark',
+      // backgroundColor: '#efeff4',
+      'usingComponents': {
+        'i-tag': '../iview/tag/index',
+        'i-divider': '../iview/divider/index'
+      }
+    }
+    components = {}
+
+    data = {
+      searchParam: Object.assign({}, DEFAULT_SEARCH_PARAM),
+      loading: false,
+      hasNext: true,
+      sheetList: [],
+      weekSheetDetailList: []
+    }
+
+    methods = {
+      showDetail(id) {
+        wx.navigateTo({
+          url: 'food-quote-sheet-detail?foodQuoteSheetId=' + id
+        })
+      }
+    }
+
+    computed() {
+
+    }
+
+    events = {}
+
+    resetSearchParam() {
+      Object.assign(this.searchParam, DEFAULT_SEARCH_PARAM)
+      this.hasNext = true
+    }
+
+    onPullDownRefresh() {
+      this.resetSearchParam()
+      this.loadData().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    onReachBottom() {
+      if (this.hasNext) {
+        this.searchParam.page++
+        this.search(true)
+      }
+    }
+
+    search(append, callback) {
+      wx.showLoading({
+        title: '加载中'
+      })
+      return api.settlementSheet.search(this.searchParam).done((rs) => {
+        this.handleSheetList(rs.data.results)
+        if (append) {
+          this.sheetList = this.sheetList.concat(rs.data.results)
+        } else {
+          this.sheetList = rs.data.results
+        }
+        let paging = rs.data
+        this.hasNext = paging.hasNext
+        this.$apply()
+      }).always(() => {
+        wx.hideLoading()
+        callback && callback()
+      })
+    }
+
+    handleSheetList(sheetList) {
+      sheetList.forEach(sheet => {
+        sheet.settlementAmountStr = sheet.settlementAmount.toFixed(1)
+        sheet.date = sheet.startDate.replace(/-/g, '.') + ' - ' + sheet.endDate.replace(/-/g, '.').substring(5)
+        sheet.detailList.sort((o1, o2) => {
+          return o2.date.localeCompare(o1.date)
+        })
+        this.handleDetailList(sheet.detailList)
+      })
+    }
+
+    onLoad() {
+      this.loadData()
+    }
+
+    handleDetailList(detailList) {
+      detailList.forEach(detail => {
+        detail.settlementAmountStr = detail.settlementAmount.toFixed(1)
+        detail.deductAmountStr = detail.deductAmount.toFixed(1)
+        detail.orderAmountStr = detail.orderAmount.toFixed(1)
+        detail.partRefundAmountStr = detail.partRefundAmount.toFixed(1)
+      })
+    }
+
+    loadPage() {
+      return api.page.settlementSheetList().done(rs => {
+        this.weekSheetDetailList = rs.data.weekSettlementSheetDetailList
+        this.handleDetailList(this.weekSheetDetailList)
+        this.$apply()
+      })
+    }
+
+    loadData() {
+      return Deferred.when(this.loadPage(), this.search()).always(() => {
+        this.loaded = true
+      })
+    }
+  }
+</script>

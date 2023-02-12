@@ -1,0 +1,164 @@
+
+  <view class="container">
+    <view  wx:if="{{empty}}" class="page-notice">
+      <view class="page-notice-info">暂无订单</view>
+    </view>
+    <view class="search-bar">
+      <picker bindchange="dateChange" mode="date" value="{{search.date}}">
+        <view class="date-show">{{dateShow}}
+          <text class="iconfont date-show-icon icon-unfold"/>
+        </view>
+      </picker>
+      <picker bindchange="platChange" mode="selector" value="{{platListIndex}}" range="{{platList}}">
+        <view class="status-select">{{platShow}}
+          <text class="iconfont status-select-icon icon-unfold"/>
+        </view>
+      </picker>
+      <picker bindchange="statusChange" mode="selector" value="{{statusListIndex}}" range="{{statusList}}">
+        <view class="status-select">{{statusShow}}
+          <text class="iconfont status-select-icon icon-unfold"/>
+        </view>
+      </picker>
+    </view>
+    <view class="tabs">
+      <!--<input placeholder="输入平台流水号进行筛选" class="search-input" bindinput="searchInputChange"/>-->
+      <i-tabs current="{{orderStatusIndex}}" color="{{tabColor}}" bindchange="StatusTypeChange">
+        <i-tab key="0" title="新订单"/>
+        <i-tab key="1" title="已完成"/>
+        <i-tab key="2" title="预订单"/>
+      </i-tabs>
+    </view>
+    <block  wx:for="{{orderList}}" wx:key="{{item.id}}">
+      <view class="order">
+        <view class="order-head flex-row space-between">
+          <block wx:if="{{item.status === 'MERCHANT_CONFIRMED'}}">
+            <view class="order-ptime">{{item.ptime}}</view>
+          </block>
+          <block wx:if="{{item.status !== 'MERCHANT_CONFIRMED'}}">
+            <view class="order-bptime"/>
+          </block>
+          <view class="order-id">#{{item.daySeq}}<text>{{item.platTitle}}</text></view>
+          <view class="order-status">{{item.statusTitle}}</view>
+        </view>
+        <view class="order-body">
+          <view class="order-panel">
+            <view class="order-panel-head">
+              <view class="order-panel-title">{{item.recipientName}} 送达：{{item.deliveryTime}}</view>
+            </view>
+            <view class="order-info" bindtap="tellPhone" data-wpytellphone-a="{{item.recipientPhone}}">顾客号码
+              <text class="order-info-text">{{item.recipientPhone}}</text>
+              <text class="iconfont icon-phone order-toggle">点击拨打</text>
+            </view>
+            <block wx:if="{{item.caution !== '0' && item.caution !== ' ' && item.caution !== ''}}">
+            <view class="order-info">备注
+              <text class="order-info-text">{{item.caution}}</text>
+            </view>
+            </block>
+          </view>
+          <view class="order-divide"/>
+          <view class="order-panel">
+            <view class="order-panel-head" bindtap="showDetail" data-wpyshowdetail-a="{{index}}">
+              <view class="order-panel-title">商品</view>
+              <view class="order-toggle">展开
+                <text class="iconfont {{item.detailShown ? 'icon-fold' : 'icon-unfold'}}"/>
+              </view>
+            </view>
+            <view class="order-detail-list" wx-if="{{item.detailShown}}">
+              <view class="order-detail" wx:for="{{item.detailList}}" bindtap="preview" wx:for-item="detail" wx:key="{{detai.id}}" data-wpypreview-a="{{detail.foodPicture}}">
+                <image src="{{detail.foodPicture}}" class="order-food-pic" mode="aspectFill"/>
+                <view class="order-food-name">{{detail.foodName}}({{detail.spec}})</view>
+                <view class="order-food-quantity"><text class="{{detail.quantity>1 ? 'fushu' : ''}}">×{{detail.quantity}}</text>
+                  <view class="sale-btn" catchtap="soldOut" data-wpysoldout-a="{{detail.foodCode}}">下架</view>
+                  <view class="change-btn" catchtap="modalinput" data-wpymodalinput-a="{{detail}}">改价</view>
+                </view>
+                <!--<view class="order-food-quantity">
+                  <block wx:if="{{detail.refundQuantity}}">
+                    <text class="order-food-quantity-label">退</text>
+                    <text>×{{detail.refundQuantity}}</text>
+                  </block>
+                </view>-->
+                <view class="order-food-total">¥{{detail._total}}</view>
+              </view>
+            </view>
+          </view>
+          <block wx:if="{{item.deliveryType === 'MEITUAN_OPEN'}}">
+            <view class="order-divide"/>
+            <view class="order-panel">
+              <view class="order-panel-head">
+                <view class="order-panel-title">配送信息</view>
+                <view class="order-status">
+                  <text>{{item.deliveryStatusTitle}}</text>
+                </view>
+              </view>
+              <view class="order-info" bindtap="tellPhone" data-wpytellphone-a="{{item.psCourierPhone}}">骑手信息
+                <block wx:if="{{item.psCourierPhone}}">
+                  <text class="order-info-text">{{item.psCourierName}} {{item.psCourierPhone}}</text>
+                  <text class="iconfont icon-phone order-toggle">点击拨打</text>
+                </block>
+                <block wx:else>
+                  <text>暂无骑手信息</text>
+                </block>
+              </view>
+            </view>
+          </block>
+          <view class="order-divide"/>
+          <view class="order-panel">
+            <view class="order-panel-head">
+              <view class="order-panel-title">总计</view>
+              <view class="order-fee">
+                <view class="order-income">¥{{item._total}}</view>
+              </view>
+            </view>
+          </view>
+          <view class="order-divide"/>
+          <view class="order-footer">
+            <view>下单：{{item.createTime}}</view>
+            <view>单号：{{item.platOrderId}}
+              <text class="copy-btn" bindtap="copyClipboard" data-wpycopyclipboard-a="{{item.platOrderId}}">复制</text>
+            </view>
+            <view class="order-btn-bar">
+              <view class="order-btn" bindtap="print" data-wpyprint-a="{{item.id}}">
+                <view class="iconfont icon-print order-btn-icon"/>
+                <view class="order-btn-txt">打印</view>
+              </view>
+              <block wx:if="{{item.status === 'WAIT_MERCHANT_CONFIRM'}}">
+                <view class="order-btn" bindtap="receiptOrder" data-wpyreceiptorder-a="{{item.id}}">
+                <view class="iconfont icon-arrow-right order-btn-icon"/>
+                <view class="order-btn-txt">接单</view>
+                </view>
+              </block>
+              <view class="order-btn" bindtap="open" data-wpyopen-a="/pages/order-suppliers?id={{item.id}}">
+                <view class="iconfont icon-pickup order-btn-icon"/>
+                <view class="order-btn-txt">捡货</view>
+              </view>
+              <block wx:if="{{item.deliveryStatus === 'CANCELED'}}">
+                <view class="order-btn" bindtap="sendDelivery" data-wpysenddelivery-a="{{item.id}}">
+                <view class="iconfont icon-arrow-right order-btn-icon"/>
+                <view class="order-btn-txt">发起配送</view>
+                </view>
+              </block>
+              <block wx:if="{{item.deliveryStatus === 'WAIT_SCHEDULE' || item.deliveryStatus === 'ACCEPT'}}">
+                <view class="order-btn" bindtap="cancelDelivery" data-wpycanceldelivery-a="{{item.id}}">
+                <view class="iconfont icon-unfold order-btn-icon"/>
+                <view class="order-btn-txt">取消配送</view>
+                </view>
+              </block>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <i-divider content="我是有底线的" wx:if="{{!hasNext && !empty}}"/>
+    <view class="return" bindtap="back">返回首页</view>
+    <view class="modal-dialog" hidden="{{hideModel}}">
+      <view class="modal-title">请注意报价单位为 <text class="warning">{{detail.foodUnit}}</text></view>
+      <view class="modal-content">
+        <input class="search-input" type="digit" placeholder="请输入报价 单位 元" value="{{detail.price}}" bindinput="getChange" focus="{{!hideModel}}"/>
+      </view>
+      <view class="modal-footer">
+        <view class="btn-cancel" bindtap="cancel" data-wpycancel-a="">取消</view>
+        <view class="btn-confirm" bindtap="confirmb">确定</view>
+      </view>
+    </view>
+    <view class="modal-mask" bindtap="cancel" hidden="{{hideModel}}" data-wpycancel-a=""/>
+  </view>

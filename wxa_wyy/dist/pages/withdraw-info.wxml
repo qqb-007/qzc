@@ -1,0 +1,17 @@
+
+  <view class="container">
+    <view class="page-head">
+      <text class="page-title text-title">转账详情</text>
+    </view>
+    <i-cell-group>
+      <i-cell title="开户行" value="{{withdraw.bankName}}"/>
+      <i-cell title="银行卡" value="{{withdraw.bankAccount}}"/>
+      <i-cell title="开户名" value="{{withdraw.bankAccountName}}"/>
+      <i-cell title="金额" value="{{withdraw.moneyStr}}"/>
+      <i-cell title="交易号" value="{{withdraw.alipayOrderId ? withdraw.alipayOrderId : '-'}}"/>
+      <i-cell title="转账时间" value="{{withdraw.payDate ? withdraw.payDate : '-'}}"/>
+      <i-cell title="状态" value="{{withdraw.statusTitle}}"/>
+      <i-cell title="备注" value="{{withdraw.remark}}"/>
+    </i-cell-group>
+
+  </view>

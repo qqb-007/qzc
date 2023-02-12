@@ -1,0 +1,8 @@
+.i-grid-item {
+  position: relative;
+  flex: 1;
+  padding: 20px 10px;
+  box-sizing: border-box;
+  border-right: 1rpx solid #e9eaec;
+  border-bottom: 1rpx solid #e9eaec
+}

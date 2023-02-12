@@ -1,0 +1,94 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  .page-head {
+    /*margin-bottom: 20rpx;*/
+    padding: 20rpx;
+    font-size: 40rpx;
+  }
+  .container {
+    padding: 20rpx;
+  }
+
+  .bottom {
+    padding-top: 50rpx;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="page-head">
+      <text class="page-title text-title">转账详情</text>
+    </view>
+    <i-cell-group>
+      <i-cell title="开户行" value="{{withdraw.bankName}}"></i-cell>
+      <i-cell title="银行卡" value="{{withdraw.bankAccount}}"></i-cell>
+      <i-cell title="开户名" value="{{withdraw.bankAccountName}}"></i-cell>
+      <i-cell title="金额" value="{{withdraw.moneyStr}}"></i-cell>
+      <i-cell title="交易号" value="{{withdraw.alipayOrderId ? withdraw.alipayOrderId : '-'}}"></i-cell>
+      <i-cell title="转账时间" value="{{withdraw.payDate ? withdraw.payDate : '-'}}"></i-cell>
+      <i-cell title="状态" value="{{withdraw.statusTitle}}"></i-cell>
+      <i-cell title="备注" value="{{withdraw.remark}}"></i-cell>
+    </i-cell-group>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  let api = require('../utils/api')
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的',
+      enablePullDownRefresh: true,
+      usingComponents: {
+        'i-input': '../iview/input/index',
+        'i-button': '../iview/button/index',
+        'i-cell-group': '../iview/cell-group/index',
+        'i-cell': '../iview/cell/index'
+      }
+    }
+
+    data = {
+      withdraw: {},
+      alipayOrderId: '',
+      payDate: '',
+      id: 0,
+      walletFlowDetailId: 0
+    }
+
+    methods = {
+
+    }
+
+    events = {
+
+    }
+
+    loadData() {
+      return api.page.withdrawInfo({walletFlowDetailId: this.walletFlowDetailId}).done(rs => {
+        let data = rs.data
+        this.withdraw = data.withdraw
+        this.withdraw.moneyStr = this.withdraw.money.toFixed(2)
+        this.alipayOrderId = data.alipayOrderId
+        this.payDate = data.payDate
+        this.$apply()
+      })
+    }
+
+    onPullDownRefresh() {
+      this.loadData().done(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    onLoad(option) {
+      this.walletFlowDetailId = option.walletFlowDetailId
+      this.loadData()
+    }
+  }
+</script>

@@ -1,0 +1,137 @@
+<meta title="商家营业数据" />
+<div class="p">
+    <div class="m-b clearfix">
+        <form class="form-inline pull-left" id="form">
+            <input autocomplete="off" type="text" class="form-control input-sm" name="storeUserName" placeholder="商家名" />
+            <input type="text" class="form-control input-sm" name="startDate" id="startDate" placeholder="开始时间" s="datetimepicker" /> -
+            <input type="text" class="form-control input-sm" name="endDate" id="endDate" placeholder="结束时间" s="datetimepicker" />
+            <select class="form-control input-sm" s="select"
+                    s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+                    name="plat">
+                <option value="">所有平台</option>
+            </select>
+            <select class="form-control input-sm" name="dimension">
+                <option value="NONE">选择维度</option>
+                <option value="day">按日</option>
+            </select>
+            <input type="hidden" name="page" id="page" value="1" />
+            <button type="button" class="btn btn-default btn-sm" s-click="$page.node.val(1); $bizDataGrid.refresh()">查询</button>
+            <button type="button" class="btn btn-default btn-sm"
+                    s-click="clear()">清空
+            </button>
+            <button type="button" class="btn btn-default btn-sm"
+                    s-click="downloadXls()"><i class="fa fa-download"></i> 下载
+            </button>
+        </form>
+        <div class="pull-right">
+            <input type="button" class="btn btn-sm btn-outline btn-default" value="今天" s-click="selectDate(0)"/>
+            <input type="button" class="btn btn-sm btn-outline btn-default" value="昨天" s-click="selectDate(-1)"/>
+            <input type="button" class="btn btn-sm btn-outline btn-default" value="近7天" s-click="selectDate(7)"/>
+            <input type="button" class="btn btn-sm btn-outline btn-default" value="近30天" s-click="selectDate(30)"/>
+        </div>
+    </div>
+    <div id="bizDataGrid"
+         s='datac,nda'
+         s-data="S.get('/api/order-biz-data/store-user', $form.node.serialize())">
+        <table class="table table-striped table-bordered table-hover user-commission-order-list">
+            <tr>
+                <th>维度</th>
+                <th>商家</th>
+                <th>有效单量</th>
+                <th>有效营业额</th>
+                <th>有效成本</th>
+                <th>有效利润</th>
+            </tr>
+            <tbody s="loop" s-data-filter="'results'">
+            <tr s-loop-role="empty">
+                <td colspan="6">暂无数据</td>
+            </tr>
+            <tr s-loop-role="row" s-check-role="i" s="datac" class="userCommissionEarning">
+                <td s="tpl">
+                    {%if(this.date) {%}
+                    <span>{%=this.date || '无'%}</span>
+                    {%}else{%}
+                    <span>{%=this.startTime%}-{%=this.endTime%}</span>
+                    {%}%}
+                </td>
+                <td name="storeUserName"></td>
+                <td name="totalNum"></td>
+                <td s="tpl">
+                    <span><small>¥</small>{%=(this.total-this.refundMoney).toFixed(2)%}</span>
+                </td>
+                <td s="tpl">
+                    <span><small>¥</small>{%=(this.costTotal - this.costRefund).toFixed(2)%}</span>
+                </td>
+                <td s="tpl">
+                    <span><small>¥</small>{%=(this.total-this.refundMoney - this.costTotal + this.costRefund).toFixed(2)%}</span>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="6" class="text-right">
+                    共有<span name="total"></span>个数据
+                    <ul s="pagination"
+                        s-pagination="{action:function(){$page.node.val(this); $bizDataGrid.refresh()}}"
+                        class="pagination pagination-sm">
+                    </ul>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<style>
+    .user-commission-order-list dt{
+        width: 70px;
+    }
+    .user-commission-order-list dd {
+        margin-left: 70px;
+    }
+    .inner-table {
+        margin: 0;
+        font-size: 12px;
+    }
+</style>
+<script type="text/javascript">
+
+    S.meta.btns = [
+        {
+            name: '关闭',
+            style: 'btn btn-default',
+            click: function() {
+                S.close(true)
+            }
+        }
+    ]
+
+		function selectDate(val) {
+			var now = Date.now()
+			let startDate, endDate
+			if (val > 0) {
+				let start = now - 60 * 60 * 24 * 1000 * (val - 1)
+				start = new Date(start)
+				startDate = $.format.date(start, 'yyyy-MM-dd')
+				endDate = $.format.date(new Date(), 'yyyy-MM-dd')
+			} else {
+				now += 60 * 60 * 24 * 1000 * val
+				now = new Date(now)
+				startDate = $.format.date(now, 'yyyy-MM-dd')
+				endDate = startDate
+			}
+			$startDate.node.val(startDate)
+			$endDate.node.val(endDate)
+			$bizDataGrid.refresh()
+		}
+
+		function clear() {
+			$startDate.node.val('')
+			$endDate.node.val('')
+			$bizDataGrid.refresh()
+		}
+
+		function downloadXls() {
+    	window.open('/api/order-biz-data/store-user/export?' + $form.node.serialize())
+    }
+
+</script>

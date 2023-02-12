@@ -1,0 +1,1 @@
+ALTER TABLE wxc_order ADD preparation TINYINT (1) NULL;

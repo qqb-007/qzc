@@ -1,0 +1,111 @@
+<metat title="选择门店" args="multi:true,storeUserId" width="700"/>
+<div class="p">
+	<div class="m-b clearfix">
+		<form class="form-inline pull-left" id="form">
+			<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商家ID"
+				   style="width:100px;" name="storeUserId" s s-data="storeUserId"/>
+			<input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店电话"
+				   style="width:100px;" name="phone"/>
+			<input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店名"
+				   style="width:200px;" name="name"/>
+			<input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+			<select class="form-control input-sm" s="select"
+					s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+					name="type">
+				<option value="">平台</option>
+			</select>
+			<button type="button" class="btn btn-default btn-sm"
+					s-click="$page.node.val(1); $storesGrid.refresh()">查询
+			</button>
+		</form>
+		<div class="pull-right">
+			<div class="btn-group">
+				<a href="javascript:;" class="btn btn-warning btn-sm s-loading-icon btn-outline"
+				   s-click="return syncFromMeituan()">
+					<i class="fa fa-refresh s-loading-spinner"></i> 同步美团店铺
+				</a>
+			</div>
+		</div>
+	</div>
+	<div style="max-height: 500px; overflow: auto">
+		<table
+				id="storesGrid"
+				s='datac,nda,check'
+				s-check="{multiple: multi}"
+				s-data="S.get('/api/store/search', $form.node.serialize())"
+				class="table table-striped table-bordered">
+			<tr>
+				<th>
+					<label class="s-checkbox">
+						<input autocomplete="off" type="checkbox" s-check-role="checkall-h"/>
+						<span class="s-checkbox-indicator"></span>
+					</label>
+				</th>
+				<th>平台</th>
+				<th>平台ID</th>
+				<th>门店</th>
+				<th class="">电话</th>
+				<th class="text-center">地址</th>
+			</tr>
+			<tbody s="loop" s-data-filter="'results'">
+			<tr s-loop-role="empty">
+				<td colspan="6" class="alert alert-warning">
+					暂无门店
+				</td>
+			</tr>
+			<tr s-loop-role="row" s-check-role="i" class="store-row" s="datac">
+				<td>
+					<label class="s-checkbox">
+						<input autocomplete="off" type="checkbox" s-check-role="h" />
+						<span class="s-checkbox-indicator"></span>
+					</label>
+				</td>
+				<td name="typeTitle"></td>
+				<td name="code"></td>
+				<td name="name"></td>
+				<td name="phone"></td>
+				<td name="address"></td>
+			</tr>
+			</tbody>
+			<tfoot>
+			<tr>
+				<td colspan="6" class="text-right">
+					共有<span name="total"></span>个数据
+					<ul s="pagination"
+						s-pagination="{action:function(){$page.node.val(this); $storesGrid.refresh()}}"
+						class="pagination pagination-sm">
+					</ul>
+				</td>
+			</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>
+<script>
+  S.meta.btns = [
+    {
+      name: "选择",
+      style: "btn btn-primary",
+      click: function() {
+        var datas = $storesGrid.getCheckedData();
+        if (datas.length) {
+          S.close(datas);
+        } else {
+          S.toast("您还没有选择门店！", "warning");
+        }
+      }
+    },
+    {
+      name: "关闭",
+      style: "btn btn-default",
+      click: function() {
+        S.close();
+      }
+    }
+  ]
+
+  S.node.delegate('.store-row', 'dblclick', function (e) {
+	  var node = $(e.currentTarget);
+	  S.close([Smart.of(node).data()])
+  })
+</script>

@@ -1,0 +1,126 @@
+<metat title="美团门店商品检测" args="storeId"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<span class="h3">门店商品检测</span>
+		</div>
+		<div class="panel-body">
+			<div class="m-b clearfix">
+				<div class="input-group pull-left" style="width: 250px;">
+					<input type="text" class="form-control" placeholder="选择门店" aria-describedby="sizing-addon2">
+					<a href="javascript:;" s-click="selectStore()" class="input-group-addon">选择</a>
+				</div>
+				<a href="javascript:;" class="btn pull-right btn-warning btn-sm s-loading-icon btn-outline"
+				   s-click="return $foodsGrid.refresh()">
+					<i class="fa fa-refresh s-loading-spinner"></i> 刷新
+				</a>
+			</div>
+			<form id="form" s="valid">
+				<div class="" id="foodsGrid" s='check,datac,nda'
+					 s-data="loadData()" style="max-height: 500px; overflow: auto">
+					<table class="table table-striped table-bordered form-inline table-hover">
+						<tr>
+							<th>图片</th>
+							<th>商品名</th>
+							<th>编码</th>
+							<th class="text-right">报价</th>
+							<th class="text-right">售价</th>
+							<th class="text-right">信息</th>
+							<th class="text-right">操作</th>
+						</tr>
+						<tbody s="loop">
+						<tr s-loop-role="empty">
+							<td colspan="7" class="alert alert-warning">
+								暂无商品
+							</td>
+						</tr>
+						<tr s-loop-role="row" class="food-quote-row" s="datac">
+							<td s="tpl">
+								<input type="hidden" class="food-id" value="{%=this.food.id%}"/>
+							</td>
+							<td>
+								<input type="text" class="form-control" s-valid-error="require()" name="food.name"
+									   readonly/>
+							</td>
+							<td>
+								<input type="text" class="form-control" s-valid-error="require()" name="food.code"/>
+							</td>
+							<td class="text-right" s="tpl">
+								<div class="input-group">
+									<input type="number" class="form-control price" name="price"
+										   data-food-unit="{%=this.quoteUnit%}"
+										   style="width: 80px;" s-valid-error="require(),number()"
+										   value="{%=this.food.price.toFixed(1)%}"/>
+									<span class="input-group-addon">元/{%=this.food.quoteUnit%}</span>
+								</div>
+							</td>
+							<td class="text-right" s="tpl">
+								<div class="input-group">
+									<input type="number" class="form-control sale-price" name="salePrice"
+										   style="width: 80px;" s-valid-error="require(),number()"
+										   value="{%=this.salePrice.toFixed(1)%}"/>
+									<span class="input-group-addon">元/{%=this.food.quoteUnit%}</span>
+								</div>
+							</td>
+							<td s="tpl">
+								<text>{%=this.msgList.join('<br/>')%}</text>
+							</td>
+							<td class="text-right" s="tpl">
+								{%if(this.noFood) {%}
+								<a href="javascript:;" class="btn btn-warning btn-xs" s-click="bindFood(this)">更新</a>
+								{%} else if(this.noSku) {%}
+								<a href="javascript:;" class="btn btn-primary btn-xs">处理SKU</a>
+								{%}%}
+							</td>
+						</tr>
+						</tbody>
+						<tfoot>
+						<tr>
+							<td colspan="7" class="text-right">
+								共有<span name="length"></span>个数据
+							</td>
+						</tr>
+						</tfoot>
+					</table>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+
+	function bindFood($this) {
+		var data = $this.parent().data()
+		S.popupOpen('/storeFood/storeFoodBind.html', {
+			foodName: data.food.name,
+			originFoodCode: data.food.code,
+			skuList: data.food.skuList
+		}).done(function (rs) {
+			if (rs) {
+
+			}
+		})
+	}
+
+	function selectStore() {
+		S.popupOpen('/store/store-selector.html', {multi: false}).done(function (storeList) {
+			if (storeList) {
+				var store = storeList[0]
+				storeId = store.id
+				$foodsGrid.refresh()
+			}
+		}).fail(function () {
+		})
+	}
+	selectStore();
+
+	function loadData() {
+		if (storeId) {
+			return S.get('/api/food/detect-plat-store/' + storeId)
+		} else {
+			return []
+		}
+	}
+
+
+</script>

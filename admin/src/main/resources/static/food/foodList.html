@@ -1,0 +1,606 @@
+<metat title="商品列表"/>
+<style>
+	.page-food-list {
+		display: flex;
+		flex-direction: row;
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		bottom: 0;
+		align-items: stretch;
+	}
+
+	.page-food-list .category-list {
+		/*width: 200px;*/
+		/*margin-right: 20px;*/
+		overflow: auto;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.page-food-list .category-list .nav > li > a {
+		padding: 5px 20px;
+		border-radius: 0;
+	}
+
+	.page-food-list .category-list .nav > li.active > a {
+		background-color: #ffffff;
+		color: #333;
+	}
+
+	.page-food-list .category-list .nav {
+		background-color: #EAEDF1;
+	}
+
+	.page-food-list .category-bar {
+
+	}
+
+	.page-food-list .nav-pills {
+		flex: 1;
+		overflow: auto;
+	}
+
+	.page-food-list .food-list-panel {
+		flex: 1;
+		overflow: auto;
+		display: flex;
+		flex-direction: column;
+		background-color: #ffffff;
+	}
+
+	.page-food-list .food-list-table {
+		flex: 1;
+		overflow: auto;
+		margin-bottom: 10px;
+	}
+
+	.page-food-list .category-bar {
+		background-color: #D9DEE4;
+		padding: 10px;
+	}
+</style>
+<div class="page-food-list clearfix">
+	<div class="category-list">
+		<!--<div class="category-bar">
+			<a href="javascript:;" class="btn btn-xs btn-default s-loading-icon" s-click="return initCategory()"
+			   title="同步校对分类">
+				<i class="fa fa-spinner s-loading-spinner"></i>
+			</a>
+		</div>-->
+		<ul class="nav nav-pills nav-stacked p-b"
+			s="nda,loop"
+			s="tpl"
+			id="foodCategoryList"
+			s-data="categoryList()">
+			<ul s-loop-role="row" s="datac" class="category-li" s-click="findFood(this)">
+				<a href="javascript:;" class="text-ellipsis"><i class="fa fa-angle-right text-info"></i> <span
+						name="name" class="fircategory-name"></span></a>
+
+				<ul class="nav nav-pills nav-stacked p-b form-inline"
+					s="nda,loop"
+					name="foodCategories">
+					<li s-loop-role="row" s="datac,nda" class="category-li">
+						<div class="input-group">&nbsp;&nbsp;
+							<a href="javascript:;" class="text-ellipsis"><i class="fa fa-angle-right text-info"></i> <span
+									name="name" class="category-name"></span></a>
+						</div>
+					</li>>
+				</ul>
+			</ul>
+		</ul>
+	</div>
+	<div class="food-list-panel p ">
+		<div class="m-b clearfix">
+			<form class="form-inline pull-left" id="form">
+				<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品ID"
+					   style="width:100px;" name="foodId"/>
+				<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品编码"
+							 style="width:100px;" name="code"/>
+				<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品名"
+					   style="width:200px;" name="name"/>
+				<input autocomplete="off" type="text" class="form-control input-sm" placeholder="报价单位"
+					   style="width:100px;" name="quoteUnit"/>
+				<input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+				<input type="hidden" class="form-control dropdown-toggle input-sm" placeholder="分类名" id="categoryName"
+					   name="categoryName" data-toggle="dropdown"/>
+				<select class="form-control input-sm" name="emptyQuoteUnit">
+					<option value="">报价单位</option>
+					<option value="true">无报价单位</option>
+					<option value="false">有报价单位</option>
+				</select>
+				<select class="form-control input-sm" name="quotable">
+					<option value="">报价状态</option>
+					<option value="true">可报价</option>
+					<option value="false">不可报价</option>
+				</select>
+				<label class="s-checkbox">
+					<input autocomplete="off" type="checkbox" name="sp" value="1"/>
+					<span class="s-checkbox-indicator"></span> 标品
+				</label>
+				<select class="form-control input-sm" s="select"
+						name="sort"
+						s-build="S.get('/api/enum/valuesMap/core.enums.FoodSort')">
+					<option value="">选择排序</option>
+				</select>
+				<button type="button" class="btn btn-success btn-sm"
+						s-click="$page.node.val(1); $foodsGrid.refresh()">查询
+				</button>
+
+				<button type="button" class="btn btn-info btn-sm"
+						s-click="return exportFood()"><i class="fa fa-download"></i>导出
+				</button>
+
+				<button type="button" class="btn btn-default btn-sm"
+						s-click="return detectProblematicFood()">检测问题商品
+				</button>
+			</form>
+			<div class="pull-right">
+				<input type="button" class="btn btn-sm btn-success" value="新增" s-click="create()"/>
+				<input type="button" class="btn btn-sm btn-success" value="加水印" s-click="addsy()"/>
+				<div class="btn-group">
+					<a href="javascript:;" class="btn btn-warning btn-sm s-loading-icon btn-outline"
+					   s-click="return syncFromMeituan()">
+						<i class="fa fa-refresh s-loading-spinner"></i> 同步美团商品
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="food-list-table">
+			<table
+					id="foodsGrid"
+					s='datac,nda'
+					s-datac="{targets:[$pager]}"
+					s-data="S.get('/api/food/search', $form.node.serialize())"
+					class="table table-striped table-bordered form-inline">
+				<tr>
+					<th>图片</th>
+					<th>视频</th>
+					<th>商品名</th>
+					<th>编码</th>
+					<th class="text-right">参考价/警戒价</th>
+					<th class="text-right">销售加价(%)</th>
+					<th class="text-center">规格</th>
+					<th class="text-center">报价规格</th>
+					<th class="text-center">店铺类目</th>
+					<th class="text-center" style="width: 150px;">美团类目</th>
+					<th class="text-center">创建/更新</th>
+					<th>打标</th>
+					<th class="text-right">排序</th>
+					<th class="text-right">操作</th>
+				</tr>
+				<tbody s="loop" s-data-filter="'results'">
+				<tr s-loop-role="empty">
+					<td colspan="14" class="alert alert-warning">
+						暂无商品
+					</td>
+				</tr>
+				<tr s-loop-role="row" s="datac">
+					<td s="tpl">
+						<img src="{%=this.picture%}" style="max-width: 40px; max-height: 40px;"/>
+					</td>
+					<td s="tpl">
+						<video src="{%=this.video%}" autoplay muted="true"  style="max-width: 40px; max-height: 40px;">
+							您的浏览器不支持播放视频。
+						</video>
+					</td>
+					<td>
+						<div s="tpl">
+							{%if(this.actualFoodId) {%}
+							<label class="label label-info">镜像</label>
+							{%}%}
+							{%if(this.promotional) {%}
+							<label class="label label-warning">促销</label>
+							{%}%}
+							<span name="name">{%=this.name%}</span>
+							<div>ID: <span name="id">{%=this.id%}</span></div>
+						</div>
+					</td>
+					<td>
+						<input autocomplete="off" type="text" class="form-control" style="width: 80px;" name="code"
+							   s-change="codeChange(this)"/>
+					</td>
+					<td class="text-right">
+						<div class="input-group" title="参考价" s="tooltip,datac">
+							<input autocomplete="off" type="number" step="0.1" style="width: 70px;"
+								   class="form-control text-right" name="price.toFixed(1)"
+								   s-change="priceChange(this)"/>
+							<span class="input-group-addon">元</span>
+						</div>
+						<div class="input-group" title="警戒价" s="tooltip,datac">
+							<input autocomplete="off" type="number" step="0.1" style="width: 70px;"
+								   class="form-control text-right" name="warningPrice.toFixed(1)"
+								   s-change="warningPriceChange(this)"/>
+							<span class="input-group-addon">元</span>
+						</div>
+					</td>
+					<td class="text-center">
+						<div class="input-group">
+							<input autocomplete="off" type="number" style="width: 50px;" class="form-control text-right"
+								   name="perIncrease" s-change="perIncreaseChange(this)"/>
+							<span class="input-group-addon">%</span>
+						</div>
+					</td>
+					<td name="unit" class="text-center"></td>
+					<td class="text-center">
+						<input autocomplete="off" type="text" style="width: 80px;" class="form-control text-center"
+							   name="quoteUnit" s-change="quoteUnitChange(this)"/>
+					</td>
+					<td name="categoryName" class="text-center"></td>
+					<td class="text-center" s="tpl">
+						<a href="javascript:;" s-click="setMeituanTag(this)" name="meituanTagName">{%=this.meituanTagName
+							|| '设置'%}</a>
+					</td>
+					<td class="text-center">
+						<label class="label-info label" name="createTime"> </label> <br/>
+						<label class="label label-warning" name="updateTime"> </label>
+					</td>
+					<td s="tpl">
+						{%if(this.quotable) {%}
+						<input type="button" class="btn btn-xs btn-success" value="报价" title="点击关闭报价状态"
+							   s-click="setQuotable(this, false)" s="tooltip"/>
+						{%} else {%}
+						<input type="button" class="btn btn-xs btn-default" value="报价" title="点击开启报价状态"
+							   s-click="setQuotable(this, true)" s="tooltip"/>
+						{%}%}
+						{%if(this.promotional) {%}
+						<input type="button" class="btn btn-xs btn-success" value="促销" title="点击关闭促销状态"
+							   s-click="setPromotional(this, false)" s="tooltip"/>
+						{%} else {%}
+						<input type="button" class="btn btn-xs btn-default" value="促销" title="点击开启促销状态"
+							   s-click="setPromotional(this, true)" s="tooltip"/>
+						{%}%}
+					</td>
+					<td class="text-right">
+						<input type="number" class="form-control text-right" s-change="changeIdx(this)"
+							   style="width: 70px;" name="idx"/>
+					</td>
+					<td class="text-right" s="tpl">
+						<input type="button" class="btn btn-xs btn-outline btn-warning" s-click="skuList(this)"
+							   value="SKU({%=this.skuList.length%})"/>
+						<input type="button" class="btn btn-xs btn-outline btn-warning" s-click="propertieList(this)"
+							   value="属性({%=this.propertieList.length%})"/>
+						<input type="button" class="btn btn-xs btn-success btn-outline" s-click="edit(this)"
+							   value="编辑"/>
+						<div class="p-t-xs">
+							{%if(!this.actualFoodId) {%}
+							<a href="javascript:;" class="btn btn-xs btn-info btn-outline" s-click="bindMirror(this)"
+								 s="tooltip" title="绑定商品，作为其镜像">
+								<i class="fa fa-link"></i>
+							</a>
+							<a href="javascript:;" class="btn btn-xs btn-info btn-outline" s-click="forkMirror(this)"
+								 s="tooltip" title="创建镜像，可用于发布促销">
+								<i class="fa fa-code-fork"></i>
+							</a>
+							{%} else {%}
+							<a href="javascript:;" class="btn btn-xs btn-info btn-outline" s-click="relieveMirror(this)"
+								 s="tooltip" title="解除镜像">
+								<i class="fa fa-chain-broken"></i>
+							</a>
+							{%}%}
+							<a href="javascript:;" class="btn btn-xs btn-info btn-outline"
+							   s-click="generateFoodQuoteReport(this)" s="tooltip" title="生成报价报表">
+								<i class="fa fa-bar-chart"></i>
+							</a>
+							<a href="javascript:;" class="btn btn-warning btn-xs" s-click="batchSoldOut(this)">商品下架</a>
+							<input type="button" class="btn btn-xs btn-danger btn-outline" s-click="del(this)"
+								   value="删除"/>
+						</div>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="text-right" id="pager" s="datac,nda">
+			共有<span name="total"></span>个数据
+			<ul s="pagination"
+				s-pagination="{action:function(){$page.node.val(this); $foodsGrid.refresh()}}"
+				class="pagination pagination-sm">
+			</ul>
+		</div>
+	</div>
+</div>
+<script>
+	function syncFromMeituan() {
+		var deferred = $.Deferred();
+		S.popupOpen('/store/store-selector.html', {multi: false}).done(function (storeList) {
+			if (storeList) {
+				var store = storeList[0]
+				Smart.deferredChain(deferred, S.post("/api/food/sync/meituan/" + store.code).done(function (flag) {
+					if (flag) {
+						S.toast('同步完成', 'success')
+						$foodsGrid.refresh()
+					} else {
+						S.toast('同步失败，请重试', 'danger')
+					}
+				}))
+			} else {
+				deferred.reject()
+			}
+		}).fail(function () {
+			deferred.reject()
+		})
+		return deferred;
+	}
+
+    function batchSoldOut($this) {
+        var data = $this.parent().data()
+        var foodId = data.id
+        S.confirm('确认批量下架所有门店的当前商品吗？').done(function () {
+            var loadingDeferred = S.loading()
+            S.put('/api/store-user-food/sold-out/food/' + foodId).done(function () {
+                S.toast('批量下架商品成功', 'success');
+                $foodsGrid.refresh();
+            }).always(function () {
+                loadingDeferred.resolve()
+            })
+        })
+    }
+
+	function create() {
+        S.popupOpen('/food/food-save.html').done(function (rs) {
+            if (rs) {
+                $foodsGrid.refresh()
+                openSkuList(rs.id)
+            }
+        })
+    }
+
+    function addsy() {
+        S.popupOpen('/food/addsy.html').done(function (rs) {
+            if (rs) {
+                $foodsGrid.refresh()
+                openSkuList(rs.id)
+            }
+        })
+    }
+
+	function trace($this) {
+		var data = $this.parent().data()
+		S.popupOpen('/publishTrace/food-publish-trace.html', {relationId: data.id}).done(function (rs) {
+			rs && $foodsGrid.refresh()
+		})
+	}
+
+	function categoryList() {
+		var deferred = $.Deferred()
+		S.get('/api/food-category/firstcategorylist').done(function (rs) {
+            rs.unshift({name: '全部分类'})
+			deferred.resolve(rs);
+		})
+		return deferred
+	}
+
+	function generateFoodQuoteReport($s) {
+		var data = $s.parent().data()
+		var loading = S.loading();
+		S.put('/api/food-quote-report/generate/' + data.id).done(function () {
+			S.toast('生成成功')
+		}).always(function () {
+			loading.resolve()
+		})
+	}
+
+	function codeTrace($this) {
+		var data = $this.parent().data()
+		S.popupOpen('/publishTrace/food-code-publish-trace.html', {relationId: data.id}).done(function (rs) {
+
+		})
+	}
+
+	function setQuotable($this, flag) {
+		var row = $this.parent().parent()
+		var data = row.data()
+		S.put('/api/food/quotable/' + data.id + '/' + flag).done(function () {
+			data.quotable = flag
+			row.data(data)
+
+		})
+	}
+
+	function setPromotional($this, flag) {
+		var row = $this.parent().parent()
+		var data = row.data()
+		S.put('/api/food/promotional/' + data.id + '/' + flag).done(function () {
+			data.promotional = flag
+			row.data(data)
+
+		})
+	}
+
+	function codeChange($this) {
+		S.put('/api/food/code/' + $this.parent().data().id, {code: $this.node.val()}).done(function () {
+			S.toast('修改成功', 'success')
+		})
+	}
+
+	function priceChange($this) {
+		S.put('/api/food/price/' + $this.parent().data().id, {price: $this.node.val()}).done(function () {
+			S.toast('修改成功', 'success')
+		})
+	}
+
+	function warningPriceChange($this) {
+		S.put('/api/food/warning-price/' + $this.parent().data().id, {warningPrice: $this.node.val()}).done(function () {
+			S.toast('修改成功', 'success')
+		})
+	}
+
+	function perIncreaseChange($this) {
+		S.put('/api/food/per-increase/' + $this.parent().data().id, {perIncrease: $this.node.val()}).done(function () {
+			S.toast('修改成功', 'success')
+		})
+	}
+
+	function quoteUnitChange($this) {
+		S.put('/api/food/quote-unit/' + $this.parent().data().id, {unit: $this.node.val()}).done(function () {
+			S.toast('修改成功', 'success')
+		})
+	}
+
+	function edit($this) {
+		S.popupOpen('/food/food-edit.html', {id: $this.parent().data().id}).done(function (rs) {
+			rs && $foodsGrid.refresh()
+		})
+	}
+
+	function updateCode($this) {
+		var data = $this.parent().data()
+		S.popupOpen('/food/food-code.html', {id: data.id, code: data.code}).done(function (rs) {
+			rs && $foodsGrid.refresh()
+			rs && codeTrace($this)
+		})
+	}
+
+	function del($this) {
+		var data = $this.parent().data()
+		S.confirm('确认删除吗？').done(function (rs) {
+			S.remove('/api/food/' + data.id).done(function (rs) {
+				rs && $foodsGrid.refresh()
+			})
+		})
+	}
+
+	function detectProblematicFood() {
+		return S.get('/api/food/detect-problematic-food').done(function (rs) {
+			$foodsGrid.data({
+				results: rs,
+				page: 1,
+				pageSize: 20,
+				total: rs.length
+			})
+		})
+	}
+
+    function propertieList($this) {
+        openPropertieList($this.parent().data().id, $this.parent())
+    }
+
+    function openPropertieList(id, row) {
+        S.popupOpen('/food/foodPropertieList.html', {id: id}).done(function (rs) {
+            var data = row.data()
+            data.propertieList = rs
+            row.data(data)
+        })
+    }
+
+	function skuList($this) {
+		openSkuList($this.parent().data().id, $this.parent())
+	}
+
+	function openSkuList(id, row) {
+		S.popupOpen('/food/foodSkuList.html', {id: id}).done(function (rs) {
+			var data = row.data()
+			data.skuList = rs
+			row.data(data)
+		})
+	}
+
+	function initCategory() {
+		return S.post('/api/food-category/init').done(function () {
+			$foodCategoryList.refresh()
+		})
+	}
+
+	S.on('s-ready', function () {
+		$foodCategoryList.node.sortable({
+			axis: "y",
+			update: function () {
+				saveCategoryIdx()
+			}
+		});
+	})
+
+	function saveCategoryIdx() {
+		var list = []
+		S.node.find('li.category-li .category-name').each(function (i) {
+			list.push($(this).text())
+		})
+		S.put('/api/food-category/sort', {categoryNameList: list}).done(function () {
+
+		})
+	}
+
+	$foodCategoryList.node.delegate('li.category-li', 'click', function () {
+        event.stopPropagation();
+		var li = $(this)
+		var categoryName = li.find('.category-name').text()
+		$categoryName.node.val(categoryName == '全部分类' ? '' : categoryName)
+		$foodsGrid.refresh()
+		li.addClass('active').siblings('.active').removeClass('active')
+	})
+    function findFood($this) {
+        var parent = $this
+        var nameNode = parent.node.find('.fircategory-name').text()
+        $categoryName.node.val(nameNode == '全部分类' ? '' : nameNode)
+        $foodsGrid.refresh()
+    }
+
+	function setMeituanTag($this) {
+		var row = $this.parent().parent()
+		var data = row.data()
+		S.popupOpen("/meituan-waimai/tag-selector.html", {prefix: 'adv'}).done(function (tag) {
+			if (tag) {
+				S.put('/api/food/meituan-tag/' + data.id, {
+					meituanTagName: tag.namePath,
+					meituanTagId: tag.id
+				}).done(function () {
+					data.meituanTagName = tag.namePath
+					data.meituanTagId = tag.id
+					row.data(data)
+				})
+			}
+		})
+	}
+
+	function forkMirror($this) {
+		var data = $this.parent().data()
+		S.confirm('确认生成镜像商品吗？').done(function () {
+			S.put('/api/food/fork-mirror/' + data.id).done(function () {
+				S.toast('生成镜像商品成功', 'success');
+        $foodsGrid.refresh()
+			})
+		})
+	}
+
+	function relieveMirror($this) {
+		var data = $this.parent().data()
+		S.confirm('确认解除镜像吗？').done(function () {
+			S.remove('/api/food/actual/' + data.id).done(function () {
+				S.toast('解除镜像商品成功', 'success');
+        $foodsGrid.refresh()
+			})
+		})
+	}
+
+	function bindMirror($this) {
+		var data = $this.parent().data()
+		S.popupOpen('/food/foodSelector.html').done((foodList) => {
+      if(foodList) {
+        var food = foodList[0]
+        S.confirm('确认绑定为【' + food.name + '】的镜像商品吗？').done(function () {
+          S.put('/api/food/actual/' + data.id, {actualFoodId: food.id}).done(function () {
+            S.toast('绑定为【' + food.name + '】的镜像商品成功！', 'success');
+          })
+        })
+      }
+		})
+	}
+
+	function changeIdx($this) {
+		if (!$categoryName.node.val()) {
+			S.toast('请先选择分类才能进行排序', 'warning')
+			return
+		}
+		var data = $this.parent().data()
+		S.put('/api/food/sort/' + data.id, {idx: $this.node.val()}).done(function () {
+			$foodsGrid.refresh()
+		})
+	}
+
+	function exportFood() {
+		window.open('/api/food/export?' + $form.node.serialize())
+	}
+</script>

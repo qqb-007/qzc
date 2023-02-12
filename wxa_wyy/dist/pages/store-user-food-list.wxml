@@ -1,0 +1,77 @@
+
+  <view class="container">
+    <view class="search-input-wrapper">
+      <input placeholder="输入商品名进行筛选" class="search-input" bindinput="searchInputChange" value="{{searchFoodName}}"/>
+      <view class="search-input-btn iconfont icon-plus" bindtap="open" data-wpyopen-a="food-list"/>
+    </view>
+    <scroll-view scroll-y class="category-view">
+      <view class="category {{searchParam.foodCategoryName === ' ' ? 'category-selected' : ''}}" bindtap="selectCategory"  wx:key="" data-wpyselectcategory-a=" ">所有分类</view>
+      <block  wx:for="{{foodCategoryList}}">
+        <view class="category {{searchParam.foodCategoryName === item ? 'category-selected' : ''}}" bindtap="selectCategory" wx:key="{{item}}" data-wpyselectcategory-a="{{item}}">{{item}}</view>
+        <block wx:if="{{searchParam.foodCategoryName === item && foodCategoryChildrenMap[item]}}">
+          <view wx:for="{{foodCategoryChildrenMap[item]}}" wx:for-item="child" bindtap="selectCategoryChild" class="category-child {{searchParam.foodCategoryChildName === child.name ? 'category-child-selected' : ''}}" data-wpyselectcategorychild-a="{{child.name}}">
+            {{child.name}}
+          </view>
+        </block>
+      </block>
+    </scroll-view>
+    <picker bindchange="saleChange" mode="selector" value="{{saleIndex}}" range="{{saleList}}">
+      <view class="filter-bar">{{saleShow}}<text class="iconfont status-select-icon icon-unfold"/></view>
+    </picker>
+    <view class="food-list">
+      <block wx:for="{{sufList}}">
+        <view class="food" wx:key="{{item.id}}">
+          <view class="food-info">
+            <image src="{{item.food.picture}}" bindtap="preview" class="food-pic" mode="aspectFill" data-wpypreview-a="{{item.food.picture}}"/>
+            <view class="food-offsale" wx:if="{{!item.sale}}">
+              已下架
+            </view>
+            <view class="food-detail">
+              <view class="food-title">{{item.food.name}}</view>
+              <view class="flex-row space-between align-flex-end">
+                <view class="food-price">售价: ¥ <text class="food-price-val">{{item.quotePriceShow}}</text>元/{{item.foodUnit}}</view>
+              </view>
+              <block wx:if="{{item.quoteStatus === 'WAIT_VERIFY'}}">
+                <view class="flex-row space-between align-flex-end">
+                  <view class="food-price">待审: ¥ <text class="food-price-val">{{item.alterQuotePrice}}</text>元/{{item.foodUnit}}</view>
+                </view>
+              </block>
+            </view>
+          </view>
+          <view class="food-footer">
+            <!--<modal hidden="{{item.hideModel}}" data-idx="{{index}}" title="输入报价{{changePrice == null ? 0 : changePrice}}元/{{item.foodUnit}}" confirm-text="确认" cancel-text="取消" bindcancel="cancel({{index}})" bindconfirm="confirmb">
+              <input class="search-input" placeholder="请输入报价 单位 元" value="{{item.quotePriceShow}}" bindinput="getChange" focus/>
+            </modal>-->
+            <view class="modal-dialog" hidden="{{item.hideModel}}">
+              <view class="modal-title">输入报价{{changePrice == null ? 0 : changePrice}}元/{{item.foodUnit}}</view>
+              <view class="modal-content">
+                <input class="search-input" type="digit" placeholder="请输入报价 单位 元" value="{{changePrice}}" bindinput="getChange" focus="{{!item.hideModel}}"/>
+              </view>
+              <view class="modal-footer">
+                <view class="btn-cancel" bindtap="cancel" data-wpycancel-a="{{index}}">取消</view>
+                <view class="btn-confirm" bindtap="confirmb" data-idx="{{index}}">确定</view>
+              </view>
+            </view>
+            <view class="modal-mask" bindtap="cancel" hidden="{{item.hideModel}}" data-wpycancel-a="{{index}}"/>
+            <i-tag class="i-tags" name="{{item.quoteStatusTitle}}" color="{{item.quoteStatus === 'WAIT_VERIFY' ? 'yellow' : ''}}">
+              {{item.quoteStatusTitle}}
+            </i-tag>
+          </view>
+          <i-tag class="i-tags" color="yellow" wx:if="{{item.warningPrice && item.alterQuotePrice > item.warningPrice}}">此产品价格过高影响销售，请降低报价</i-tag>
+          <view class="food-footer">
+            <view class="food-sale-btn-change" bindtap="modalinput" data-wpymodalinput-a="{{index}}">改价</view>
+            <view class="food-publish-sku-btn" bindtap="publishSku" data-wpypublishsku-a="{{index}}">规格</view>
+            <view class="food-sku-btn" bindtap="addSku" data-wpyaddsku-a="{{index}}">新增</view>
+            <view class="food-sale-btn" wx:if="{{item.sale}}" bindtap="soldOut" data-wpysoldout-a="{{index}}">下架</view>
+            <view class="food-sale-btn-on" wx:if="{{!item.sale}}" bindtap="sale" data-wpysale-a="{{index}}">上架</view>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view class="scrolltop-btn" bindtap="scrollTop">
+      <text class="iconfont icon-fold"/>
+    </view>
+    <view class="talk-btn" wx:if="{{recording == true}}">开始语音</view>
+    <view class="voice-btn" catchtouchstart="streamRecord" catchtouchend="end">按住说话</view>
+    <view class="return" bindtap="back">返回首页</view>
+  </view>

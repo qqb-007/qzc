@@ -1,0 +1,23 @@
+
+  <view class="container">
+    <i-cell-group>
+      <i-cell title="商品名称">
+        <input type="text" slot="footer" value="{{form.foodName}}" class="form-input" bindchange="bindData" data-key="form.foodName" placeholder="请输入商品名称"/>
+      </i-cell>
+      <i-cell title="商品图片">
+        <image src="{{foodPicture ? foodPicture : (form.foodPicture ? form.foodPicture : 'http://imgs.wangxiaocai.cn/adv/1/timg.jpg')}}" slot="footer" class="food-pic" mode="aspectFill" bindtap="selectPicture"/>
+      </i-cell>
+      <i-cell title="规格">
+        <input type="text" slot="footer" value="{{form.unit}}" class="form-input" bindchange="bindData" data-key="form.unit" placeholder="请输入规格"/>
+      </i-cell>
+      <i-cell title="售价"  wx:if="{{!foodId}}">
+        <i-input-number slot="footer" min="0" value="{{form.price}}" max="10000" data-key="form.price" step="0.1" bindchange="bindData"/>
+      </i-cell>
+    </i-cell-group>
+
+    <view class="bottom">
+      <i-button type="error" bindtap="applyFood" disabled="{{!validateOk}}" data-wpyapplyfood-a="">提交</i-button>
+    </view>
+    <i-message id="message"/>
+    <view class="return" bindtap="open" data-wpyopen-a="food-list">返回上页</view>
+  </view>

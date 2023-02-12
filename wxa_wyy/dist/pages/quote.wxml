@@ -1,0 +1,57 @@
+
+  <view class="container">
+    <view class="search-input-wrapper">
+      <input placeholder="输入商品名进行筛选" class="search-input" bindinput="searchInputChange"/>
+    </view>
+    <scroll-view scroll-y class="category-view">
+      <view class="category {{searchParam.categoryName === '' ? 'category-selected' : ''}}" bindtap="selectCategory"  wx:key="" data-wpyselectcategory-a="">所有分类</view>
+      <view  wx:for="{{foodCategoryList}}" class="category {{searchParam.categoryName === item ? 'category-selected' : ''}}" bindtap="selectCategory" wx:key="{{item}}" data-wpyselectcategory-a="{{item}}">{{item}}</view>
+    </scroll-view>
+    <view class="food-list">
+      <block wx:for="{{showQuoted ? quotedFoodList : foodList}}">
+        <view class="food" wx:key="{{item.foodId}}">
+          <view class="food-info" bindtap="toggleSelected" data-wpytoggleselected-a="{{index}}">
+            <image src="{{item.foodPicture}}" class="food-pic" mode="aspectFill"/>
+            <view class="food-detail">
+              <view class="food-title">{{item.foodName}}</view>
+              <view class="flex-row space-between align-flex-end">
+                <view class="food-price">
+                  现价: ¥
+                  <text class="food-price-val">{{item.foodPrice}}</text>
+                  元/{{item.foodUnit}}
+                </view>
+              </view>
+            </view>
+          </view>
+          <view class="food-footer" bindtap="toggleSelected" data-wpytoggleselected-a="{{index}}">
+            <view class="food-checkbox {{item.checked && 'food-checkbox-checked'}}">
+              <text class="iconfont icon-check" wx:if="{{item.checked}}"/>
+            </view>
+            <i-input-number value="{{item.quotePrice || item.foodPrice}}" min="0" max="10000" data-idx="{{index}}" step="0.1" bindchange="quotePriceChange"/>
+          </view>
+          <view class="food-footer">
+            <i-tag class="i-tags" name="{{item.sale ? '已上架' : '已下架'}}" color="{{item.sale ? 'green' : 'default'}}">
+              {{item.sale ? '已上架' : '已下架'}}
+            </i-tag>
+            <view class="food-sale-btn" wx:if="{{item.sale}}" bindtap="soldOut" data-wpysoldout-a="{{index}}">下架</view>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view class="footer-bar">
+      <view class="footer-bar-info">已报
+        <text class="footer-bar-info-val">{{quotedFoodList.length}}</text>
+        个
+      </view>
+      <view class="switch-bar">
+        <i-switch value="{{showQuoted}}" size="large"  bind:change="showQuotedSwitchChange">
+          <view slot="open">隐藏</view>
+          <view slot="close">查看</view>
+        </i-switch>
+      </view>
+      <view class="footer-bar-btn activeable" bindtap="submit">提交</view>
+    </view>
+    <view class="scrolltop-btn" bindtap="scrollTop">
+      <text class="iconfont icon-fold"/>
+    </view>
+  </view>

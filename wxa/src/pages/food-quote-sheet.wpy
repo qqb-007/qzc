@@ -1,0 +1,201 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+  .container {
+    padding: 10px;
+    background-color: #efeff4;
+    font-size: 16px;
+  }
+  .sheet {
+    border: 1rpx solid #ddd;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+    &-head {
+      font-size: 14px;
+      background-color: #f9f9f9;
+      padding: 8px 0;
+      color: #fff;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    &-status {
+      margin-right: 10px;
+      font-size: 12px;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+    &-id {
+      height: 24px;
+      padding: 0 6px;
+      line-height: 24px;
+      font-size: 16px;
+      background-color: @color-success;
+    }
+    &-create {
+      font-size: 12px;
+    }
+    &-body {
+      padding: 10px 15px;
+    }
+    &-detail {
+      flex: 1;
+      font-size: 16px;
+    }
+    &-divide {
+      border-top: 1rpx dashed #ddd;
+      margin: 10px 0;
+    }
+    &-footer{
+      font-size: 12px;
+      color: @color-muted;
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <block wx:for="{{sheetList}}" wx:key="{{item.id}}">
+      <view class="sheet" @tap="showDetail({{item.id}})">
+        <view class="sheet-head flex-row space-between">
+          <view class="sheet-id">{{item.id}}</view>
+          <view class="sheet-status" style="background-color: {{item.statusColor}}">{{item.statusTitle}}</view>
+        </view>
+        <view class="sheet-body">
+          <view class="flex-row space-between align-center">
+            <view class="sheet-detail">商品：{{item.foodNum}}</view>
+            <i-tag
+              class="i-tags"
+              name="{{item.publishStatusTitle}}"
+              color="{{item.publishStatusColor}}">{{item.publishStatusTitle}}</i-tag>
+          </view>
+          <view class="sheet-divide"></view>
+          <view class="sheet-footer">
+            <view>创建：{{item.createTime}}</view>
+            <view wx:if="{{item.publishTime}}">发布：{{item.publishTime}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <i-divider content="我是有底线的" wx:if="{{!hasNext}}"></i-divider>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  let Deferred = require('../utils/deferred')
+  let api = require('../utils/api')
+  let color = require('../utils/color')
+  const DEFAULT_SEARCH_PARAM = {
+    page: 1
+  }
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的报价单',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark',
+      // backgroundColor: '#efeff4',
+      'usingComponents': {
+        'i-tag': '../iview/tag/index',
+        'i-divider': '../iview/divider/index'
+      }
+    }
+    components = {}
+
+    data = {
+      searchParam: Object.assign({}, DEFAULT_SEARCH_PARAM),
+      loading: false,
+      hasNext: true,
+      sheetList: []
+    }
+
+    methods = {
+      showDetail(id) {
+        wx.navigateTo({
+          url: 'food-quote-sheet-detail?foodQuoteSheetId=' + id
+        })
+      }
+    }
+
+    computed() {
+
+    }
+
+    events = {}
+
+    resetSearchParam () {
+      Object.assign(this.searchParam, DEFAULT_SEARCH_PARAM)
+      this.hasNext = true
+    }
+
+    onPullDownRefresh() {
+      this.resetSearchParam()
+      this.search().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    onReachBottom() {
+      if (this.hasNext) {
+        this.searchParam.page++
+        this.search(true)
+      }
+    }
+
+    search (append, callback) {
+      wx.showLoading({
+        title: '加载中'
+      })
+      return api.foodQuoteSheet.search(this.searchParam).done((rs) => {
+        this.handleSheetList(rs.data.results)
+        if (append) {
+          this.sheetList = this.sheetList.concat(rs.data.results)
+        } else {
+          this.sheetList = rs.data.results
+        }
+        let paging = rs.data
+        this.hasNext = paging.hasNext
+        this.$apply()
+      }).always(() => {
+        wx.hideLoading()
+        callback && callback()
+      })
+    }
+
+    handleSheetList(sheetList) {
+      sheetList.forEach(sheet => {
+        sheet.statusColor = this.getStatusStyle(sheet.status)
+        sheet.publishStatusColor = this.getPublishStatusStyle(sheet.publishStatus)
+      })
+    }
+
+    getStatusStyle(status) {
+      switch (status) {
+        case 'WAIT_VERIFY': return color.warning
+        case 'VERIFY_SUCCESS': return color.success
+        case 'VERIFY_FAIL': return color.danger
+      }
+    }
+
+    getPublishStatusStyle(status) {
+      switch (status) {
+        case 'WAIT': return 'yellow'
+        case 'SUCCESS': return 'green'
+        case 'FAIL': return 'red'
+      }
+    }
+
+    onLoad() {
+      Deferred.when(this.search()).always(() => {
+        this.loaded = true
+      })
+    }
+  }
+</script>

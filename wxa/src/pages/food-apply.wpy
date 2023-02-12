@@ -1,0 +1,312 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+
+  @import "../css/var";
+
+  .container {
+
+  }
+
+  .panel {
+    padding: 20px;
+    background-color: #ffffff;
+  }
+
+  .bank {
+    &-card {
+      height: 60px;
+      border-radius: 5px;
+      background-image: linear-gradient(to right, #65AFE4, #1DB8A3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      &-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 54px;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #1DB8A3;
+        .iconfont {
+          font-size: 34px;
+        }
+      }
+    }
+    &-name {
+      color: #ffffff;
+      font-size: 14px;
+    }
+    &-account {
+      color: #ffffff;
+      font-size: 16px;
+    }
+    &-owner {
+      color: #ffffff;
+      font-size: 18px;
+    }
+  }
+
+  .tip {
+    color: @color-muted;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 5px;
+  }
+
+  .money {
+    font-size: 14px;
+    margin-top: 20px;
+    color: @color-title;
+    &-value {
+      font-size: 20px;
+      color: @color-danger;
+    }
+  }
+
+  .withdraw-input {
+    border-bottom: 1rpx solid #ddd;
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    &-y {
+      font-size: 18px;
+      color: #000;
+      width: 30px;
+      text-align: center;
+    }
+    &-val {
+      flex: 1;
+      height: 40px;
+      font-size: 20px;
+      line-height: 40px;
+    }
+  }
+
+  .bottom {
+    padding-top: 20rpx;
+  }
+
+  .form-input {
+    font-size: 14px;
+  }
+
+  .food-pic {
+    width: 100px;
+    height: 100px;
+  }
+  .return {
+    box-shadow: 0px 0px 10px rgba(102, 102, 102, 0.39);
+    width: 26%;
+    height: 40px;
+    padding: 0 5px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    background-color: #495060;
+    position: fixed;
+    right: 37%;
+    left: 37%;
+    bottom: 0px;
+    border-radius: 10px;
+    color: #ffffff;
+    z-index: 10;
+  }
+</style>
+<template>
+  <view class="container">
+    <i-cell-group>
+      <i-cell title="商品名称">
+        <input type="text" slot="footer" value="{{form.foodName}}" class="form-input" @change="bindData" data-key="form.foodName" placeholder="请输入商品名称"/>
+      </i-cell>
+      <i-cell title="商品图片">
+        <image src="{{foodPicture ? foodPicture : (form.foodPicture ? form.foodPicture : 'http://imgs.wangxiaocai.cn/adv/1/timg.jpg')}}"
+               slot="footer" class="food-pic" mode="aspectFill" @tap="selectPicture"></image>
+      </i-cell>
+      <i-cell title="规格">
+        <input type="text" slot="footer" value="{{form.unit}}" class="form-input" @change="bindData" data-key="form.unit" placeholder="请输入规格"/>
+      </i-cell>
+      <i-cell title="售价" wx:if="{{!foodId}}">
+        <i-input-number slot="footer" min="0" value="{{form.price}}" value="{{form.price}}" max="10000" data-key="form.price" step="0.1" @change="bindData"/>
+      </i-cell>
+    </i-cell-group>
+
+    <view class="bottom">
+      <i-button type="error" @tap="applyFood()" disabled="{{!validateOk}}">提交</i-button>
+    </view>
+    <i-message id="message"/>
+    <view class="return" @tap="open('food-list')">返回上页</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Bind from '../mixins/bind'
+
+  let $Message = require('../iview/base/index').$Message
+
+  let api = require('../utils/api')
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '商品申请',
+      enablePullDownRefresh: true,
+      backgroundColor: '#efeff4',
+      usingComponents: {
+        'i-input': '../iview/input/index',
+        'i-input-number': '../iview/input-number/index',
+        'i-button': '../iview/button/index',
+        'i-cell-group': '../iview/cell-group/index',
+        'i-cell': '../iview/cell/index',
+        'i-message': '../iview/message/index'
+      }
+    }
+    mixins = [Bind]
+
+    data = {
+      validateOk: false,
+      foodPicture: '',
+      foodId: 0,
+      form: {
+        foodName: '',
+        unit: '',
+        price: 0,
+        foodPicture: ''
+      }
+    }
+
+    watch = {
+      form() {
+        this.validateOk = this.validate()
+      }
+    }
+
+    methods = {
+      selectPicture() {
+        let self = this
+        wx.chooseImage({
+          count: 1,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['album', 'camera'],
+          success(res) {
+            // tempFilePath可以作为img标签的src属性显示图片
+            const tempFilePaths = res.tempFilePaths
+            self.foodPicture = tempFilePaths[0]
+            self.$apply()
+          }
+        })
+      },
+      back() {
+        wx.navigateBack({
+          delta: 1
+        })
+      },
+      open(url) {
+        wx.redirectTo({
+          url: url
+        })
+      }
+    }
+
+    events = {}
+
+    validate(showFlag) {
+      if (this.data.form.foodName.trim().length < 1) {
+        showFlag && this.showMsg('请填写商品名')
+        return false
+      }
+      if (this.data.foodPicture.length < 1) {
+        showFlag && this.showMsg('请上传图片')
+        return false
+      }
+      if (this.data.form.unit.length < 1) {
+        showFlag && this.showMsg('请填写商品规格')
+        return false
+      }
+      if (this.data.form.price <= 0) {
+        showFlag && this.showMsg('商品报价输入不正确')
+        return false
+      }
+      return true
+    }
+
+    showMsg(msg, type = 'error') {
+      $Message({
+        content: msg,
+        type: type,
+        duration: 3
+      })
+    }
+
+    applyFood() {
+      let self = this
+      if (!this.validate(true)) {
+        return
+      }
+      if (!this.foodPicture) {
+        this.doApply()
+        return
+      }
+      wx.showLoading()
+      api.aliyun.sts.acs({
+        filename: self.foodPicture.substring(self.foodPicture.lastIndexOf('/'))
+      }).done(rs => {
+        wx.uploadFile({
+          url: rs.data.uploadUrl,
+          filePath: self.foodPicture,
+          name: 'file',
+          formData: rs.data.formData,
+          success(res) {
+            self.form.foodPicture = rs.data.objectUrl
+            self.doApply()
+          }
+        })
+      }).fail(() => {
+        wx.hideLoading()
+        this.showMsg('文件上传失败')
+      })
+    }
+
+    doApply() {
+      api.storeFoodApplication.apply(this.form).done(rs => {
+        wx.showModal({
+          title: '提示',
+          content: '商品申请已经提交，客服会即时审核，请等待！',
+          success(res) {
+            wx.navigateBack()
+          }
+        })
+      }).always(() => {
+        wx.hideLoading()
+      })
+    }
+
+    onPullDownRefresh() {
+    }
+
+    onLoad(options) {
+      // wx.startPullDownRefresh()
+      // this.loadData()
+      if (options.foodName) {
+        this.form.foodName = options.foodName
+      }
+      if (options.foodId) {
+        this.foodId = options.foodId
+        api.page.storeFoodApplicationApply({foodId: options.foodId}).done(rs => {
+          let data = rs.data
+          this.form.foodPicture = data.foodPicture
+          this.form.foodName = data.foodName
+          this.form.price = data.foodPrice
+          this.$apply()
+        })
+      }
+    }
+  }
+</script>

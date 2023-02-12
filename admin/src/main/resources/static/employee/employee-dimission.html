@@ -1,0 +1,45 @@
+<meta title="选择交接人" width="650px" args="employeeId"/>
+<form role="form" id="employeeForm" s="valid,form"
+	  class=""
+	  method="put"
+	  style="padding: 20px;" action="/api/employee/dimission/{employeeId}">
+	<div class="input-group">
+
+		<input type="text" id="employeeName" class="form-control" readonly >
+		<input type="hidden" id="employeeId" class="form-control" readonly name="handOverEmployeeId">
+		<div class="input-group-btn">
+			<input type="button" class="btn btn-default" value="选择交接人" s-click="selectEmployee()">
+		</div>
+	</div>
+</form>
+<script type="text/javascript">
+	S.meta.btns = [
+		{
+			name: "保存",
+			style: "btn btn-primary",
+			click: function () {
+				return S.S("#employeeForm").submit().done(function (rs) {
+					S.close(true);
+					S.toast("新增管理员成功", "success");
+				});
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function selectEmployee() {
+		S.popupOpen('/employee/employeeSelector.html', {multi: false}).done(function (list) {
+			if (list) {
+				var employee = list[0]
+				$employeeName.node.val(employee.name)
+				$employeeId.node.val(employee.id)
+			}
+		})
+	}
+</script>

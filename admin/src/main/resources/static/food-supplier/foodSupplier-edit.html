@@ -1,0 +1,60 @@
+<meta title="新建供应商" width="650px" args="foodSupplier"/>
+<form role="form" id="foodSupplierForm" s="valid,form,datac,nda"
+			class="form-horizontal"
+			method="put"
+			s-data="foodSupplier"
+			style="padding: 20px;" action="/api/food-supplier/{foodSupplier.id}">
+	<div class="form-group" s-valid-role="item">
+		<label class="col-sm-2 control-label">手机号：</label>
+		<div class="col-sm-10">
+			<input autocomplete="off" type="text" name="phone" class="form-control" placeholder="手机号"
+						 s-valid-error="require()">
+		</div>
+	</div>
+	<div class="form-group" s-valid-role="item">
+		<label class="col-sm-2 control-label">姓名：</label>
+		<div class="col-sm-10">
+			<input autocomplete="off" type="text" name="name" class="form-control" placeholder="姓名"
+						 s-valid-error="require()">
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-2 control-label">加价方式：</label>
+		<div class="col-sm-10">
+			<select class="form-control input-sm" s="select"
+							name="priceIncreaseType"
+							s-build="S.get('/api/enum/valuesMap/core.enums.FoodSupplierPriceIncreaseType')">
+			</select>
+		</div>
+	</div>
+	<div class="form-group" s-valid-role="item">
+		<label class="col-sm-2 control-label">地址：</label>
+		<div class="col-sm-10">
+			<input autocomplete="off" type="text" name="address" class="form-control"
+						 placeholder="地址" s-valid-error="require()">
+		</div>
+	</div>
+</form>
+<script type="text/javascript">
+	S.on('s-ready', function () {
+	})
+
+	S.meta.btns = [
+		{
+			name: "保存",
+			style: "btn btn-primary",
+			click: function () {
+				return S.S("#foodSupplierForm").submit().done(function (rs) {
+					S.close(true);
+				});
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+</script>

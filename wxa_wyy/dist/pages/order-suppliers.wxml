@@ -1,0 +1,73 @@
+<wxs src="../wxs/utils.wxs" module="utils"/>
+
+  <view class="container">
+    <view  wx:for="{{supplierGroupList}}" wx:key="{{item.id}}" class="supplier-info">
+      <view class="flex-row space-between align-center" bindtap="showSupplierInfo" data-wpyshowsupplierinfo-a="{{index}}">
+        <text class="supplier-name">{{item.supplierName ? item.supplierName : '默认供应商'}}</text>
+        <text class="iconfont {{item.supplierShow ? 'icon-fold' : 'icon-unfold'}}"/>
+      </view>
+      <block wx:if="{{item.supplierShow}}">
+        <view class="supplier-phone" wx:if="{{item.supplierPhone}}"><text class="iconfont icon-phone supplier-icon"/> <text bindtap="tel" data-wpytel-a="{{item.supplierPhone}}">{{item.supplierPhone}}</text></view>
+        <view class="supplier-address" wx:if="{{item.supplierAddress}}"><text class="iconfont icon-dizhi supplier-icon"/> {{item.supplierAddress}}</view>
+        <view class="supplier-divide"/>
+        <view class="supplier-detail-list">
+          <view class="supplier-detail" wx:for="{{item.orderDetailList}}" bindtap="preview" wx:for-item="detail" wx:key="{{detai.id}}" data-wpypreview-a="{{detail.foodPicture}}">
+            <view class="flex-row space-between">
+              <image src="{{detail.foodPicture}}?x-oss-process=style/xs" class="supplier-food-pic" mode="aspectFill"/>
+              <view class="supplier-food-name">{{detail.foodName}}({{detail.spec}})</view>
+              <view>
+                <view class="supplier-food-quantity">×{{detail.quantity}}</view>
+              </view>
+              <view class="supplier-food-quantity">
+                <block wx:if="{{detail.refundQuantity}}">
+                  <text class="supplier-food-quantity-label">退</text>
+                  <text>×{{detail.refundQuantity}}</text>
+                </block>
+              </view>
+              <view class="supplier-food-total">¥{{utils.toFixed(detail.supplierIncome, 1)}}</view>
+            </view>
+            <view class="supplier-food-quote-bar">
+              <view class="supplier-food-quote">
+                <text class="supplier-food-quote-label">供应:</text>
+                <text>¥{{utils.toFixed(detail.supplierQuotePrice, 1)}}/{{detail.quoteUnit}}</text>
+              </view>
+              <view class="supplier-food-quote">
+                <text class="supplier-food-quote-label">我的:</text>
+                <text>¥{{utils.toFixed(detail.quotePrice, 1)}}/{{detail.quoteUnit}}</text>
+              </view>
+              <view class="supplier-food-quote">
+                <text class="supplier-food-quote-label">收入:</text>
+                <text>¥{{utils.toFixed(detail.merchantIncome, 1)}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <!--<view class="supplier-fee-row" style="margin-top: 10px;">-->
+        <!--<view class="supplier-fee-label">供应商总金额：</view>-->
+        <!--<view class="supplier-fee-val">¥{{utils.toFixed(item.totalMoney, 1)}}</view>-->
+      <!--</view>-->
+      <!--<view class="supplier-fee-row" wx:if="{{item.refundMoney}}">-->
+        <!--<view class="supplier-fee-label">供应商退款：</view>-->
+        <!--<view class="supplier-fee-val">¥{{utils.toFixed(item.refundMoney, 1)}}</view>-->
+      <!--</view>-->
+      <view class="supplier-fee-row">
+        <view class="supplier-fee-label">供应商应结：</view>
+        <view class="supplier-fee-val">¥{{utils.toFixed(item.remainMoney, 1)}}</view>
+      </view>
+      <view class="supplier-fee-row">
+        <view class="supplier-fee-label">我的收入：</view>
+        <view class="supplier-fee-val">¥{{utils.toFixed(item.merchantIncome, 1)}}</view>
+      </view>
+    </view>
+    <view class="footer">
+      <view class="footer-item">
+        <text class="footer-item-label">总应付：</text>
+        <text class="footer-item-fee">¥{{utils.toFixed(supplierRemainMoney, 1)}}</text>
+      </view>
+      <view class="footer-item">
+        <text class="footer-item-label">我的收入：</text>
+        <text class="footer-item-fee text-warning">¥{{utils.toFixed(merchantRemainMoney, 1)}}</text>
+      </view>
+    </view>
+  </view>

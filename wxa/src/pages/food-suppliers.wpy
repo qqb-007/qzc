@@ -1,0 +1,135 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+  .container {
+    padding: 10px;
+  }
+  .supplier {
+    &-info {
+      background-color: #ffffff;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      position: relative;
+    }
+    &-name {
+      font-size: 18px;
+      margin-bottom: 5px;
+      color: @color-primary;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      &:before {
+        content: " ";
+        border-radius: 3px;
+        width: 3px;
+        height: 14px;
+        display: inline-block;
+        background-color: @color-warning;
+        margin-right: 4px;
+      }
+    }
+    &-phone {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    &-address {
+      font-size: 14px;
+    }
+    &-icon {
+      font-size: 14px;
+      color: @color-muted;
+    }
+    &-status {
+      font-size: 12px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 18px;
+      line-height: 18px;
+      border-bottom-left-radius: 9px;
+      color: #ffffff;
+      padding: 0 6px;
+      &-VALID {
+        background-color: @color-success;
+      }
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view wx:for="{{foodSupplierList}}" wx:key="{{item.id}}" class="supplier-info" @tap="open('/pages/supplier-food-list?foodSupplierId={{item.id}}')">
+      <view class="supplier-name">{{item.name}}</view>
+      <view class="supplier-phone"><text class="iconfont icon-phone supplier-icon"></text> <text @tap="tel({{item.phone}})">{{item.phone}}</text></view>
+      <view class="supplier-address"><text class="iconfont icon-dizhi supplier-icon"></text> {{item.address}}</view>
+      <view class="supplier-status supplier-status-{{item.status}}">{{item.statusTitle}}</view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let api = require('../utils/api')
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的供应商',
+      enablePullDownRefresh: true,
+      usingComponents: {
+        'i-input': '../iview/input/index',
+        'i-button': '../iview/button/index',
+        'i-cell-group': '../iview/cell-group/index',
+        'i-cell': '../iview/cell/index'
+      }
+    }
+    mixins = []
+
+    data = {
+      foodSupplierList: []
+    }
+
+    watch = {}
+
+    methods = {
+      open(url) {
+        wx.navigateTo({
+          url
+        })
+      },
+      tel(phone) {
+        if (!phone) {
+          return
+        }
+        wx.makePhoneCall({
+          phoneNumber: phone // 仅为示例，并非真实的电话号码
+        })
+      }
+    }
+
+    events = {}
+
+    onPullDownRefresh() {
+      this.loadData().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    loadData() {
+      return api.foodSupplier.listOfCurrent().done(rs => {
+        const data = rs.data
+        this.foodSupplierList = data
+        this.$apply()
+      })
+    }
+
+    onLoad() {
+      wx.startPullDownRefresh()
+    }
+  }
+</script>

@@ -1,0 +1,118 @@
+<metat title="结算详情" args="id,settlementOrder:_model_" model="S.get('/api/settlement-sheet/' + id)" width="1000"/>
+<style>
+
+</style>
+<div class="p" s="nda,datac" s-data="settlementOrder">
+	<table class="table table-stripped table-bordered">
+		<caption>结算单信息</caption>
+		<tr>
+			<th>ID</th>
+			<th>账单</th>
+			<th>商家</th>
+			<th class="text-right">订单金额</th>
+			<th class="text-right">餐损金额</th>
+			<th class="text-right">部分退款金额</th>
+			<th class="text-right">扣点金额</th>
+			<th class="text-right">结算金额</th>
+			<th class="text-center">状态</th>
+			<th class="text-center">创建时间</th>
+		</tr>
+		<tr s-loop-role="row" s="datac">
+			<td name="id"></td>
+			<td s="tpl">
+				<span>{%=this.startDate.replace(/-/g, '.')%}</span> - <span>{%=this.endDate && this.endDate.replace(/-/g, '.').substring(5)%}</span>
+			</td>
+			<td>
+				<span name="storeUser.name"></span>
+				<div>
+					ID：<span name="storeUser.id"></span>
+				</div>
+			</td>
+			<td class="text-right" name="orderAmount"></td>
+			<td class="text-right" name="cansunAmount"></td>
+			<td class="text-right" name="partRefundAmount"></td>
+			<td class="text-right" name="deductAmount"></td>
+			<td class="text-right" name="settlementAmount"></td>
+			<td s="tpl" class="text-center">
+				<label class="label
+                            {%
+                                switch(this.status) {
+                                    case 'WAIT_CHECK': out.print('label-danger'); break;
+                                    case 'WAIT_SETTLE': out.print('label-warning'); break;
+                                    case 'SETTLED': out.print('label-success'); break;
+                                    case false: out.print('label-default'); break;
+                                }
+                            %}
+                            ">{%=this.statusTitle%}</label>
+			</td>
+			<td name="createTime" class="text-center"></td>
+		</tr>
+
+	</table>
+	<table class="table table-stripped table-bordered">
+		<caption>日结算明细</caption>
+		<tr>
+			<th>日期</th>
+			<th class="text-center">订单数量</th>
+			<th class="text-center">退款数量</th>
+			<th class="text-center">总金额</th>
+			<th class="text-center">退款金额</th>
+			<th class="text-center">餐损金额</th>
+			<th class="text-center">扣点金额</th>
+			<th class="text-center">结算金额</th>
+			<th class="text-right">明细</th>
+		</tr>
+		<tbody s='loop' s-data-filter="'detailList'">
+		<tr s-loop-role="row" s="datac">
+			<td name="date"></td>
+			<td class="text-center" name="orderNum"></td>
+			<td class="text-center" name="partRefundNum"></td>
+			<td class="text-center" name="orderAmount"></td>
+			<td class="text-center" name="partRefundAmount"></td>
+			<td class="text-center" name="cansunAmount"></td>
+			<td class="text-center" name="deductAmount"></td>
+			<td class="text-center" name="settlementAmount"></td>
+			<td class="text-right">
+				<a href="javascript:;" s-click="showDetail(this)" class="btn btn-xs btn-link">详情</a>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<script>
+	var btns = [
+		{
+			name: "结算到账户",
+			style: "btn btn-warning",
+			click: function () {
+				S.confirm('确认结算到余额吗？').done(function() {
+					var deferred = S.loading()
+					S.put('/api/settlement-sheet/settle/' + id).done(function(rs) {
+						if(rs.success) {
+							S.toast('结算成功', 'success')
+							S.close(true)
+						} else {
+							S.alert(rs.msg, 'danger')
+						}
+
+					}).always(function() {
+						deferred.resolve()
+					})
+				})
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+	S.meta.btns = btns;
+
+	function showDetail($this) {
+		var data = $this.parent().data();
+		S.popupOpen('/settlement/settlementSheetOrderList.html?', {settlementSheetDetailId: data.id})
+	}
+</script>

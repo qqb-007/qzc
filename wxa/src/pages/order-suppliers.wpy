@@ -1,0 +1,294 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+  .container {
+    padding: 10px;
+    padding-bottom: 100px;
+  }
+  .supplier {
+    &-divide {
+      border-bottom: 1rpx dashed #ddd;
+      margin: 10px 0;
+    }
+    &-info {
+      background-color: #ffffff;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      position: relative;
+    }
+    &-name {
+      font-size: 18px;
+      margin-bottom: 5px;
+      color: @color-primary;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      &:before {
+        content: " ";
+        border-radius: 3px;
+        width: 3px;
+        height: 14px;
+        display: inline-block;
+        background-color: @color-warning;
+        margin-right: 4px;
+      }
+    }
+    &-phone {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    &-address {
+      font-size: 14px;
+    }
+    &-icon {
+      font-size: 14px;
+      color: @color-muted;
+    }
+    &-detail {
+      font-size: 16px;
+      border-bottom: 1rpx dashed #ddd;
+      padding: 10px 0;
+      &-list {
+
+      }
+    }
+    &-food {
+      &-pic {
+        border-radius: 3px;
+        width: 30px;
+        height: 30px;
+        margin-right: 2px;
+      }
+      &-name {
+        font-size: 14px;
+        /*font-weight: bold;*/
+        flex: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      &-quantity {
+        font-size: 14px;
+        font-weight: bold;
+        flex: 1;
+        &-label {
+          font-size: 12px;
+          font-weight: normal;
+        }
+      }
+      &-quote {
+        font-size: 14px;
+        color: @color-warning;
+        margin-top: 10px;
+        flex: 1;
+        &-label {
+          color: @color-muted;
+        }
+        &-bar {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+      }
+      &-total {
+        font-size: 14px;
+        /*font-weight: bold;*/
+        flex: 1;
+        text-align: right;
+      }
+    }
+    &-fee {
+      &-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+      &-label {
+        font-size: 14px;
+      }
+      &-val {
+        font-size: 16px;
+        color: @color-success;
+      }
+    }
+  }
+  .footer {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 50px;
+    background-color: #ffffff;
+    border-top: 1rpx solid #ddd;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 100;
+    &-item {
+      &-label {
+        color: @color-muted;
+      }
+      &-fee {
+        color: @color-success;
+      }
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view wx:for="{{supplierGroupList}}" wx:key="{{item.id}}" class="supplier-info">
+      <view class="flex-row space-between align-center" @tap="showSupplierInfo({{index}})">
+        <text class="supplier-name">{{item.supplierName ? item.supplierName : '默认供应商'}}</text>
+        <text class="iconfont {{item.supplierShow ? 'icon-fold' : 'icon-unfold'}}"></text>
+      </view>
+      <block wx:if="{{item.supplierShow}}">
+        <view class="supplier-phone" wx:if="{{item.supplierPhone}}"><text class="iconfont icon-phone supplier-icon"></text> <text @tap="tel({{item.supplierPhone}})">{{item.supplierPhone}}</text></view>
+        <view class="supplier-address" wx:if="{{item.supplierAddress}}"><text class="iconfont icon-dizhi supplier-icon"></text> {{item.supplierAddress}}</view>
+        <view class="supplier-divide"></view>
+        <view class="supplier-detail-list">
+          <view class="supplier-detail" wx:for="{{item.orderDetailList}}" @tap="preview({{detail.foodPicture}})" wx:for-item="detail" wx:key="{{detai.id}}">
+            <view class="flex-row space-between">
+              <image src="{{detail.foodPicture}}?x-oss-process=style/xs" class="supplier-food-pic" mode="aspectFill"></image>
+              <view class="supplier-food-name">{{detail.foodName}}({{detail.spec}})</view>
+              <view>
+                <view class="supplier-food-quantity">×{{detail.quantity}}</view>
+              </view>
+              <view class="supplier-food-quantity">
+                <block wx:if="{{detail.refundQuantity}}">
+                  <text class="supplier-food-quantity-label">退</text>
+                  <text>×{{detail.refundQuantity}}</text>
+                </block>
+              </view>
+              <view class="supplier-food-total">¥{{utils.toFixed(detail.supplierIncome, 1)}}</view>
+            </view>
+            <view class="supplier-food-quote-bar">
+              <view class="supplier-food-quote">
+                <text class="supplier-food-quote-label">供应:</text>
+                <text>¥{{utils.toFixed(detail.supplierQuotePrice, 1)}}/{{detail.quoteUnit}}</text>
+              </view>
+              <view class="supplier-food-quote">
+                <text class="supplier-food-quote-label">我的:</text>
+                <text>¥{{utils.toFixed(detail.quotePrice, 1)}}/{{detail.quoteUnit}}</text>
+              </view>
+              <view class="supplier-food-quote">
+                <text class="supplier-food-quote-label">收入:</text>
+                <text>¥{{utils.toFixed(detail.merchantIncome, 1)}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      <!--<view class="supplier-fee-row" style="margin-top: 10px;">-->
+        <!--<view class="supplier-fee-label">供应商总金额：</view>-->
+        <!--<view class="supplier-fee-val">¥{{utils.toFixed(item.totalMoney, 1)}}</view>-->
+      <!--</view>-->
+      <!--<view class="supplier-fee-row" wx:if="{{item.refundMoney}}">-->
+        <!--<view class="supplier-fee-label">供应商退款：</view>-->
+        <!--<view class="supplier-fee-val">¥{{utils.toFixed(item.refundMoney, 1)}}</view>-->
+      <!--</view>-->
+      <view class="supplier-fee-row">
+        <view class="supplier-fee-label">供应商应结：</view>
+        <view class="supplier-fee-val">¥{{utils.toFixed(item.remainMoney, 1)}}</view>
+      </view>
+      <view class="supplier-fee-row">
+        <view class="supplier-fee-label">我的收入：</view>
+        <view class="supplier-fee-val">¥{{utils.toFixed(item.merchantIncome, 1)}}</view>
+      </view>
+    </view>
+    <view class="footer">
+      <view class="footer-item">
+        <text class="footer-item-label">总应付：</text>
+        <text class="footer-item-fee">¥{{utils.toFixed(supplierRemainMoney, 1)}}</text>
+      </view>
+      <view class="footer-item">
+        <text class="footer-item-label">我的收入：</text>
+        <text class="footer-item-fee text-warning">¥{{utils.toFixed(merchantRemainMoney, 1)}}</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let api = require('../utils/api')
+
+  import utilsWxs from '../wxs/utils.wxs'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '订单捡货',
+      enablePullDownRefresh: true,
+      usingComponents: {
+        'i-input': '../iview/input/index',
+        'i-button': '../iview/button/index',
+        'i-cell-group': '../iview/cell-group/index',
+        'i-cell': '../iview/cell/index'
+      }
+    }
+    mixins = []
+
+    wxs = {
+      utils: utilsWxs
+    }
+
+    data = {
+      id: 0,
+      supplierGroupList: [],
+      supplierRemainMoney: 0,
+      merchantRemainMoney: 0
+    }
+
+    watch = {}
+
+    methods = {
+      showSupplierInfo(idx) {
+        this.supplierGroupList[idx].supplierShow = !this.supplierGroupList[idx].supplierShow
+        this.$apply()
+      },
+      open(url) {
+        wx.navigateTo({
+          url
+        })
+      },
+      tel(phone) {
+        if (!phone) {
+          return
+        }
+        wx.makePhoneCall({
+          phoneNumber: phone // 仅为示例，并非真实的电话号码
+        })
+      }
+    }
+
+    events = {}
+
+    onPullDownRefresh() {
+      this.loadData().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    loadData() {
+      return api.order.groupSupplierDetailList({id: this.id}).done(rs => {
+        const data = rs.data
+        this.supplierGroupList = data.groupList
+        this.supplierRemainMoney = data.supplierRemainMoney
+        this.merchantRemainMoney = data.merchantRemainMoney
+        this.$apply()
+      })
+    }
+
+    onLoad(options) {
+      this.id = +options.id
+      wx.startPullDownRefresh()
+    }
+  }
+</script>

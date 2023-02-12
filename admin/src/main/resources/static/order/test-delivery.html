@@ -1,0 +1,38 @@
+<metat title="配送测试" args="order" width="500"/>
+<div class="p">
+	<form role="form" id="getOrderDetailForm" s="valid,form,nda,datac"
+				class="form-horizontal"
+				method="post"
+				s-data="order"
+				s-form="{done: submitDone}"
+				style="padding: 20px;" action="/api/mt-peisong/test">
+		<input type="hidden" name="deliveryId" s-data-filter="'psDeliveryId'" />
+		<input type="hidden" name="mtPeisongId" />
+		<div class="form-group" s-valid-role="item">
+			<label class="col-sm-2 control-label">orderId：</label>
+			<div class="col-sm-10">
+				<select class="form-control" name="endpoint">
+					<option value="/test/order/arrange">模拟接单</option>
+					<option value="/test/order/pickup">模拟取货</option>
+					<option value="/test/order/deliver">模拟送达</option>
+					<option value="/test/order/rearrange">模拟改派</option>
+					<option value="/test/order/reportException">模拟上传异常</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-sm-10 col-sm-offset-2">
+				<input type="submit" class="btn btn-primary" value="提交"/>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+  function submitDone(rs) {
+		if (rs.code === "0") {
+			S.toast('操作成功', 'success')
+		} else {
+			S.alert(rs.message)
+		}
+  }
+</script>

@@ -1,0 +1,55 @@
+<meta title="填写物流单号" args="userWithdraw" width="600px" />
+<form class="p" id="form" s="valid,form,nda,datac" s-data="userWithdraw" method="post" action="/api/bag/manual-fund-transfer">
+    <input autocomplete="off" type="hidden" name="id" />
+    <table class="table table-bordered table-stripped">
+        <!--<tr>-->
+            <!--<th>银行卡：</th>-->
+            <!--<td>-->
+                <!--<div name="bankAccountName"></div>-->
+                <!--<div name="bankName"></div>-->
+                <!--<div name="bankAccount"></div>-->
+            <!--</td>-->
+        <!--</tr>-->
+        <tr>
+            <th>快递名称：</th>
+            <td>
+                <input type="text" class="form-control" s-valid-error="require()" name="wuliuType"/>
+            </td>
+        </tr>
+
+        <tr>
+            <th>物流单号：</th>
+            <td>
+                <input type="text" class="form-control" s-valid-error="require()" name="wuliu"/>
+            </td>
+        </tr>
+
+        <tr>
+            <th>备注：</th>
+            <td>
+                <input type="text" class="form-control" name="remark"/>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<script>
+    S.meta.btns = [
+        {
+            name: "通过",
+            style: "btn btn-success",
+            click: function() {
+                return $form.submit().done(function(rs) {
+                    S.close(rs);
+                })
+            }
+        },
+        {
+            name: "取消",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+</script>

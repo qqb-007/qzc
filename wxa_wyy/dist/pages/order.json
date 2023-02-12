@@ -1,0 +1,1 @@
+{"navigationBarTitleText":"订单","enablePullDownRefresh":true,"backgroundTextStyle":"dark","usingComponents":{"i-tabs":"../iview/menus/index","i-tab":"../iview/menu/index","i-tag":"../iview/tag/index","i-divider":"../iview/divider/index","i-input":"../iview/input/index"}}

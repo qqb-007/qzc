@@ -1,0 +1,26 @@
+<metat title="设置起送份数" args="storeUserFood" width="500"/>
+<div class="p">
+	<form role="form" id="setMinCount" s="valid,form,nda,datac"
+				class="form-horizontal"
+				method="post"
+				s-data="storeUserFood"
+				s-form="{done: submitDone}"
+				style="padding: 20px;" action="/api/store-user-food/setMinCount">
+		<input type="hidden" name="id" s-data-filter="'id'" />
+		<input type="text" class="form-control input-sm" name="count" placeholder="最小起送份数"/>
+		<div class="form-group">
+			<div class="col-sm-10 col-sm-offset-2">
+				<input type="submit" class="btn btn-primary" value="提交"/>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+  function submitDone(rs) {
+		if (rs) {
+			S.toast('操作成功', 'success')
+		} else {
+			S.alert(rs.message)
+		}
+  }
+</script>

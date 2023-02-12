@@ -1,0 +1,54 @@
+<meta title="加水印" width="500"/>
+<style>
+	.store-info {
+		border-radius: 5px;
+		border: 1px solid #ddd;
+		padding: 5px 10px;
+		margin: 3px;
+	}
+</style>
+<div class="p">
+	<form id="form" s="valid,form" method="post" action="/api/store-user-food/copy">
+		<table class="table table-bordered table-stripped">
+			<tr>
+				<th style="width: 100px;">品牌名</th>
+				<td>
+					<div s-valid-role="item">
+						<input type="text" name="name"  value="" class="form-control" s-valid-error="require()"/>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<script type="text/javascript">
+
+	var sale = false;
+	S.meta.btns = [
+		{
+			name: "提交修改",
+			style: "btn btn-primary",
+			click: function () {
+                var deferred = $.Deferred()
+
+				$form.validate().done(function() {
+					S.confirm('确认加水印吗？').done(function() {
+						var loading = S.loading()
+						S.put('/api/food/addsy', $form.node.serialize()).done(function() {
+							S.toast('修改成功', 'success');
+						}).always(function() {
+							loading.resolve()
+						})
+					})
+				})
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+</script>

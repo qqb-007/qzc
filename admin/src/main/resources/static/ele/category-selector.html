@@ -1,0 +1,69 @@
+<meta title="饿了么分类选择器" width="600"/>
+<style>
+    .mt-tag-selector {
+        display: flex;
+        flex-direction: row;
+        height: 600px;
+        align-items: stretch;
+    }
+
+    .mt-tag-list {
+        flex: 1;
+        overflow: auto;
+    }
+
+    .mt-tag-item {
+        display: block;
+        padding: 10px;
+    }
+
+    .mt-tag-item:hover {
+        background-color: #efefef;
+    }
+</style>
+<div class="p mt-tag-selector">
+    <div class="mt-tag-list" id="lv1" s="loop">
+        <a href="javascript:;" class="mt-tag-item" s-loop-role="row" s="tpl"><span>{%=this.cat_name%}</span>
+            <i class="fa fa-angle-right"></i></a>
+    </div>
+    <div class="mt-tag-list" id="lv2" s="loop" s-data="[]">
+        <a href="javascript:;" class="mt-tag-item" s-loop-role="row" s="tpl"><span>{%=this.cat_name%}</span>
+            <i class="fa fa-angle-right"></i></a>
+    </div>
+    <div class="mt-tag-list" id="lv3" s="loop" s-data="[]">
+        <a href="javascript:;" class="mt-tag-item" s-click="select(this)" s-loop-role="row" s="tpl"><span>{%=this.cat_name%}</span>
+            <i class="fa fa-angle-right"></i></a>
+    </div>
+</div>
+<script type="text/javascript">
+    var list = [];
+    var map = {}
+    S.get('/api/ele/category/list').done(function (rs) {
+        list = rs
+        walkList(list)
+        $lv1.data(list)
+    })
+
+    function walkList(list) {
+        list.forEach(function (obj) {
+            map[obj.depth] = obj
+        })
+    }
+
+    S.node.delegate('.mt-tag-item', 'mouseenter', function () {
+        var $this = Smart.of($(this))
+        var data = $this.data()
+        switch (data.level) {
+            case 0:
+                $lv2.data(data.childenList);
+                break;
+            case 1:
+                $lv3.data(data.childenList);
+                break;
+        }
+    })
+
+    function select($this) {
+        S.close($this.data())
+    }
+</script>

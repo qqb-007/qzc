@@ -1,0 +1,27 @@
+<metat title="同意退款" args="order" width="500"/>
+<div class="p">
+	<form role="form" id="getOrderDetailForm" s="valid,form,nda,datac"
+				class="form-horizontal"
+				method="post"
+				s-data="order"
+				s-form="{done: submitDone}"
+				style="padding: 20px;" action="/api/order/refund/agree">
+		<input type="hidden" name="id" s-data-filter="'id'" />
+		<input type="text" class="form-control input-sm" name="remarks" placeholder="备注格式需要标准"/>
+		<input type="text" class="form-control input-sm" name="money" placeholder="退款金额"/>
+		<div class="form-group">
+			<div class="col-sm-10 col-sm-offset-2">
+				<input type="submit" class="btn btn-primary" value="提交"/>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+  function submitDone(rs) {
+		if (rs) {
+			S.toast('操作成功', 'success')
+		} else {
+			S.alert(rs.message)
+		}
+  }
+</script>

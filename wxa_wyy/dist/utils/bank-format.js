@@ -1,0 +1,1 @@
+"use strict";module.exports=function(e){return e.replace(/\s/g,"").replace(/\d{4}/gi,function(e,r){return e+" "}).trim()};

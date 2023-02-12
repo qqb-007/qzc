@@ -1,0 +1,25 @@
+<metat title="切换配送" width="500"/>
+<div class="p clearfix">
+	<tr>
+		<th style="width: 100px;">选择平台</th>
+		<td>
+			<select class="form-control input-sm" s="select"
+					s-build="S.get('/api/enum/valuesMap/core.enums.DeliveryType')"
+					name="plat" id="platSelector">
+				<option value="">平台</option>
+			</select>
+		</td>
+	</tr>
+	<!--<div s="window" s-window="{href: '/plat/plat-selector.html', args: {plat: plat}}" id="platSelector"></div>-->
+</div>
+<script>
+	S.meta.btns = [
+		{
+			name: "确定切换",
+			style: "btn btn-default",
+			click: function () {
+                S.close(false, $platSelector.val())
+			}
+		}
+	]
+</script>

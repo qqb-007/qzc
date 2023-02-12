@@ -1,0 +1,182 @@
+<meta title="购物袋管理">
+<div class="p">
+    <div class="p" style="background-color: #ffffff">
+        <div class="p-b">
+            <form class="form-inline m-b-wrapper-xs pull-left" id="form" s="form"
+                  s-form="{action:function(){$page.node.val(1); $userWithdrawsGrid.refresh()}}"
+            >
+                <input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店ID"
+                       name="storeUserId"/>
+                <!--<input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店手机号"-->
+                <!--name="storeUserPhone"/>-->
+                <input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店名称"
+                       name="storeUserName"/>
+                申请时间：<input autocomplete="off" type="text" class="form-control input-sm" s="datetimepicker"
+                            name="createStartDate" placeholder="开始时间"/>
+                - <input autocomplete="off" type="text" class="form-control input-sm" s="datetimepicker"
+                         name="createEndDate" placeholder="结束时间"/>
+                <select class="form-control input-sm" s="select"
+                        s-build="S.get('/api/enum/valuesMap/core.enums.BagStatus')"
+                        name="status">
+                    <option value="">选择状态</option>
+                </select>
+                <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+                <input autocomplete="off" type="submit" class="btn btn-default btn-sm" value="查找"/>
+                <input type="button" class="btn btn-primary" s-click="exportFile()" value="导出明细"/>
+                <input type="button" class="btn btn-primary" s-click="download()" value="下载"/>
+                <!--<input type="button" class="btn btn-primary" s-click="batchCheck()" value="一键审核"/>-->
+                <!--<input type="button" class="btn btn-primary" s-click="batchTranslate()" value="一键转账"/>-->
+            </form>
+        </div>
+        <table
+                id="userWithdrawsGrid"
+                s='datac,nda'
+                s-data="Smart.cleanJsonRef(S.get('/api/bag/search', $form.node.serialize()))"
+                class="table table-stripped table-bordered">
+            <tr>
+                <th>门店</th>
+                <th>申请数量</th>
+                <th>袋子类型</th>
+                <th>申请时间</th>
+                <th>物流单号</th>
+                <th>需要运费</th>
+                <th class="text-center">备注</th>
+                <th class="text-center">状态</th>
+                <th class="text-right">操作</th>
+            </tr>
+            <tbody s="loop" s-data-filter="'results'">
+            <tr s-loop-role="empty">
+                <td colspan="9" class="alert alert-warning">
+                    暂无数据
+                </td>
+            </tr>
+            <tr s-loop-role="row" s="row,datac">
+                <td>
+                    <span name="storeUser.name"></span>（ID:<span name="storeUser.id"></span>）
+                    <div name="storeUser.address"></div>
+                </td>
+                <td name="bagNum"></td>
+                <td name="bagTypeTitle">
+                    <!--<span name="bankAccountName"></span> <span name="bankName"></span>-->
+                    <!--<div name="bankAccount"></div>-->
+                </td>
+                <td name="createTime"></td>
+                <td name="logistics"></td>
+                <td name="fee"></td>
+                <td name="context"></td>
+                <td class="text-center" s="tpl">
+                    <label class="label
+                            {%
+                                switch(this.status) {
+                                    case 'WAIT_VERIFY':
+                                        out.print('label-warning'); break;
+                                    case 'WAIT_DELIVERY':
+                                    case 'SHIPPED':
+                                        out.print('label-info'); break;
+                                    case 'VERIFY_FAIL':
+                                    case 'REJECT':
+                                        out.print('label-danger'); break;
+                                    case 'TRANSFER_SUCCESS':
+                                        out.print('label-success'); break;
+                                    default:
+                                        out.print('label-default');break;
+                                }
+                            %}
+                        ">{%=this.statusTitle%}</label>
+                </td>
+                <td s="tpl" class="text-right">
+                    {%
+                    if(this.status == 'WAIT_VERIFY') {%}
+                    <input autocomplete="off" type="button" s-click="verify(this)"
+                           class="btn btn-xs btn-warning btn-outline" value="审核"/>
+
+                    <input autocomplete="off" type="button" s-click="update(this)"
+                           class="btn btn-xs btn-warning btn-outline" value="修改"/>
+
+                    {%}%}
+                    {%if(this.status == 'WAIT_DELIVERY') {%}
+                    <input autocomplete="off" type="button" s-click="manualTransfer(this)"
+                           class="btn btn-xs btn-danger btn-outline" value="填写物流单号"/>
+                    {%}%}
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="9" class="text-right">
+                    <ul s="pagination" id="sellerPagination"
+                        s-pagination="{action:function(){$page.node.val(this); $userWithdrawsGrid.refresh()}}"
+                        class="pagination pagination-sm">
+                    </ul>
+                    共有<span name="total"></span>个数据
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function verify($s) {
+        S.popupOpen("/bag/withdraw-verify.html", {userWithdraw: $s.parent().data()}).done(function (rs) {
+            rs && $userWithdrawsGrid.refresh()
+        })
+    }
+
+    function transfer($s) {
+        var data = $s.parent().data();
+        S.confirm("确认立即转账吗").done(function () {
+            S.post("/api/withdraw/fund-transfer/" + data.id).done(function (rs) {
+                if (rs.success) {
+                    S.toast("转账成功")
+                    $userWithdrawsGrid.refresh()
+                } else {
+                    S.alert("转账失败，原因为：" + rs.errMsg)
+                }
+            })
+        })
+    }
+
+    function batchCheck() {
+        S.confirm("确认一键审核当前条件下提现申请吗").done(function () {
+            S.get('/api/withdraw/batchCheck', $form.node.serialize()).done(function (rs) {
+                rs && $userWithdrawsGrid.refresh()
+            })
+        })
+    }
+
+    function batchTranslate() {
+        S.confirm("确认一键转账吗").done(function () {
+            S.get('/api/withdraw/Translate').done(function (rs) {
+                rs && $userWithdrawsGrid.refresh()
+            })
+        })
+    }
+
+    function download() {
+        S.get('/api/bag/download').done(function (rs) {
+            if (rs.file) {
+                window.open(rs.file)
+            } else {
+                S.toast('正在努力导出了,稍等一下', 'success')
+            }
+        })
+
+    }
+
+    function manualTransfer($s) {
+        S.popupOpen("/bag/withdraw-manual-transfer.html", {userWithdraw: $s.parent().data()}).done(function (rs) {
+            rs && $userWithdrawsGrid.refresh()
+        })
+    }
+
+    function update($s) {
+        S.popupOpen("/bag/update.html", {userWithdraw: $s.parent().data()}).done(function (rs) {
+            rs && $userWithdrawsGrid.refresh()
+        })
+    }
+
+    function exportFile() {
+        S.get('/api/bag/export', $form.node.serialize())
+    }
+
+</script>

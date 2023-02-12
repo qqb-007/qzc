@@ -1,0 +1,545 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+
+  .container {
+    padding: 10px;
+    background-color: #efeff4;
+    padding-top: 40px;
+  }
+
+  .food {
+    background-color: #ffffff;
+    margin-bottom: 5px;
+    padding: 10px;
+    position: relative;
+    &-info {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+    &-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      background-color: #e9e9e9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: @color-success;
+      &-checked {
+        background-color: @color-success;
+        color: #ffffff;
+      }
+    }
+    &-pic {
+      border-radius: 5px;
+      width: 60px;
+      height: 60px;
+    }
+    &-detail {
+      flex: 1;
+      padding-left: 10px;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+    }
+    &-title {
+      font-size: 16px;
+    }
+    &-price {
+      font-size: 14px;
+      color: @color-muted;
+      &-val {
+        font-size: 14px;
+        color: @color-success;
+      }
+    }
+    &-footer {
+      border-top: 1rpx dashed #ddd;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    &-sale {
+      font-size: 14px;
+      color: @color-title;
+      &-btn {
+        /*border: 1rpx solid #ddd;*/
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 2px;
+        background-color: @color-info;
+        color: #ffffff;
+        &-on {
+          background-color: @color-success;
+        }
+      }
+    }
+  }
+
+  .search-input {
+    border-radius: 30px;
+    height: 30px;
+    line-height: 30px;
+    border: 1rpx solid #ddd;
+    padding: 0 20px;
+    font-size: 14px;
+    background-color: #ffffff;
+    flex: 1;
+    &-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: #efeff4;
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      padding: 5px 10px;
+      z-index: 1000;
+    }
+    &-btn {
+      border-radius: 30px;
+      height: 30px;
+      line-height: 30px;
+      width: 40px;
+      margin-left: 5px;
+      font-size: 14px;
+      color: #ffffff;
+      text-align: center;
+      background-color: @color-info;
+    }
+  }
+
+  .category-view {
+    position: fixed;
+    top: 40px;
+    width: 100px;
+    background-color: #fff;
+    left: 0;
+    z-index: 10;
+    bottom: 0;
+  }
+
+  .category {
+    font-size: 14px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    color: @color-title;
+    &-selected {
+      background-color: #efeff4;
+      font-weight: bold;
+    }
+    &-child {
+      font-size: 12px;
+      height: 34px;
+      line-height: 34px;
+      text-align: center;
+      color: @color-title;
+      background-color: #efeff4;
+      &-selected {
+        background-color: #f6f6f6;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .food-list {
+    padding-left: 95px;
+  }
+
+  .empty-tip {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    &-btn {
+      font-size: 14px;
+    }
+  }
+
+  .return {
+    box-shadow: 0px 0px 10px rgba(102, 102, 102, 0.39);
+    width: 26%;
+    height: 40px;
+    padding: 0 5px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    background-color: #495060;
+    position: fixed;
+    right: 37%;
+    left: 37%;
+    bottom: 0px;
+    border-radius: 10px;
+    color: #ffffff;
+    z-index: 10;
+  }
+
+  .modal-mask {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000;
+    opacity: 0.5;
+    overflow: hidden;
+    z-index: 9000;
+    color: #fff;
+  }
+  .modal-dialog {
+    width: 80%;
+    overflow: hidden;
+    position: fixed;
+    top: 10%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #f9f9f9;
+    margin: auto;
+    border-radius: 18px;
+  }
+  .modal-title {
+    padding-top: 25px;
+    font-size: 20px;
+    color: #030303;
+    text-align: center;
+  }
+  .modal-content {
+    padding: 25px 16px;
+  }
+  .modal-input {
+    display: flex;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    font-size: 18px;
+  }
+  .input {
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+    line-height: 18px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    color: #333;
+  }
+  input-holder {
+    color: #666;
+    font-size: 18px;
+  }
+  .modal-footer {
+    display: flex;
+    flex-direction: row;
+    height: 43px;
+    border-top: 1px solid #dedede;
+    font-size: 17px;
+    line-height: 43px;
+  }
+  .btn-cancel {
+    width: 50%;
+    color: #666;
+    text-align: center;
+    border-right: 1px solid #dedede;
+  }
+  .btn-confirm {
+    width: 50%;
+    color: #ec5300;
+    text-align: center;
+  }
+
+
+</style>
+<template>
+  <view class="container">
+    <view class="search-input-wrapper">
+      <input focus="{true}" value="{{searchParam.name}}" placeholder="输入商品名进行筛选" class="search-input" @input="searchInputChange" />
+      <view class="search-input-btn" @tap="searchBtnChange">搜索</view>
+    </view>
+    <scroll-view
+      scroll-y
+      class="category-view">
+      <view class="category {{searchParam.foodCategoryName === ' ' ? 'category-selected' : ''}}"
+            @tap="selectCategory('')" wx:key="">所有分类</view>
+      <block wx:for="{{foodCategoryList}}">
+        <view class="category {{searchParam.foodCategoryName === item ? 'category-selected' : ''}}"
+              @tap="selectCategory({{item}})" wx:key="{{item}}">{{item}}</view>
+        <block wx:if="{{searchParam.foodCategoryName === item && foodCategoryChildrenMap[item]}}">
+          <view wx:for="{{foodCategoryChildrenMap[item]}}" wx:for-item="child"
+                @tap="selectCategoryChild({{child.name}})"
+                class="category-child {{searchParam.categoryName === child.name ? 'category-child-selected' : ''}}">
+            {{child.name}}
+          </view>
+        </block>
+      </block>
+    </scroll-view>
+    <view class="food-list">
+      <block wx:for="{{foodList}}">
+        <view class="food" wx:key="{{item.id}}">
+          <view class="food-info">
+            <image src="{{item.picture}}" @tap="preview({{item.picture}})" class="food-pic" mode="aspectFill"></image>
+            <view class="food-detail">
+              <view class="food-title">{{item.name}}</view>
+              <view class="flex-row space-between align-flex-end">
+                <view class="food-price">售价: ¥<text class="food-price-val">{{item.price}}</text>元/{{item.quoteUnit}}</view>
+              </view>
+            </view>
+          </view>
+          <view class="food-footer">
+            <i-input-number value="{{item.priceShow}}" min="0" max="10000" data-idx="{{index}}" step="0.1" @change="priceChange" />
+            <view class="food-sale-btn {{item.added ? 'food-sale-btn-on' : ''}}" @tap="add({{index}})">{{item.added ? '已添加' : '添加'}}</view>
+          </view>
+        </view>
+      </block>
+      <view wx:if="{{!hasNext}}" class="empty-tip">
+        <i-button type="info" shape="circle" size="small" @tap="addNew()">未找到商品，手动添加</i-button>
+      </view>
+    </view>
+    <view class="scrolltop-btn" @tap="scrollTop">
+      <text class="iconfont icon-fold"></text>
+    </view>
+    <view class="return" @tap="back">返回首页</view>
+    <!--<modal hidden="{{hideModel}}" title="输入商品名搜索" confirm-text="确认" cancel-text="取消" bindcancel="cancel" bindconfirm="confirmb">
+      <input class="search-input" placeholder="请输入商品名称" value="{{item.quotePriceShow}}" @input="searchInputChange" focus/>
+    </modal>-->
+    <view class="modal-mask" bindtap="cancel" hidden="{{hideModel}}"></view>
+    <view class="modal-dialog" hidden="{{hideModel}}">
+      <view class="modal-title">输入商品名搜索</view>
+      <view class="modal-content">
+        <input class="search-input" placeholder="请输入商品名称" value="{{item.quotePriceShow}}" @input="searchInputChange"
+          focus />
+      </view>
+      <view class="modal-footer">
+        <view class="btn-cancel" bindtap="cancel" data-status="cancel">取消</view>
+        <view class="btn-confirm" bindtap="confirmb" data-status="confirmb">确定</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let Deferred = require('../utils/deferred')
+  let api = require('../utils/api')
+  const DEFAULT_SEARCH_PARAM = {
+    page: 1,
+    categoryName: '',
+    foodCategoryName: ''
+  }
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '商品管理',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark',
+      backgroundColor: '#efeff4',
+      'usingComponents': {
+        'i-input-number': '../iview/input-number/index',
+        'i-button': '../iview/button/index'
+      }
+    }
+    components = {}
+
+    data = {
+      searchParam: Object.assign({}, DEFAULT_SEARCH_PARAM),
+      loading: false,
+      hasNext: true,
+      hideModel: false,
+      foodList: [],
+      foodCategoryList: [],
+      keyword: '',
+      foodCategoryChildrenMap: {}
+    }
+
+    methods = {
+      priceChange(e) {
+        let dataset = e.currentTarget.dataset
+        let idx = dataset.idx
+        let food = this.foodList[idx]
+        food.price = parseFloat(e.detail.value)
+        food.priceShow = food.price.toFixed(1)
+      },
+      addNew() {
+        wx.navigateTo({
+          url: '/pages/food-apply?foodName=' + DEFAULT_SEARCH_PARAM.name
+        })
+      },
+      scrollTop() {
+        wx.pageScrollTo({
+          scrollTop: 0,
+          duration: 300
+        })
+      },
+      preview(url) {
+        wx.previewImage({
+          current: '', // 当前显示图片的http链接
+          urls: [url] // 需要预览的图片http链接列表
+        })
+      },
+      back() {
+        wx.navigateBack({
+          delta: 1
+        })
+      },
+      searchInputChange(e) {
+        DEFAULT_SEARCH_PARAM.name = e.detail.value
+        DEFAULT_SEARCH_PARAM.foodCategoryName = ''
+        DEFAULT_SEARCH_PARAM.categoryName = ''
+      },
+      searchBtnChange(e) {
+        this.resetSearchParam()
+        this.loadingSearch()
+      },
+      cancel() {
+        this.hideModel = true
+      },
+      confirmb() {
+        this.hideModel = true
+        this.resetSearchParam()
+        this.loadingSearch()
+      },
+      selectCategory(category) {
+        DEFAULT_SEARCH_PARAM.foodCategoryName = category
+        this.loadFoodCategoryChildren(category).then(list => {
+          if (list.length) {
+            this.doSelectCategoryChild(list[0].name)
+          } else {
+            DEFAULT_SEARCH_PARAM.categoryName = category
+            this.resetSearchParam()
+            this.loadingSearch()
+          }
+        })
+      },
+      selectCategoryChild(category) {
+        DEFAULT_SEARCH_PARAM.categoryName = DEFAULT_SEARCH_PARAM.categoryName === category ?
+          null : category
+        this.resetSearchParam()
+        this.loadingSearch()
+      },
+      add(idx) {
+        let food = this.foodList[idx]
+        wx.showLoading()
+        api.storeUserFood.save({
+          foodId: food.id,
+          quotePrice: food.price,
+          sale: false
+        }).done(rs => {
+          food.added = true
+          this.$apply()
+        }).always(() => {
+          wx.hideLoading()
+        })
+      }
+    }
+
+    events = {}
+
+    resetSearchParam() {
+      Object.assign(this.searchParam, DEFAULT_SEARCH_PARAM)
+      this.hasNext = true
+    }
+
+    onReachBottom() {
+      if (this.hasNext) {
+        this.searchParam.page++
+        this.search(true)
+      }
+    }
+
+    onPullDownRefresh() {
+      this.resetSearchParam()
+      this.search().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    loadingSearch(flag) {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+      this.searchTimeout = setTimeout(() => {
+        wx.showLoading()
+        this.search(flag).always(() => {
+          wx.hideLoading()
+        })
+      }, 500)
+    }
+
+    doSelectCategoryChild(category) {
+      DEFAULT_SEARCH_PARAM.categoryName = category
+      this.resetSearchParam()
+      this.loadingSearch()
+    }
+
+    loadFoodCategoryChildren(foodName) {
+      return new Promise(resolve => {
+        if (this.foodCategoryChildrenMap[foodName]) {
+          resolve(this.foodCategoryChildrenMap[foodName])
+          return
+        }
+        if (!foodName) {
+          resolve([])
+          return
+        }
+        api.foodCategory.listByParentName({
+          parentName: foodName
+        }).done(rs => {
+          this.foodCategoryChildrenMap[foodName] = rs.data
+          this.$apply()
+          resolve(rs.data)
+        })
+      })
+    }
+
+    search(append, callback) {
+      console.log(this.searchParam)
+      return api.food.search(this.searchParam).done((rs) => {
+        rs.data.results.forEach(food => {
+          food.priceShow = food.price.toFixed(1)
+        })
+        if (append) {
+          this.foodList = this.foodList.concat(rs.data.results)
+        } else {
+          this.foodList = rs.data.results
+        }
+        if (this.foodList.length === 0) {
+          wx.redirectTo({
+            url: '/pages/food-apply?foodName=' + DEFAULT_SEARCH_PARAM.name
+          })
+        }
+        let paging = rs.data
+        this.hasNext = paging.hasNext
+        this.$apply()
+      }).always(() => {
+        callback && callback()
+      })
+    }
+
+    loadData() {
+      return api.page.storeUserFoodList().done(rs => {
+        this.foodCategoryList = rs.data.foodCategoryList
+        this.$apply()
+      })
+    }
+
+    onLoad() {
+      this.hideModel = false
+      DEFAULT_SEARCH_PARAM.name = ''
+      Deferred.when(this.loadData(), this.search()).always(() => {
+        this.loaded = true
+      })
+    }
+    onShow() {}
+  }
+</script>

@@ -1,0 +1,1 @@
+"use strict";module.exports=function(r){var e=[];for(var n in r){var o=r[n];if(Array.isArray(o))for(var s=0;s<o.length;s++)e.push(n+"["+s+"]="+o[s]);else e.push(n+"="+encodeURIComponent(o))}return e.join("&")};

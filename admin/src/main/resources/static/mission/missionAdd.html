@@ -1,0 +1,61 @@
+<meta title="新增任务" width="600"/>
+<style>
+</style>
+<form s="valid,form"
+      method="post"
+      action="/api/mission"
+      id="form" class="form-horizontal">
+    <table class="table">
+        <tr>
+            <td style="width: 100px;">任务类型</td>
+            <td>
+                <select class="form-control" s="select"
+                        name="type"
+                        s-build="S.get('/api/enum/valuesMap/core.enums.MissionType')">
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>所需次数</td>
+            <td>
+                <input autocomplete="off" type="number" name="totalTimes" s-valid-error="require(),number()" class="form-control" placeholder="所需次数">
+            </td>
+        </tr>
+        <tr>
+            <td>赠送积分</td>
+            <td>
+                <input autocomplete="off" type="number" name="integral" s-valid-error="require(),number()" class="form-control" placeholder="赠送积分">
+            </td>
+        </tr>
+        <tr>
+            <td>状态</td>
+            <td>
+                <select class="form-control" s="select"
+                        name="status"
+                        s-build="S.get('/api/enum/valuesMap/core.enums.MissionStatus?igNames=DELETED,SNAPSHOT')">
+                </select>
+            </td>
+        </tr>
+    </table>
+</form>
+<script>
+    S.meta.btns = [
+        {
+            name: "确定",
+            style: "btn btn-primary",
+            click: function() {
+                return $form.submit().done(function() {
+                    S.close(true)
+                })
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+
+</script>

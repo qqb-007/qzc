@@ -1,0 +1,1 @@
+ALTER TABLE `store` ADD COLUMN `delivery_self` tinyint(1) DEFAULT '0';

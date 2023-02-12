@@ -1,0 +1,153 @@
+<meta title="批量发布" width="1000"/>
+<style>
+	.store-info {
+		border-radius: 5px;
+		border: 1px solid #ddd;
+		padding: 5px 10px;
+		margin: 3px;
+	}
+</style>
+<div class="p">
+	<form id="form" s="valid,form" method="put" action="/api/store-user-food/batch-publish">
+		<table class="table table-bordered table-stripped">
+			<tr>
+				<th style="width: 100px;">指定门店</th>
+				<td>
+					<div s="tpl" id="storeUserList" style="display: inline-block">
+						<div style="display: inline-block" class="store-info">
+							{%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()"
+											  class="fa fa-times"></a>
+							<input type="hidden" name="storeUserId" data-name="{%=this.name%}" class="store-user-id"
+								   value="{%=this.id%}"/>
+						</div>
+					</div>
+					<input type="button" class="btn btn-xs btn-outline btn-success" value="选择门店"
+						   s-click="selectStoreUser()"/>
+					<div class="help-block">
+						不选择门店，则表示所有门店
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">指定分类</th>
+				<td class="form-inline">
+					<select class="form-control" id="allStoreUser"
+							s-change="$categoryListPanel.data(this.node.val())"
+							name="allCategory">
+						<option value="true" selected>全部分类</option>
+						<option value="false">指定分类</option>
+					</select>
+					<div s="tpl" id="categoryListPanel" class="p-t" s-valid-role="item">
+						{%if(this == 'false'){%}
+						<div s="nda,loop"
+							s-data="categoryList()" s-valid-error="checkboxRequire()">
+							<label s-loop-role="row" s="tpl" class="s-checkbox p-r">
+								{#
+								<input name="categoryNameList" value="{%=this.name%}" checked type="checkbox"/>
+								<span class="s-checkbox-indicator"></span> <span name="" class="category-name">{%=this.name%}</span>
+								#}
+							</label>
+						</div>
+						{%}%}
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">指定商品</th>
+				<td>
+					<div s="tpl" id="foodList">
+						<div style="display: inline-block" class="store-info">
+							{%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()"
+											  class="fa fa-times"></a>
+							<input type="hidden" name="foodId" data-name="{%=this.name%}" class="store-user-id"
+								   value="{%=this.id%}"/>
+						</div>
+					</div>
+					<div class="help-block">
+						<input type="button" class="btn btn-xs btn-outline btn-success" value="选择商品"
+							   s-click="selectFood()"/>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">检测商品是否存在</th>
+				<td>
+					<div class="alert alert-warning">
+						<label class="s-checkbox">
+							<input autocomplete="off" name="checkExists" value="true" type="checkbox" s-check-role="h"/>
+							<span class="s-checkbox-indicator"></span> 检测商品发布
+						</label> 选择"检测商品并发布"适用于老门店，能够最大程度保证发布成功率，但是会大幅度降低发布效率！
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">选择平台</th>
+				<td>
+					<select class="form-control input-sm" s="select"
+									s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+									name="plat">
+						<option value="">平台</option>
+					</select>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<script type="text/javascript">
+
+	var sale = false;
+	S.meta.btns = [
+		{
+			name: "发布",
+			style: "btn btn-primary",
+			click: function () {
+				var deferred = $.Deferred();
+				S.confirm('确认进行批量发布吗？').done(function() {
+					var loadingDeferred = S.loading()
+					$form.submit().always(function() {
+						deferred.resolve()
+						loadingDeferred.resolve()
+						S.alert('批量发布完成', 'success').done(function() {
+							// S.close(true)
+						})
+					})
+				})
+				return deferred;
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function selectFood() {
+		S.popupOpen('/food/foodSelector.html', {
+			multi: false,
+			quotable: true
+		}).done(function (foodList) {
+			if (foodList) {
+				$foodList.data(foodList[0])
+			}
+		})
+	}
+
+	function categoryList() {
+		var deferred = $.Deferred()
+		S.get('/api/food-category/list').done(function (rs) {
+			deferred.resolve(rs);
+		})
+		return deferred
+	}
+
+	function selectStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: false}).done(function (storeUserList) {
+			if (storeUserList) {
+				$storeUserList.data(storeUserList[0])
+			}
+		})
+	}
+</script>

@@ -1,0 +1,85 @@
+<meta title="新建库位" width="650px"/>
+<form role="form" id="storeUserForm" s="valid,form"
+	  class="form-horizontal"
+	  method="post"
+	  style="padding: 20px;" action="/api/warehouse">
+	<div class="form-group" s-valid-role="item">
+		<label class="col-sm-2 control-label">选择门店：</label>
+		<div s="tpl" id="storeUserList" style="display: inline-block">
+			<div style="display: inline-block" class="store-info">
+				{%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()"
+								  class="fa fa-times"></a>
+				<input type="hidden" name="storeUserId" data-name="{%=this.name%}" class="store-user-id"
+					   value="{%=this.id%}"/>
+			</div>
+		</div>
+		<input type="button" class="btn btn-xs btn-outline btn-success" value="选择门店"
+			   s-click="selectStoreUser()"/>
+	</div>
+
+	<div class="form-group" s-valid-role="item">
+		<label class="col-sm-2 control-label">库位名称：</label>
+		<div class="col-sm-10">
+			<input autocomplete="off" type="text" name="name" class="form-control" placeholder="名称"
+				   s-valid-error="require()">
+		</div>
+	</div>
+
+	<div class="form-group" s-valid-role="item">
+		<label class="col-sm-2 control-label">详细地址：</label>
+		<div class="col-sm-10">
+
+			<input class="form-control" rows="3" name="address" placeholder="库位地址" s-valid-error="require()"/>
+		</div>
+	</div>
+
+	<!--<div class="form-group">-->
+		<!--<label class="col-sm-2 control-label">状态：</label>-->
+		<!--<div class="col-sm-10">-->
+			<!--<select class="form-control input-sm"-->
+					<!--name="deleted">-->
+				<!--<option value="false">正常</option>-->
+				<!--<option value="true">锁定</option>-->
+			<!--</select>-->
+		<!--</div>-->
+	<!--</div>-->
+
+</form>
+<script type="text/javascript">
+	S.on('s-ready', function(){
+
+	})
+    function selectStoreUser() {
+        S.popupOpen('/storeUser/storeUserSelector.html', {multi: false}).done(function (storeUserList) {
+            if (storeUserList) {
+                $storeUserList.data(storeUserList[0])
+            }
+        })
+    }
+	S.meta.btns = [
+		{
+			name: "保存",
+			style: "btn btn-primary",
+			click: function () {
+			    // S.alert(S.node.find('.store-user-id').val())
+                if (S.node.find('.store-user-id').val()) {
+                    return S.S("#storeUserForm").submit().done(function (rs) {
+                        S.close(true);
+                    });
+
+                }else {
+                    S.alert('请选择要绑定的店铺');
+                    return
+				}
+
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+</script>

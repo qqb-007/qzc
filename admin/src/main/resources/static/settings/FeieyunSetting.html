@@ -1,0 +1,37 @@
+<meta title="飞蛾云配置" args="data"/>
+<style>
+
+</style>
+<form class="form-horizontal" id="form" s="form,datac,nda,valid" s-data="data" style="width: 600px;">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">USER</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" name="user" placeholder="USER"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">UKEY</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" name="ukey" placeholder="UKEY"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">默认打印机SN</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" name="sn" placeholder="默认打印机SN"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+
+</form>
+<script type="text/javascript">
+    S.getContent = function () {
+        var deferred = $.Deferred();
+        $form.validate().done(function() {
+            deferred.resolve(Smart.serializeToObject($form.node))
+        })
+        return deferred;
+    }
+</script>

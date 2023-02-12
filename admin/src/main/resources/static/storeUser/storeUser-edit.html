@@ -1,0 +1,290 @@
+<meta title="编辑商家" width="900px" args="storeUser"/>
+<form role="form" id="storeUserForm" s="valid,form,nda,datac"
+      class="form-horizontal"
+      s-data="storeUser"
+      method="put"
+      style="padding: 20px;" action="/api/store-user/{storeUser.id}">
+    <!--<div class="form-group" s-valid-role="item">-->
+        <!--<label class="col-sm-2 control-label">编码：</label>-->
+        <!--<div class="col-sm-10">-->
+            <!--<input autocomplete="off" type="text" name="code" class="form-control" placeholder="编码"-->
+                   <!--s-valid-error="require()">-->
+        <!--</div>-->
+    <!--</div>-->
+    <div class="form-group" s-valid-role="item">
+        <label class="col-sm-2 control-label">手机号：</label>
+        <div class="col-sm-10">
+            <input autocomplete="off" type="text" name="phone" class="form-control" placeholder="手机号"
+                   s-valid-error="require()">
+        </div>
+    </div>
+    <div class="form-group" s-valid-role="item">
+        <label class="col-sm-2 control-label">姓名：</label>
+        <div class="col-sm-10">
+            <input autocomplete="off" type="text" name="name" class="form-control" placeholder="姓名"
+                   s-valid-error="require()">
+        </div>
+    </div>
+    <div class="form-group" s-valid-role="item">
+        <label class="col-sm-2 control-label">加价百分比：</label>
+        <div class="col-sm-10">
+            <input autocomplete="off" placeholder="加价百分比" type="number"
+                   class="form-control" name="priceIncrease" s-valid-error="require()" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">结算方式：</label>
+        <div class="col-sm-10">
+            <select class="form-control input-sm" s="select"
+                    name="settleType"
+                    s-build="S.get('/api/enum/valuesMap/core.enums.SettleType')">
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">结算扣点%：</label>
+        <div class="col-sm-10">
+            <input autocomplete="off" placeholder="结算扣点(百分比)" type="number"
+                   min="0"
+                   max="100"
+                   class="form-control" name="deductPoint" s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">结算周期：</label>
+        <div class="col-sm-10">
+            <input autocomplete="off" placeholder="结算周期" type="number"
+                   min="0"
+                   max="100"
+                   class="form-control" name="seCycle" s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group" s-valid-role="item">
+        <label class="col-sm-2 control-label">地址：</label>
+        <div class="col-sm-10">
+            <div style="padding-bottom: 10px;">
+                <div class="form-control s-select input-sm " style="width: 150px;"
+                     s="select"
+                     id="province"
+                     s-data-filter="'province.id'"
+                     s-data="storeUser"
+                     s-valid-label="省份"
+                     s-build="S.get('api/region/list/0')" >
+                    <input autocomplete="off" type="hidden" name="provinceId" s-data-filter="'province.id'" class="s-select-input" />
+                    <div class="s-select-mirror">
+                        <span></span>
+                        <i class="fa fa-caret-down"></i>
+                    </div>
+                    <div class="s-select-panel">
+                        <input autocomplete="off" type="text" class="s-select-filter">
+                        <ul class="s-select-list">
+                            <li class="s-select-list-item" value="">选择省份</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-control s-select input-sm" style="width: 100px;"
+                     s="select"
+                     id="city"
+                     s-data-filter="'city.id'"
+                     s-data="storeUser"
+                     s-build-switch="'off-on'"
+                     s-select="{title: 'name'}"
+                     s-build="S.get('api/region/list/' + ($province.val() || -1))" >
+                    <input autocomplete="off" type="hidden" class="s-select-input" name="cityId" s-data-filter="'city.id'"/>
+                    <div class="s-select-mirror">
+                        <span></span>
+                        <i class="fa fa-caret-down"></i>
+                    </div>
+                    <div class="s-select-panel">
+                        <input autocomplete="off" type="text"  class="s-select-filter">
+                        <ul class="s-select-list">
+                            <li class="s-select-list-item" value="">选择城市</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-control s-select input-sm" style="width: 100px;"
+                     s="select"
+                     id="district"
+                     s-data="storeUser"
+                     s-data-filter="'district.id'"
+                     s-build-switch="'off-on'"
+                     s-select="{title: 'name'}"
+                     s-build="S.get('api/region/list/' + ($city.val() || -1))" >
+                    <input autocomplete="off" type="hidden" class="s-select-input" name="districtId" s-data-filter="'district.id'"/>
+                    <div class="s-select-mirror">
+                        <span></span>
+                        <i class="fa fa-caret-down"></i>
+                    </div>
+                    <div class="s-select-panel">
+                        <input autocomplete="off" type="text"  class="s-select-filter">
+                        <ul class="s-select-list">
+                            <li class="s-select-list-item" value="">选择区县</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <input class="form-control" type="text" name="address" s-valid-error="require()" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">经纬度：</label>
+        <div class="col-sm-10 form-inline">
+            <input autocomplete="off" placeholder="经度" type="text" style="width: 150px;"
+                   class="form-control" name="lng" /> -
+            <input autocomplete="off" placeholder="纬度" type="text" style="width: 150px;"
+                   class="form-control" name="lat" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">配送联系人：</label>
+        <div class="col-sm-10 form-inline">
+            <input autocomplete="off" placeholder="配送联系人" type="text" style="width: 150px;"
+                   class="form-control" name="psContactName" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">配送联系电话：</label>
+        <div class="col-sm-10 form-inline">
+            <input autocomplete="off" placeholder="配送联系电话" type="text" style="width: 150px;"
+                   class="form-control" name="psContactPhone" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">营业时间：</label>
+        <div class="col-sm-10 form-inline">
+            <select class="form-control input-sm" s="select"
+                    name="bizStartTime"
+                    s-build="bizTimeList">
+            </select>  -
+            <select class="form-control input-sm" s="select"
+                    name="bizEndTime"
+                    s-build="bizTimeList">
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">美团配送分类：</label>
+        <div class="col-sm-10 form-inline">
+            <select class="form-control input-sm" s="select"
+                    name="mtpsCategory"
+                    s-build="mtpsCategoryList">
+            </select>  -
+            <select class="form-control input-sm" s="select"
+                    name="mtpsSecondCategory"
+                    s-build="mtpsSecondCategoryList">
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">美团配送门店ID：</label>
+        <div class="col-sm-10 form-inline">
+            <input autocomplete="off" placeholder="美团配送门店ID" type="text" style="width: 150px;"
+                   class="form-control" name="mtpsShopId" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">顺丰配送门店ID：</label>
+        <div class="col-sm-10 form-inline">
+            <input autocomplete="off" placeholder="顺丰配送门店ID" type="text" style="width: 150px;"
+                   class="form-control" name="sfpsShopId" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">起送价：</label>
+        <div class="col-sm-10 form-inline">
+            <input autocomplete="off" placeholder="起送价" type="number" min="0" style="width: 150px;"
+                   class="form-control" name="minPrice" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">配送费：</label>
+        <div class="col-sm-10 form-inline">
+            <input autocomplete="off" placeholder="配送费" type="number" min="0" style="width: 150px;"
+                   class="form-control" name="shippingFee" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">美团：</label>
+        <div class="col-sm-10">
+            <select class="form-control input-sm"
+                    name="meituanOpened">
+                <option value="true">已开</option>
+                <option value="false">未开</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">菜老板美：</label>
+        <div class="col-sm-10">
+            <select class="form-control input-sm"
+                    name="clbmOpened">
+                <option value="true">已开</option>
+                <option value="false">未开</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">饿百：</label>
+        <div class="col-sm-10">
+            <select class="form-control input-sm"
+                    name="eleOpened">
+                <option value="true">已开</option>
+                <option value="false">未开</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">客户端：</label>
+        <div class="col-sm-10">
+            <select class="form-control input-sm"
+                    name="wanteOpened">
+                <option value="true">已开</option>
+                <option value="false">未开</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">京东到家：</label>
+        <div class="col-sm-10">
+            <select class="form-control input-sm"
+                    name="jddjOpened">
+                <option value="true">已开</option>
+                <option value="false">未开</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">开店：</label>
+        <div class="col-sm-10">
+            <select class="form-control input-sm"
+                    name="opened">
+                <option value="true">已开</option>
+                <option value="false">未开</option>
+            </select>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+	S.on('s-ready', function(){
+		S.cascade($province, $city, $district);
+	})
+    S.meta.btns = [
+        {
+            name: "保存",
+            style: "btn btn-primary",
+            click: function(){
+                return S.S("#storeUserForm").submit().done(function(rs){
+                    S.close(true);
+                });
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function(){
+                S.close();
+            }
+        }
+    ]
+</script>

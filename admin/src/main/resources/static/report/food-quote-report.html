@@ -1,0 +1,200 @@
+<meta title="菜品报价报表"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<span class="h3">菜品报价报表</span>
+		</div>
+		<div class="panel-body">
+			<div class="p-b clearfix">
+				<form class="form-inline pull-left" id="reportsSearchForm" s="form"
+					  s-form="{action:function(){$page.node.val(1); $reportsGrid.refresh()}}"
+				>
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品名"
+						   style="width:150px;" name="foodName"/>
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品ID"
+						   style="width:150px;" name="foodId"/>
+					<div class="form-control s-select input-sm " style="width: 150px;"
+							 s="select"
+							 id="province"
+							 s-valid-label="省份"
+							 s-build="S.get('api/region/list/0')" >
+						<input autocomplete="off" type="hidden" name="provinceId" class="s-select-input" />
+						<div class="s-select-mirror">
+							<span></span>
+							<i class="fa fa-caret-down"></i>
+						</div>
+						<div class="s-select-panel">
+							<input autocomplete="off" type="text" class="s-select-filter">
+							<ul class="s-select-list">
+								<li class="s-select-list-item" value="">选择省份</li>
+							</ul>
+						</div>
+					</div>
+					<div class="form-control s-select input-sm" style="width: 150px;"
+							 s="select"
+							 id="city"
+							 s-data="''"
+							 s-build-switch="'off-on'"
+							 s-select="{title: 'name'}"
+							 s-build="S.get('api/region/list/' + ($province.val() || -1))" >
+						<input autocomplete="off" type="hidden" class="s-select-input" name="cityId" />
+						<div class="s-select-mirror">
+							<span></span>
+							<i class="fa fa-caret-down"></i>
+						</div>
+						<div class="s-select-panel">
+							<input autocomplete="off" type="text"  class="s-select-filter">
+							<ul class="s-select-list">
+								<li class="s-select-list-item" value="">选择城市</li>
+							</ul>
+						</div>
+					</div>
+					<input autocomplete="off" type="hidden" name="page" id="page"/>
+					<input autocomplete="off" type="submit" class="btn btn-primary btn-sm" value="查找"/>
+				</form>
+				<div class="pull-right">
+					<div class="btn-group">
+						<a href="javascript:;" class="btn btn-default btn-sm" s-click="generateAll()">
+							<i class="fa fa-refresh"></i> 生成所有
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="" id="reportsGrid" s='datac,nda'
+				 s-data="S.get('/api/food-quote-report/search', $reportsSearchForm.node.serialize())">
+				<table class="table table-striped form-inline table-hover table-bordered" style="width: 100%;">
+					<tr>
+						<th>图片</th>
+						<th>菜品</th>
+						<th>城市</th>
+						<th class="text-right">参考价</th>
+						<th class="text-right">警戒价</th>
+						<th class="text-right">平均价</th>
+						<th class="text-right">最低报价</th>
+						<th class="text-right">最高报价</th>
+						<th class="text-center">报价总数量</th>
+						<th class="text-center">高于参考价数量</th>
+						<th class="text-center">低于参考价数量</th>
+						<th class="text-center">更新时间</th>
+						<th class="text-right">操作</th>
+					</tr>
+					<tbody s="loop" s-data-filter="'results'">
+					<tr s-loop-role="empty">
+						<td colspan="13">
+							<div class="s-ui-none-data-info text-center"><i class="fa fa-info-circle text-info"></i>
+								未查询到数据，请先生成数据
+							</div>
+						</td>
+					</tr>
+					<tr s-loop-role="row" s="datac,row">
+						<td s="tpl">
+							<img src="{%=this.foodPic%}" style="max-width: 40px; max-height: 40px;"/>
+						</td>
+						<td>
+							<span name="foodName"></span>
+							<div>ID: <span name="foodId"></span></div>
+						</td>
+						<td>
+							<span name="province.name"></span>
+							<span name="city.name"></span>
+						</td>
+						<td class="text-right">
+							<div style="font-size: 8px;" class="text-muted">参考价</div>
+							<input autocomplete="off" type="number" step="0.1" style="width: 70px;"
+										 class="form-control text-right" name="refPrice.toFixed(1)"
+										 s-change="refPriceChange(this)"/>
+						</td>
+						<td class="text-right">
+							<div style="font-size: 8px;" class="text-muted">警戒价</div>
+							<input autocomplete="off" type="number" step="0.1" style="width: 70px;"
+										 class="form-control text-right" name="warningPrice.toFixed(1)"
+										 s-change="warningPriceChange(this)"/>
+						</td>
+						<td class="text-right">
+							<div style="font-size: 8px;" class="text-muted">平均价</div>
+							<span name="avgQuotePrice"></span>
+						</td>
+						<td class="text-right">
+							<div style="font-size: 8px;" class="text-muted">最低报价</div>
+							<span name="minQuotePrice"></span>
+						</td>
+						<td class="text-right">
+							<div style="font-size: 8px;" class="text-muted">最高报价</div>
+							<span name="maxQuotePrice"></span>
+						</td>
+						<td class="text-center">
+							<div style="font-size: 8px;" class="text-muted">报价总数量</div>
+							<span name="totalQuoteNum"></span>
+						</td>
+						<td class="text-center">
+							<div style="font-size: 8px;" class="text-muted">高于参考价数量</div>
+							<span name="greatQuoteNum"></span>
+						</td>
+						<td class="text-center">
+							<div style="font-size: 8px;" class="text-muted">低于参考价数量</div>
+							<span name="lessQuoteNum"></span>
+						</td>
+						<td class="text-center" name="updateTime"></td>
+						<td class="text-right">
+							<a href="javascript:;" class="btn btn-info btn-outline btn-xs"
+							   s-click="generateFoodQuoteReport(this)">
+								<i class="fa fa-refresh"></i> 生成
+							</a>
+						</td>
+					</tr>
+					</tbody>
+					<tfoot>
+					<tr>
+						<td colspan="13" class="text-right" style="vertical-align: middle">
+							<ul s="pagination" id="employeePagination"
+								s-pagination="{action:function(){$page.node.val(this); $reportsGrid.refresh()}}"
+								class="pagination pagination-sm ">
+							</ul>
+						</td>
+					</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	function generateAll() {
+		S.confirm('确认更新所有商品的报价数据吗？').done(function () {
+			var loading = S.loading();
+			S.put('/api/food-quote-report/generate-all').done(function () {
+				$reportsGrid.refresh()
+			}).always(function () {
+				loading.resolve()
+			})
+		})
+	}
+
+	S.on('s-ready', function(){
+		S.cascade($province, $city);
+	})
+
+	function refPriceChange($this) {
+		S.put('/api/food-quote-report/ref-price/' + $this.parent().data().id, {refPrice: $this.node.val()}).done(function () {
+			S.toast('修改成功', 'success')
+		})
+	}
+
+	function warningPriceChange($this) {
+		S.put('/api/food-quote-report/warning-price/' + $this.parent().data().id, {warningPrice: $this.node.val()}).done(function () {
+			S.toast('修改成功', 'success')
+		})
+	}
+
+	function generateFoodQuoteReport($s) {
+		var data = $s.parent().data()
+		var loading = S.loading();
+		S.put('/api/food-quote-report/generate/' + data.foodId).done(function () {
+			$reportsGrid.refresh()
+		}).always(function () {
+			loading.resolve()
+		})
+	}
+
+</script>

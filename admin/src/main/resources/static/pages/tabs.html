@@ -1,0 +1,24 @@
+<meta title="" args="title,navList" />
+<style>
+
+</style>
+<div class="p">
+    <ul class="nav nav-tabs" s="tpl" s-data="navList" id="nav">
+        {%$.each(this, function(i) {%}
+        <li class="{%=(i===0) ? 'active': ''%}" data-href="{%=this.url%}">
+            <a href="javascript:;">{%=this.title%}</a>
+        </li>
+        {%})%}
+    </ul>
+    <div id="contentPanel" s="window" style="background: #FFFFFF; border: 1px solid #ddd; border-top: none;"
+         s-window="{href: navList[0].url}">
+    </div>
+</div>
+<script>
+    $nav.node.delegate("li", 'click', function (e) {
+        var li = $(e.currentTarget);
+        var href = li.attr("data-href");
+        $contentPanel.load(href);
+        li.addClass("active").siblings(".active").removeClass("active");
+    });
+</script>

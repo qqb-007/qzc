@@ -1,0 +1,194 @@
+<meta title="商品属性" args="food:_model_,id" model="S.get('/api/food/' + id)" width="1000"/>
+<style>
+</style>
+<div class="p">
+    <table class="table table-striped table-bordered" s="datac,nda" s-data="food">
+        <tr>
+            <th>商品</th>
+        </tr>
+        <tr>
+            <td name="name"></td>
+            <td id="foodId" name="id"></td>
+        </tr>
+    </table>
+    <form class="form-inline" id="form"
+          s="form,valid" method="put" action="/api/food/propertie/{id}">
+        <table id="foodsGrid" s='nda'
+               class="table table-striped table-middle table-bordered form-inline">
+            <tr>
+                <th>排序</th>
+                <!--<th>SkuId</th>-->
+                <th>属性名</th>
+                <th class="text-right">可选值</th>
+                <!--<th class="text-right">报价倍数</th>-->
+                <!--<th class="text-center">重量(g)</th>-->
+                <!--<th class="text-center">不发布</th>-->
+                <th class="text-right">操作</th>
+            </tr>
+            <tbody s="loop" s-data="food.propertieList" id="skuList">
+            <tr s-loop-role="empty">
+                <td colspan="8" class="alert alert-warning">
+                    暂无属性
+                </td>
+            </tr>
+            <tr s-loop-role="row" s="datac" class="sku-tr">
+                <td>
+                    <i class="fa fa-arrows"></i>
+                </td>
+
+                <td>
+                    <!--<input s s-data-filter="'propertyName'"/>-->
+                    <input type="text" s class="form-control nameList" style="width: 100%" placeholder="属性名"
+                           s-data-filter="'propertyName'" s-valid-error="require()"/>
+                </td>
+                <td class="text-left">
+                    <div s="tpl" s-data-filter="'values'">
+                        {%$.each(this, function(i) {%}
+                        <div s>
+                            <input type="text" class="form-control test" s-valid-error="require()"  style="width: 25%"
+                                   value="{%=this%}" s-data="{%=this%}"/>
+                            <a href="javascript:;" s-click="this.node.parent().remove()" class="fa fa-times"></a>
+
+                        </div>
+
+                        {%})%}
+                        <input type="button" class="btn btn-default btn-xs" value="新增" s-click="addPropertie(this)"/>
+                    </div>
+
+                </td>
+                <td class="text-right" s="tpl">
+
+                    <input type="button" class="btn btn-xs btn-danger btn-outline"
+                           s-click="this.node.parent().parent().remove()" value="删除"/>
+
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="8">
+                    <input type="button" class="btn btn-default btn-xs" value="新增" s-click="add()"/>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </form>
+</div>
+<script>
+    S.meta.btns = [
+        {
+            name: "确定",
+            style: "btn btn-primary",
+            click: function () {
+                var deferred = $.Deferred()
+                $form.validate().done(function () {
+                    var list = []
+                    S.node.find('.sku-tr').each(function () {
+                        var row = $(this)
+                        var name = row.find('.nameList').val()
+                        //console.log($foodId.data().id)
+                        let arr = []
+                        row.find('.test').each(function () {
+                            var p = $(this)
+                            arr.push(p.val())
+
+                        })
+                        var detail = {
+                            propertyName: name,
+                            values: arr
+                        }
+                        list.push(detail)
+                    })
+                    if (list.length == 0) {
+                        S.alert('请填写属性', 'warning')
+                        deferred.reject()
+                        return
+                    }
+                    var loadingDeferred = S.loading()
+                    var param = Smart.serializeToObject($form.node);
+                    param.plist = list
+                    param.id = $foodId.data().id
+                    S.post('/api/food/pro', {json: JSON.stringify(param)}).done(function (rs) {
+                        if (rs) {
+                            S.toast('保存成功', 'success')
+                            S.close(true)
+                        } else {
+                            deferred.reject()
+                        }
+                    }).fail(function () {
+                        deferred.reject()
+                    }).always(function () {
+                        loadingDeferred.resolve()
+                    })
+
+
+                }).fail(function () {
+                    deferred.reject()
+                })
+                return deferred
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+
+
+    // function delPropertie($this,data) {
+    //     var row = $this.parent()
+    //     console.log(row.data())
+    //     console.log(data)
+    //     let arr = row.data().values
+    //     //console.log(arr.indexOf(data.toString()))
+    //     if(data){
+    //         arr.splice(arr.indexOf(data.toString()), 1)
+    //         row.data().values = arr;
+    //         $this.parent().data(row.data())
+    //     }else {
+    //         arr.pop()
+    //         row.data().values = arr;
+    //         $this.parent().data(row.data())
+    //     }
+    //
+    // }
+
+
+    function addPropertie($this) {
+        var row = $this.parent()
+        //console.log(row.data())
+        var list = []
+        row.find('.test').each(function () {
+            var row = $(this)
+            list.push(this.val())
+        })
+        list.push('')
+        row.data().values = list;
+        $this.parent().data(row.data())
+    }
+
+    function add(data) {
+        $skuList.addRow($.extend({
+            delable: true,
+            propertyName: '',
+            values: ['']
+        }, data))
+    }
+
+    S.on('s-ready', function () {
+        if (!food.propertieList.length) {
+            //console.log('没有')
+            // add({
+            //     // propertyName: '',
+            //     // values: ['']
+            // })
+        }
+        $skuList.node.sortable({
+            handle: ".fa-arrows"
+        })
+    })
+
+</script>

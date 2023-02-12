@@ -1,0 +1,1 @@
+"use strict";function setEnv(e){switch(e){case"pro":apiBase="https://capi.028tg.cn"}}function wrapVersion(e,s){return s?(-1!==e.indexOf("?")?e+="&_="+(new Date).getTime():e+="?_="+(new Date).getTime(),e):e}var mode="pro",assetsBase,apiBase;setEnv(mode),module.exports={assets:function(e,s){return wrapVersion(assetsBase+e,s)},api:function(e,s){return wrapVersion(apiBase+e,s)}};

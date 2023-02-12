@@ -1,0 +1,28 @@
+
+  <view class="container">
+    <view class="panel">
+      <view class="bank-card">
+        <view class="bank-card-icon">
+          <view class="iconfont icon-bank-card"/>
+        </view>
+        <view class="bank-card-info">
+          <view class="bank-name">{{storeUser.bankName ? storeUser.bankName : ''}}</view>
+          <view class="bank-account">{{storeUser.bankAccount ? storeUser.bankAccount : ''}}</view>
+        </view>
+        <view class="bank-owner">{{storeUser.bankAccountName ? storeUser.bankAccountName : ''}}</view>
+      </view>
+      <view class="tip">如需修改您的银行卡信息，请联系客服进行修改！</view>
+      <view class="money">可提现余额：¥
+        <text class="money-value">{{wallet.money}}</text>
+      </view>
+      <view class="withdraw-input">
+        <text class="withdraw-input-y">¥</text>
+        <input type="text" class="withdraw-input-val" bindchange="bindData" data-key="form.money" value="{{wallet.money}}" disabled="true"/>
+      </view>
+    </view>
+    <view class="bottom">
+      <i-button type="success" bindtap="withdraw" data-wpywithdraw-a="">确认提现</i-button>
+      <view class="tip">预计1-2个工作日到账</view>
+    </view>
+    <i-message id="message"/>
+  </view>

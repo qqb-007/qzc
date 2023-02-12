@@ -1,0 +1,1 @@
+ALTER TABLE `store_user_food` ADD COLUMN `min_order_count` INT (11);

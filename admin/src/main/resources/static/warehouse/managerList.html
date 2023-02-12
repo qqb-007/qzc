@@ -1,0 +1,90 @@
+<metat title="库位商品列表" width="1000px" args="wid"/>
+<style>
+
+</style>
+<div class="p">
+    <form class="form-inline pull-left" id="form" style="display: none">
+        <input autocomplete="off" type="text" class="form-control input-sm" placeholder="平台订单ID"
+               s s-data="wid"
+               style="width:200px;" name="storeUserId"/>
+        <input type="hidden" id="page" name="page"/>
+    </form>
+    <table id="orderDetailsGrid"
+           s='datac,nda'
+           s-data="S.get('/api/warehouse/getWhSufList', $form.node.serialize())"
+           class="table table-striped table-bordered">
+        <tr>
+            <th>图片</th>
+            <th class="text-right">商品名称</th>
+            <th class="text-right">商品编码</th>
+            <th class="text-right">店铺名称</th>
+            <!--<th class="text-right">是否上架</th>-->
+            <th class="text-right">操作</th>
+        </tr>
+        <tbody s="loop" s-data-filter="'results'">
+        <tr s-loop-role="empty">
+            <td colspan="9" class="alert alert-warning">
+                库位暂未绑定商品
+            </td>
+        </tr>
+        <tr s-loop-role="row" s="datac">
+            <td s="tpl">
+                <img src="{%=this.food.picture%}" style="max-width: 40px; max-height: 40px;"/>
+                <input type="hidden" class="food-id" value="{%=this.foodId%}"/>
+                <input type="hidden" class="sale" value="{%=this.sale%}"/>
+            </td>
+            <td>
+                <div class="text-right" name="food.code" s="tooltip" title="商品编码"></div>
+            </td>
+            <td>
+                <div class="text-right" name="food.name" s="tooltip" title="商品名称"></div>
+            </td>
+            <td>
+                <div class="text-right" name="storeUser.name" s="tooltip" title="店铺名称"></div>
+            </td>
+            <!--<td>-->
+                <!--<div class="text-right" name="sale" s="tooltip" title="是否上架"></div>-->
+            <!--</td>-->
+            <td class="text-right">
+                <input type="button" class="btn btn-xs btn-link" s-click="check(this)" value="删除"/>
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <!--<tr>-->
+            <!--<td colspan="9" class="text-right">-->
+                <!--共有<span name="total"></span>个数据-->
+                <!--<ul s="pagination"-->
+                    <!--s-pagination="{action:function(){$page.node.val(this); $orderDetailsGrid.refresh()}}"-->
+                    <!--class="pagination pagination-sm">-->
+                <!--</ul>-->
+            <!--</td>-->
+        <!--</tr>-->
+        </tfoot>
+    </table>
+</div>
+<script type="text/javascript">
+    S.meta.btns = [
+        // {
+        // 	name: '核对明细',
+        // 	style: 'btn btn-primary',
+        // 	click: function() {
+        //
+        // 	}
+        // },
+        {
+            name: '关闭',
+            style: 'btn btn-default',
+            click: function () {
+                S.close()
+            }
+        }
+    ]
+
+    function check($this) {
+        var data = $this.parent().data()
+        S.put('/api/warehouse/delsuf/' + data.id, {wid: wid}).done(function () {
+            S.close()
+        })
+    }
+</script>

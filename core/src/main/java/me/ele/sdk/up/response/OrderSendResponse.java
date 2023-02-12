@@ -1,0 +1,8 @@
+package me.ele.sdk.up.response;
+
+import me.ele.sdk.up.Response;
+
+public class OrderSendResponse extends Response<Boolean, String> {
+
+
+}

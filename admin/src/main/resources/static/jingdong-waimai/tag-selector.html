@@ -1,0 +1,54 @@
+<meta title="京东类目选择器" width="400"/>
+<style>
+	.jd-tag-selector {
+		display: flex;
+		flex-direction: row;
+		height: 600px;
+		align-items: stretch;
+	}
+
+	.jd-tag-list {
+		flex: 1;
+		overflow: auto;
+	}
+
+	.jd-tag-item {
+		display: block;
+		padding: 10px;
+	}
+
+	.jd-tag-item:hover {
+		background-color: #efefef;
+	}
+</style>
+<div class="p jd-tag-selector">
+	<div class="jd-tag-list" id="lv1" s="loop">
+		<a href="javascript:;" class="jd-tag-item" s-loop-role="row" s="tpl"><span>{%=this.categoryName%}</span>
+			<i class="fa fa-angle-right"></i></a>
+	</div>
+	<div class="jd-tag-list" id="lv2" s="loop" s-data="[]">
+		<a href="javascript:;" class="jd-tag-item" s-click="select(this)" s-loop-role="row" s="tpl"><span>{%=this.categoryName%}</span>
+			</a>
+	</div>
+</div>
+<script type="text/javascript">
+    var list = [];
+	S.get('/api/jingdong-waimai/retail/getJdTagIds').done(function (rs) {
+        list = rs
+        $lv1.data(list)
+	})
+
+    S.node.delegate('.jd-tag-item', 'mouseenter', function () {
+        var $this = Smart.of($(this))
+        var data = $this.data()
+        switch (data.categoryLevel) {
+            case 1:
+                $lv2.data(data.children);
+                break;
+        }
+    })
+
+	function select($this) {
+		S.close($this.data())
+	}
+</script>

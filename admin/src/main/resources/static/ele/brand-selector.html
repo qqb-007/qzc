@@ -1,0 +1,89 @@
+<metat title="选择品牌" args="multi:false" width="700"/>
+<div class="p">
+	<div class="m-b clearfix">
+		<form class="form-inline pull-left" id="form" s="form,valid">
+			<input autocomplete="off" type="text" class="form-control input-sm" s-valid-error="require()" placeholder="关键字"
+						 style="width:400px;" name="keyword" s />
+			<input type="hidden" id="page" name="page" value="1"/>
+			<button type="button" class="btn btn-default btn-sm"
+							s-click="$page.node.val(1); $form.validate().done(function() {$brandGrid.refresh()})">查询
+			</button>
+		</form>
+	</div>
+	<div style="max-height: 500px; overflow: auto">
+		<table
+				id="brandGrid"
+				s='datac,nda,check'
+				s-data-switch="'off-on'"
+				s-check="{multiple: multi}"
+				s-data="S.get('/api/ele/brand/list', $form.node.serialize())"
+				class="table table-striped table-bordered">
+			<tr>
+				<th>
+					<label class="s-checkbox">
+						<input autocomplete="off" type="checkbox" s-check-role="checkall-h"/>
+						<span class="s-checkbox-indicator"></span>
+					</label>
+				</th>
+				<th>品牌ID</th>
+				<th>品牌名</th>
+			</tr>
+			<tbody s="loop" s-data-filter="'results'">
+			<tr s-loop-role="empty">
+				<td colspan="2" class="alert alert-warning">
+					暂无品牌
+				</td>
+			</tr>
+			<tr s-loop-role="row" s-check-role="i" class="store-row" s="datac">
+				<td>
+					<label class="s-checkbox">
+						<input autocomplete="off" type="checkbox" s-check-role="h" />
+						<span class="s-checkbox-indicator"></span>
+					</label>
+				</td>
+				<td name="brandId"></td>
+				<td name="brandName"></td>
+			</tr>
+			</tbody>
+			<tfoot>
+			<tr>
+				<td colspan="3" class="text-right">
+					共有<span name="total"></span>个数据
+					<ul s="pagination"
+							s-pagination="{action:function(){$page.node.val(this); $brandGrid.refresh()}}"
+							class="pagination pagination-sm">
+					</ul>
+				</td>
+			</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>
+<script>
+	S.meta.btns = [
+		{
+			name: "选择",
+			style: "btn btn-primary",
+			click: function() {
+				var datas = $brandGrid.getCheckedData();
+				if (datas.length) {
+					S.close(datas);
+				} else {
+					S.toast("您还没有选择品牌！", "warning");
+				}
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function() {
+				S.close();
+			}
+		}
+	]
+
+	S.node.delegate('.store-row', 'dblclick', function (e) {
+		var node = $(e.currentTarget);
+		S.close([Smart.of(node).data()])
+	})
+</script>

@@ -1,0 +1,163 @@
+<meta title="日结算单"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<span class="h3">日结算单列表</span>
+		</div>
+		<div class="panel-body">
+			<div class="m-b clearfix">
+				<form class="form-inline pull-left" id="form">
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商家ID"
+						   style="width:200px;" name="storeUserId"/>
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商家名称"
+						   style="width:200px;" name="storeUserName"/>
+					<input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+					<select class="form-control input-sm" s="select"
+							s-build="S.get('/api/enum/valuesMap/core.enums.SettlementSheetDetailStatus')"
+							name="status">
+						<option value="">状态</option>
+					</select>
+					<button type="button" class="btn btn-default btn-sm"
+							s-click="$page.node.val(1); return $sheetsGrid.refresh()">查询
+					</button>
+				</form>
+                <form class="form-inline pull-left" role="form" s="valid,form" id="checkForm" action="/api/settlement/batch-re-generate-store-user-daily-settlement-sheet-detail"
+                      method="get">
+                    <input type="text" placeholder="重检/核对日期" class="form-control" autocomplete="off" name="date" s-valid-error="require()"
+                           s="datetimepicker"/>
+                    <input type="hidden" id="type" name="type"/>
+                    <input type="button" class="btn btn-primary" s-click="batchReCheck()" value="一键重检">
+                    <input type="button" class="btn btn-primary" s-click="batchCheck()" value="一键核对检查">
+                </form>
+
+			</div>
+			<table id="sheetsGrid"
+				   s='datac,nda'
+				   s-data="S.get('/api/settlement-sheet-detail/search', $form.node.serialize())"
+				   class="table table-striped table-bordered">
+				<tr>
+					<th>ID</th>
+					<th>日期</th>
+					<th>门店</th>
+					<th class="text-center">年周</th>
+					<th class="text-center">订单数量</th>
+					<th class="text-center">退款数量</th>
+					<th class="text-center">订单总金额</th>
+					<th class="text-center">餐损金额</th>
+					<th class="text-center">退款金额</th>
+					<th class="text-center">扣点金额</th>
+					<th class="text-center">结算金额</th>
+					<th class="text-center">状态</th>
+					<th class="text-right">操作</th>
+				</tr>
+				<tbody s="loop" s-data-filter="'results'">
+				<tr s-loop-role="empty">
+					<td colspan="12" class="alert alert-warning">
+						暂无结算单
+					</td>
+				</tr>
+				<tr s-loop-role="row" s="datac">
+					<td name="id"></td>
+					<td name="date"></td>
+					<td name="storeUserName"></td>
+					<td class="text-center" >
+						<span name="year"></span>.<span name="week"></span>
+					</td>
+					<td class="text-center" name="orderNum"></td>
+					<td class="text-center" name="partRefundNum"></td>
+					<td class="text-center" name="orderAmount"></td>
+					<td class="text-center" name="cansunAmount"></td>
+					<td class="text-center" name="partRefundAmount"></td>
+					<td class="text-center" name="deductAmount"></td>
+					<td class="text-center" name="settlementAmount"></td>
+					<td class="text-center" s="tpl">
+						<label class="label
+                            {%
+                                switch(this.status) {
+                                    case 'WAIT_CHECK': out.print('label-danger'); break;
+                                    case 'WAIT_VERIFY': out.print('label-warning'); break;
+                                    case 'WAIT_SETTLE': out.print('label-info'); break;
+                                    case 'SETTLED': out.print('label-success'); break;
+                                    default: out.print('label-default');break;
+                                }
+                            %}
+                            ">{%=this.statusTitle%}</label>
+					</td>
+					<td class="text-right" s="tpl">
+						{%if(this.status == 'WAIT_CHECK') {%}
+						<input type="button" class="btn btn-xs btn-info btn-outline" s-click="check(this)"
+							   value="核对检查"/>
+						{%}%}
+						{%if(this.status == 'WAIT_SETTLE') {%}
+						<input type="button" class="btn btn-xs btn-info btn-outline" s-click="reCheck(this)"
+							   value="重检"/>
+						{%}%}
+						<a href="javascript:;" s-click="showDetail(this)" class="btn btn-xs btn-link">明细</a>
+					</td>
+				</tr>
+				</tbody>
+				<tfoot>
+				<tr>
+					<td colspan="12" class="text-right">
+						共有<span name="total"></span>个数据
+						<ul s="pagination"
+							s-pagination="{action:function(){$page.node.val(this); $sheetsGrid.refresh()}}"
+							class="pagination pagination-sm">
+						</ul>
+					</td>
+				</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+</div>
+<script>
+	function showDetail($this) {
+		var data = $this.parent().data()
+		S.popupOpen('/settlement/settlementSheetOrderList.html?', {settlementSheetDetailId: data.id})
+	}
+
+	function check($this) {
+		var data = $this.parent().data()
+		var def = S.loading()
+		S.put('/api/settlement/re-generate-store-user-daily-settlement-sheet-detail/' + data.id).done(function() {
+			S.toast('核对完成')
+			$sheetsGrid.refresh()
+		}).always(function() {
+			def.resolve()
+		})
+	}
+
+    function batchCheck() {
+        var def = S.loading()
+        $type.node.val(0)
+        $checkForm.submit().done(function () {
+            S.toast('核对完成')
+            $sheetsGrid.refresh()
+        }).always(function() {
+            def.resolve()
+        });
+    }
+
+    function batchReCheck() {
+        var def = S.loading()
+        $type.node.val(1)
+        $checkForm.submit().done(function () {
+            S.toast('重检完成')
+            $sheetsGrid.refresh()
+        }).always(function() {
+            def.resolve()
+        });
+    }
+
+	function reCheck($this) {
+		var data = $this.parent().data()
+		var def = S.loading()
+		S.post('/api/settlement/recheck-settlement-sheet-detail/' + data.id).done(function() {
+			S.toast('重检完成')
+			$sheetsGrid.refresh()
+		}).always(function() {
+			def.resolve()
+		})
+	}
+</script>

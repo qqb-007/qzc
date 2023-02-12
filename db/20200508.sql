@@ -1,0 +1,1 @@
+ALTER TABLE store_user_food ADD unlock_time int NULL;

@@ -1,0 +1,26 @@
+<metat title="顺丰订单加小费" args="order" width="500"/>
+<div class="p">
+	<form role="form" id="getOrderDetailForm" s="valid,form,nda,datac"
+				class="form-horizontal"
+				method="post"
+				s-data="order"
+				s-form="{done: submitDone}"
+				style="padding: 20px;" action="/api/order/addFee">
+		<input type="hidden" name="id" s-data-filter="'id'" />
+		<input type="text" class="form-control input-sm" name="fee" placeholder="小费金额，不得小于一元"/>
+		<div class="form-group">
+			<div class="col-sm-10 col-sm-offset-2">
+				<input type="submit" class="btn btn-primary" value="提交"/>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+  function submitDone(rs) {
+		if (rs) {
+			S.toast('操作成功', 'success')
+		} else {
+			S.alert(rs.message)
+		}
+  }
+</script>

@@ -1,0 +1,1 @@
+ALTER TABLE store ADD uu_account_type varchar(20) NULL;

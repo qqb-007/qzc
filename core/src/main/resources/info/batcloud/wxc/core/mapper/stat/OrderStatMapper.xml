@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.batcloud.wxc.core.mapper.stat.OrderStatMapper">
+
+  <select id="statStoreUserDayBizDataByStoreUserId"
+          resultType="info.batcloud.wxc.core.mapper.stat.domain.StoreUserBizData">
+    select
+      count(1),
+      sum(total_num)                                                                      as total_num,
+      sum(cansun)                                                                         as cansun,
+      sum(if(plat = 'ELE', total_num, 0))                                                 as ele_total_num,
+      sum(if(plat = 'CLBM', total_num, 0))                                                as clbm_total_num,
+      sum(if(plat = 'JDDJ', total_num, 0))                                                as jddj_total_num,
+      sum(if(plat = 'MEITUAN', total_num, 0))                                             as meituan_total_num,
+      sum(valid_order_num)                                                                as valid_order_num,
+      sum(if(plat = 'ELE', valid_order_num, 0))                                           as ele_valid_order_num,
+      sum(if(plat = 'CLBM', valid_order_num, 0))                                          as clbm_valid_order_num,
+      sum(if(plat = 'JDDJ', valid_order_num, 0))                                          as jddj_valid_order_num,
+      sum(if(plat = 'MEITUAN', valid_order_num, 0))                                       as meituan_valid_order_num,
+      sum(invalid_order_num)                                                              as invalid_order_num,
+      sum(if(plat = 'ELE', invalid_order_num, 0))                                         as ele_invalid_order_num,
+      sum(if(plat = 'CLBM', invalid_order_num, 0))                                        as clbm_invalid_order_num,
+      sum(if(plat = 'JDDJ', invalid_order_num, 0))                                        as jddj_invalid_order_num,
+      sum(if(plat = 'MEITUAN', invalid_order_num, 0))                                     as meituan_invalid_order_num,
+      sum(total)                                                                          as total,
+      sum(if(plat = 'ELE', total, 0))                                                     as ele_total,
+      sum(if(plat = 'CLBM', total, 0))                                                    as clbm_total,
+      sum(if(plat = 'JDDJ', total, 0))                                                    as jddj_total,
+      sum(if(plat = 'MEITUAN', total, 0))                                                 as meituan_total,
+      sum(total) / sum(valid_order_num)                                                   as per_fee,
+      sum(if(plat = 'ELE', total, 0)) / sum(if(plat = 'ELE', valid_order_num, 0))         as ele_per_fee,
+      sum(if(plat = 'CLBM', total, 0)) / sum(if(plat = 'CLBM', valid_order_num, 0))       as clbm_per_fee,
+      sum(if(plat = 'JDDJ', total, 0)) / sum(if(plat = 'JDDJ', valid_order_num, 0))       as jddj_per_fee,
+      sum(if(plat = 'MEITUAN', total, 0)) / sum(if(plat = 'MEITUAN', valid_order_num, 0)) as meituan_per_fee
+    from (
+           select
+             count(1)                                 as total_num,
+             o.plat,
+             sum(o.cansun)                            as cansun,
+             sum(if(o.status in ('WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED', 'SHIPPING', 'SHIPPED', 'FINISHED'), 1,
+                    0))                               as valid_order_num,
+             sum(if(o.status not in ('WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED', 'SHIPPING', 'SHIPPED', 'FINISHED'),
+                    1, 0))                            as invalid_order_num,
+             sum(if(o.status in ('WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED', 'SHIPPING', 'SHIPPED', 'FINISHED'),
+                    o.cost_total - o.cost_refund, 0)) as total
+           from wxc_order o left join store s on o.store_id = s.id
+           where
+             s.store_user_id = #{storeUserId}
+             and o.create_time
+             between #{minCreateTime} and #{maxCreateTime}
+           group by o.plat
+         ) as t
+  </select>
+
+  <select id="statFoodSupplierDayBizDataByFoodSupplierId"
+          resultType="info.batcloud.wxc.core.mapper.stat.domain.FoodSupplierBizData">
+    select
+      count(1)             as total_num,
+      sum(if(order_status in ('WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED', 'SHIPPING', 'SHIPPED', 'FINISHED'), 1,
+             0))           as valid_order_num,
+      sum(if(order_status not in ('WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED', 'SHIPPING', 'SHIPPED', 'FINISHED'),
+             1, 0))        as invalid_order_num,
+      sum(total_money)     as total_money,
+      sum(refund_money)    as refund_money,
+      sum(quantity)        as quantity,
+      sum(refund_quantity) as refund_quantity,
+      sum(remain_money)    as remain_money,
+      sum(remain_money) /
+      sum(if(order_status in ('WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED', 'SHIPPING', 'SHIPPED', 'FINISHED'), 1,
+             0))           as per_fee
+    from (select
+            o.status                                                                                as order_status,
+            sum(od.supplier_quote_price * od.quantity * od.quote_unit_ratio)                        as total_money,
+            sum(od.supplier_quote_price * od.refund_quantity * od.quote_unit_ratio)                 as refund_money,
+            sum(od.quantity * od.quote_unit_ratio)                                                  as quantity,
+            sum(od.refund_quantity * od.quote_unit_ratio)                                           as refund_quantity,
+            sum(od.supplier_quote_price * (od.quantity - od.refund_quantity) * od.quote_unit_ratio) as remain_money
+          from order_detail od left join wxc_order o on o.id = od.order_id
+          where
+            o.create_time
+            between #{minCreateTime} and #{maxCreateTime}
+            and od.food_supplier_id = #{foodSupplierId}
+          group by order_id) as t
+  </select>
+
+  <select id="statStoreUserIdHasValidOrder"
+          resultType="java.lang.Long">
+    select
+    distinct s.store_user_id as store_user_id
+    from wxc_order o left join store s on o.store_id = s.id
+    where
+    o.create_time between #{startTime} and #{endTime}
+    <if test="status != null">
+      and o.status = #{status}
+    </if>
+    <if test="bizStatus != null">
+      and o.biz_status = #{status}
+    </if>
+    <if test="plat != null">
+      and o.plat = #{plat}
+    </if>
+  </select>
+
+  <select id="statFoodSaleInfoOfFoodSupplier"
+          resultType="info.batcloud.wxc.core.mapper.stat.domain.SupplierFoodSaleInfo">
+    select
+      od.food_supplier_id,
+      od.food_id,
+      f.name                                                                                  as food_name,
+      f.picture                                                                               as food_picture,
+      f.quote_unit                                                                            as unit,
+      sum((od.quantity - od.refund_quantity) * od.quote_unit_ratio)                           as sales,
+      sum(od.supplier_quote_price * (od.quantity - od.refund_quantity) * od.quote_unit_ratio) as money
+    from
+      order_detail od
+      left join wxc_order o on o.id = od.order_id
+      left join food f on f.id = od.food_id
+    where
+      o.create_time
+      between #{minCreateTime} and #{maxCreateTime}
+      and od.food_supplier_id = #{foodSupplierId}
+      and o.status in ('WAIT_MERCHANT_CONFIRM', 'MERCHANT_CONFIRMED', 'SHIPPING', 'SHIPPED', 'FINISHED')
+    group by od.food_id order by sum(od.supplier_quote_price * (od.quantity - od.refund_quantity) * od.quote_unit_ratio) desc
+  </select>
+</mapper>

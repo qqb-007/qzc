@@ -1,0 +1,94 @@
+<meta title="商品编辑" args="id,code" width="800"/>
+<style>
+</style>
+<div class="p">
+    <form s="valid,form"
+          method="put"
+          action="/api/food/code/publish/{id}"
+          id="form" class="form-horizontal">
+        <table class="table table-striped table-bordered">
+            <tr >
+                <td>商品编码</td>
+                <td>
+                    <input autocomplete="off" placeholder="输入商品编码" type="text"
+                           class="form-control" s s-data="code" name="code" s-valid-error="require()" />
+                </td>
+            </tr>
+        </table>
+        <div class="p-xs">
+            更新到选择的门店，不指定门店则表示更新到所有门店
+            <input type="button" class="btn btn-primary btn-xs" value="选择门店" s-click="selectStore()" />
+        </div>
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>ID</th>
+                <th>平台</th>
+                <th>平台ID</th>
+                <th>门店</th>
+                <th class="">电话</th>
+                <th class="text-center">地址</th>
+                <th class="text-right">操作</th>
+            </tr>
+            <tbody s="nda,loop" id="storeList" s-data="[]">
+            <tr s-loop-role="empty">
+                <td colspan="7" class="alert alert-warning">
+                    您还没有选择门店
+                </td>
+            </tr>
+            <tr s-loop-role="row" s-check-role="i" s="datac">
+                <td>
+                    <input type="text" readonly name="storeIdList" s-data-filter="'id'" class="form-control" style="width: 50px;" />
+                </td>
+                <td name="typeTitle"></td>
+                <td name="code"></td>
+                <td name="name"></td>
+                <td name="phone"></td>
+                <td name="address"></td>
+                <td class="text-right">
+                    <input type="button" class="btn btn-xs btn-danger btn-outline" value="删除" s-click="this.parent().node.remove()"/>
+                </td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="7" class="text-right">
+
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </form>
+</div>
+<script>
+    S.meta.btns = [
+        {
+            name: "确定",
+            style: "btn btn-primary",
+            click: function() {
+                return $form.submit().done(function() {
+                    S.toast('发布完成')
+                    S.close(true)
+                })
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+
+    function selectStore() {
+      S.popupOpen('/store/store-selector.html', {multi: true}).done(function (storeList) {
+        if(storeList) {
+          $storeList.addRows(storeList)
+        } else {
+        }
+      }).fail(function () {
+      })
+    }
+
+
+</script>

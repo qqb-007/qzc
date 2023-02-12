@@ -1,0 +1,36 @@
+<meta title="商品配置" args="data"/>
+<style>
+
+</style>
+<form class="form-horizontal" id="form" s="form,datac,nda,valid" s-data="data" style="width: 600px;">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">默认加价(百分比)</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="number" class="form-control" name="perIncrease" placeholder="默认加价(百分比)"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">打包盒数量</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="number" class="form-control" name="boxNum" placeholder="打包盒数量"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">打包盒价格</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="number" class="form-control" name="boxPrice" placeholder="打包盒价格"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    S.getContent = function () {
+        var deferred = $.Deferred();
+        $form.validate().done(function() {
+            deferred.resolve(Smart.serializeToObject($form.node))
+        })
+        return deferred;
+    }
+</script>

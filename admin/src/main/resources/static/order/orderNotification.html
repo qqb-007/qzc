@@ -1,0 +1,191 @@
+<metat title="订单通知与同步"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<span class="h3">订单通知历史&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<input type="button" class="btn btn-primary" s-click="start()" value="开启配送提醒"/>&emsp;&emsp;<input type="button" class="btn btn-primary" s-click="end()" value="关闭配送提醒"/></span>
+		</div>
+		<div class="panel-body">
+			<div class="m-b clearfix">
+				<form class="form-inline pull-left" id="form">
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="平台订单ID"
+						   style="width:200px;" name="platOrderId"/>
+					<select class="form-control input-sm" s="select"
+							s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+							name="plat">
+						<option value="">平台</option>
+					</select>
+					<select class="form-control input-sm" s="select"
+							s-build="S.get('/api/enum/valuesMap/core.enums.OrderNotificationType')"
+							name="type">
+						<option value="">类型</option>
+					</select>
+					<select class="form-control input-sm" s="select"
+							s-build="S.get('/api/enum/valuesMap/core.enums.OrderNotificationSort')"
+							name="sort">
+						<option value="">排序</option>
+					</select>
+					<select class="form-control input-sm"
+							name="success">
+						<option value="false">通知失败</option>
+						<option value="true">通知成功</option>
+					</select>
+					<input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+					<button type="button" class="btn btn-default btn-sm"
+							s-click="$page.node.val(1); $ordersGrid.refresh()">查询
+					</button>
+				</form>
+				<form class="form-inline pull-right"
+					  method="post"
+					  s="form,valid"
+					  s-form="{done: submitDone}"
+					  action="/api/order/sync-plat-order">
+					订单同步：
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="平台订单ID"
+						   s-valid-error="require()"
+						   style="width:200px;" name="platOrderId"/>
+					<select class="form-control input-sm" s="select"
+							s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+							name="plat">
+					</select>
+					<button type="submit" class="btn btn-default btn-sm">同步</button>
+				</form>
+			</div>
+			<table id="ordersGrid"
+				   s='datac,nda'
+				   s-data="S.get('/api/order-notification/search', $form.node.serialize())"
+				   class="table table-striped table-bordered">
+				<tr>
+					<th>ID</th>
+					<th>平台</th>
+					<th>平台订单ID</th>
+					<th>类型</th>
+					<th>时间</th>
+					<th class="text-center">状态</th>
+					<th class="text-right">操作</th>
+				</tr>
+				<tbody s="loop" s-data-filter="'results'">
+				<tr s-loop-role="empty">
+					<td colspan="7" class="alert alert-warning">
+						暂无订单通知
+					</td>
+				</tr>
+				<tr s-loop-role="row" s="datac">
+					<td name="id"></td>
+					<td name="platTitle"></td>
+					<td name="platOrderId"></td>
+					<td name="typeTitle"></td>
+					<td name="createTime"></td>
+					<td s="tpl" class="text-center">
+						<a href="javascript:;" s-click="showErrMsg(this)" class="label
+                            {%
+                                switch(this.success) {
+                                    case true: out.print('label-success'); break;
+                                    default: out.print('label-danger');break;
+                                }
+                            %}
+                            ">{%=this.success ? '成功' : '<i class="fa fa-question"></i> 失败'%}</a>
+					</td>
+					<td s="tpl" class="text-right">
+						<input type="button" class="btn btn-xs btn-info btn-outline" s-click="return showData(this)"
+							   value="查看"/>
+						<input type="button" class="btn btn-xs btn-success btn-outline" s-click="return syncOrder(this)"
+							   value="同步"/>
+					</td>
+				</tr>
+				</tbody>
+				<tfoot>
+				<tr>
+					<td colspan="7" class="text-right">
+						共有<span name="total"></span>个数据
+						<ul s="pagination"
+							s-pagination="{action:function(){$page.node.val(this); $ordersGrid.refresh()}}"
+							class="pagination pagination-sm">
+						</ul>
+					</td>
+				</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+</div>
+<script>
+    var timer1 = null;
+
+    function start(){
+        if ( timer1 )
+            return;
+        timer1 =  setInterval(function () {
+            S.get('/api/order/orderRemind').done(function (rs) {
+
+                if (rs.check) {
+                    playSound();
+                    S.toast('待发起配送订单：'+rs.msg, 'info:pe-7s-speaker',5000)
+                }
+            })
+        }, 60000);;
+    }
+    function end(){
+        if ( timer1 )
+        {
+            clearInterval(timer1);
+            timer1 = null;
+        }
+    }
+
+    function playSound() {
+        var borswer = window.navigator.userAgent.toLowerCase();
+        if(borswer.indexOf('ie') >= 0) {
+            var strEmbed = '<embed name="embedPlay" src="/sound/peisong.mp3" autostart="true" hidden="true" loop="false" />';
+            if($('form').find('embed').length <= 0) {
+                $('form').append(strEmbed);
+            }
+            var embed = document.embedPlay;
+            //浏览器不支持audio，则使用embed播放
+            embed.volume = 100;
+        } else {
+            //非IE内核浏览器
+            var strAudio = '<audio id="audioPlay" src="/sound/peisong.mp3" hidden="true" />';
+            if($('form').find('audio').length <= 0) {
+                $('form').append(strAudio);
+            }
+
+            var audio = $('#audioPlay')[0];
+            audio.play();
+        }
+    }
+	function syncOrder($this) {
+		var data = $this.parent().data()
+		return S.post('/api/order/sync-plat-order/no', {
+			plat: data.plat,
+			platOrderId: data.platOrderId,
+			type: data.type
+		}).done(function (rs) {
+			submitDone(rs, data.id)
+		})
+	}
+
+	function submitDone(rs, id) {
+		if (rs.success) {
+			S.toast('同步完成', 'success')
+			S.put('/api/order-notification/success/' + id).done(function() {
+				$ordersGrid.refresh()
+			})
+		} else {
+			S.alert('同步失败，原因是：' + rs.msg, 'danger')
+		}
+	}
+
+	function showData($this) {
+		var data = $this.parent().data()
+		try {
+			S.alert('<pre>' + JSON.stringify(JSON.parse(data.data || [])) + '</pre>')
+		} catch (e) {
+			S.alert(data.data)
+		}
+	}
+
+	function showErrMsg($this) {
+		var data = $this.parent().data()
+		S.alert(data.errMsg)
+	}
+</script>

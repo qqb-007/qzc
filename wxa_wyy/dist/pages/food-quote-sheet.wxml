@@ -1,0 +1,23 @@
+
+  <view class="container">
+    <block  wx:for="{{sheetList}}" wx:key="{{item.id}}">
+      <view class="sheet" bindtap="showDetail" data-wpyshowdetail-a="{{item.id}}">
+        <view class="sheet-head flex-row space-between">
+          <view class="sheet-id">{{item.id}}</view>
+          <view class="sheet-status" style="background-color: {{item.statusColor}}">{{item.statusTitle}}</view>
+        </view>
+        <view class="sheet-body">
+          <view class="flex-row space-between align-center">
+            <view class="sheet-detail">商品：{{item.foodNum}}</view>
+            <i-tag class="i-tags" name="{{item.publishStatusTitle}}" color="{{item.publishStatusColor}}">{{item.publishStatusTitle}}</i-tag>
+          </view>
+          <view class="sheet-divide"/>
+          <view class="sheet-footer">
+            <view>创建：{{item.createTime}}</view>
+            <view wx:if="{{item.publishTime}}">发布：{{item.publishTime}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <i-divider content="我是有底线的"  wx:if="{{!hasNext}}"/>
+  </view>

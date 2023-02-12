@@ -1,0 +1,69 @@
+<meta title="钱包明细" args="storeUserId,valueType,type"/>
+<div class="p">
+    <div class="m-b clearfix">
+        <form class="form-inline" id="form">
+            <input type="number" name="storeUserId" s s-data="storeUserId" class="form-control" placeholder="门店id"/>
+            <input type="hidden" name="page" id="page" value="1" />
+            <select class="form-control" s="select"
+                    name="valueType"
+                    s-data="valueType || ''"
+                    s-build="S.get('/api/enum/valuesMap/core.enums.WalletValueType')">
+                <option value="">类型</option>
+            </select>
+            <select class="form-control" s="select"
+                    name="type"
+                    s-data="type || ''"
+                    s-build="S.get('/api/enum/valuesMap/core.enums.WalletFlowDetailType')">
+                <option value="">明细种类</option>
+            </select>
+            <input type="button" class="btn btn-default" value="查询" s-click="$page.node.val(1); $walletsGrid.refresh()"/>
+        </form>
+    </div>
+    <div id="walletsGrid"
+         s='datac,nda'
+         s-data="S.get('/api/wallet-flow-detail/search', $form.node.serialize())">
+        <table class="table table-striped table-bordered table-hover">
+            <tr>
+                <th>ID</th>
+                <th>门店</th>
+                <th class="text-right">类型</th>
+                <th class="text-right">明细种类</th>
+                <th class="text-right">变更前余额</th>
+                <th class="text-right">存入</th>
+                <th class="text-right">变更后余额</th>
+                <th class="text-center">日期</th>
+                <th class="text-right">当前状态</th>
+            </tr>
+            <tbody s="loop" s-data-filter="'results'">
+            <tr s-loop-role="empty">
+                <td colspan="9">暂无数据</td>
+            </tr>
+            <tr s-loop-role="row" s-check-role="i" s="datac" class="wallet">
+                <td name="id"></td>
+                <td name="storeUser.name"></td>
+                <td class="text-right" name="valueTypeTitle"></td>
+                <td class="text-right" name="typeTitle"></td>
+                <td class="text-right" name="beforeValue"></td>
+                <td class="text-right" name="value"></td>
+                <td class="text-right" name="afterValue"></td>
+                <td class="text-center" name="createTime"></td>
+                <td class="text-right" name="statusTitle"></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="9" class="text-right">
+                    共有<span name="total"></span>个数据
+                    <ul s="pagination"
+                        s-pagination="{action:function(){$page.node.val(this); $walletsGrid.refresh()}}"
+                        class="pagination pagination-sm">
+                    </ul>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+
+</script>

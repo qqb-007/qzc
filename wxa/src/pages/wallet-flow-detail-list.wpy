@@ -1,0 +1,176 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+
+  @import "../css/var";
+
+  .container {
+
+  }
+
+  .caption {
+    font-size: 14px;
+    padding: 5px 10px;
+    color: @color-muted;
+  }
+
+  .wallet-flow {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #FFFFFF;
+    border-bottom: 1rpx solid #ddd;
+  }
+
+  .flow {
+    &-detail {
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+    }
+    &-right {
+      align-items: flex-end;
+      text-align: right;
+      flex: 1;
+    }
+    &-status {
+      font-size: 12px;
+      text-align: right;
+    }
+    &-title {
+      color: @color-title;
+      font-size: 18px;
+      margin-bottom: 5rpx;
+      font-weight: 300;
+    }
+    &-time {
+      font-size: 12px;
+      color: @color-muted;
+      font-weight: 300;
+    }
+    &-val {
+      font-size: 20px;
+      color: @color-danger;
+      font-weight: 300;
+      &-income {
+        color: @color-success;
+      }
+    }
+    &-arrow {
+      color: @color-muted;
+      width: 20px;
+      text-align: right;
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="caption">最近流水</view>
+    <view class="detail" >
+
+    </view>
+    <view class="wallet-flow" @tap="showDetail({{item}})" wx:for="{{walletFlowDetailList}}">
+      <view class="flow-detail">
+        <view class="flow-title">{{item.typeTitle}}</view>
+        <view class="flow-time">{{item.createTime}}</view>
+      </view>
+      <view class="flow-right">
+        <view class="flow-val {{item.value > 0 ? 'flow-val-income' : ''}}">{{item.value > 0 ? '+ ' + item.valueStr : '- ' + (item.valueStr)}}</view>
+        <view class="flow-status {{item.statusStyle}}" wx:if="{{item.status}}">{{item.statusTitle}}</view>
+      </view>
+      <text class="flow-arrow iconfont icon-arrow-right" wx:if="{{item.type === 'WITHDRAW'}}"></text>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let api = require('../utils/api')
+
+  let DEFAULT_SEARCH_PARAM = {
+    page: 1,
+    valueType: 'MONEY'
+  }
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '余额提现',
+      enablePullDownRefresh: true,
+      backgroundColor: '#efeff4'
+    }
+
+    data = {
+      walletFlowDetailList: [],
+      hasNext: true,
+      searchParam: Object.assign({}, DEFAULT_SEARCH_PARAM)
+    }
+
+    methods = {
+      showDetail(detail) {
+        if (detail.type === 'WITHDRAW') {
+          wx.navigateTo({
+            url: 'withdraw-info?walletFlowDetailId=' + detail.id
+          })
+        }
+      }
+    }
+
+    events = {}
+
+    loadData() {
+      return this.search()
+    }
+
+    search (append, callback) {
+      return api.walletFlowDetail.search(this.searchParam).done((rs) => {
+        rs.data.results.forEach(o => {
+          o.statusStyle = this.checkStatusStyle(o)
+          o.valueStr = o.value > 0 ? o.value.toFixed(2) : (-o.value).toFixed(2)
+        })
+        if (append) {
+          this.walletFlowDetailList = this.walletFlowDetailList.concat(rs.data.results)
+        } else {
+          this.walletFlowDetailList = rs.data.results
+        }
+        let paging = rs.data
+        this.hasNext = paging.hasNext
+        this.$apply()
+      }).always(() => {
+        this.loading = false
+        callback && callback()
+      })
+    }
+
+    onPullDownRefresh() {
+      this.loadData().done(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    checkStatusStyle (flowDetail) {
+      if (flowDetail.type === 'WITHDRAW') {
+        // 提现
+        switch (flowDetail.status) {
+          case 'WAIT_VERIFY' : return 'text-warning'
+          case 'WAIT_TRANSFER' : return 'text-info'
+          case 'TRANSFER_SUCCESS' : return 'text-success'
+          case 'VERIFY_FAIL' : return 'text-danger'
+        }
+      }
+    }
+
+    onLoad() {
+      // wx.startPullDownRefresh()
+      this.loadData()
+    }
+  }
+</script>

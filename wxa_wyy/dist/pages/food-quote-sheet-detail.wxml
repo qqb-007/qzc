@@ -1,0 +1,18 @@
+
+  <view class="container">
+    <input placeholder="输入商品名进行筛选" class="search-input" bindinput="searchInputChange"/>
+    <block  wx:for="{{detailList}}" wx:key="{{item.id}}">
+      <view class="food" wx:if="{{!item.hide}}">
+        <image src="{{item.food.picture}}" class="food-pic" mode="aspectFill"/>
+        <view class="food-detail">
+          <view class="food-title">{{item.food.name}}</view>
+          <view class="flex-row space-between align-flex-end">
+            <view class="food-price">
+              <text class="text-muted">报价:</text>
+              <text class="food-price-val text-danger"> ¥{{item.price}}/{{item.foodUnit}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>

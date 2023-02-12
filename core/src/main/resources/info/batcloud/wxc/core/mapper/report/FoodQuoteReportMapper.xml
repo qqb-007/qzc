@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.batcloud.wxc.core.mapper.report.FoodQuoteReportMapper">
+
+    <select id="reportByFoodIdList"
+            resultType="info.batcloud.wxc.core.mapper.report.domain.FoodQuoteReportData">
+        SELECT
+            f.id AS food_id,
+            f.name AS food_name,
+            f.picture as food_pic,
+            su.province_id as province_id,
+            su.city_id as city_id,
+            MAX(suf.quote_price) AS max_quote_price,
+            MIN(suf.quote_price) AS min_quote_price,
+            COUNT(1) AS total_quote_num,
+            SUM(IF(suf.quote_price > f.price, 1, 0)) AS great_quote_num,
+            SUM(IF(suf.quote_price > f.price, 0, 1)) AS less_quote_num,
+            AVG(suf.quote_price) AS avg_quote_price,
+            f.price AS food_price
+        FROM
+            store_user_food suf
+            LEFT JOIN
+            food f ON f.id = suf.food_id
+            LEFT JOIN
+            store_user su on su.id=suf.store_user_id
+        WHERE
+            f.deleted = 0
+            AND suf.quote_status IN ('WAIT_VERIFY' , 'VERIFY_SUCCESS')
+            AND f.id in
+            <foreach collection="foodIdList" separator="," open="(" close=")" item="foodId">
+                #{foodId}
+            </foreach>
+        GROUP BY f.id, su.province_id, su.city_id
+    </select>
+</mapper>

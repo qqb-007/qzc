@@ -1,0 +1,174 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+
+  .container {
+    padding: 10px;
+    background-color: #efeff4;
+    padding-top: 40px;
+    .food-name {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+  }
+
+</style>
+<template>
+  <view class="container">
+    <view class="food-name">{{foodName}}</view>
+    <i-panel title="美团规格(美团平台不指定规格，则发布所有规格)">
+      <i-checkbox-group shape="square" current="{{specialSkuNameList}}" bindchange="handleSpecialSkuChange">
+        <i-checkbox wx:for="{{foodSkuList}}" position="right" wx:key="{{item.skuId}}" value="{{item.spec}}">
+        </i-checkbox>
+      </i-checkbox-group>
+    </i-panel>
+    <i-panel title="饿百规格">
+      <i-radio-group current="{{eleSkuName}}" bindchange="handleEleSkuChange">
+        <i-radio wx:for="{{foodSkuList}}" position="right" wx:key="{{item.skuId}}" value="{{item.spec}}"></i-radio>
+      </i-radio-group>
+    </i-panel>
+    <view style="margin-top: 40px;">
+      <i-button type="success" @tap="save()">发布规格</i-button>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let Deferred = require('../utils/deferred')
+  let api = require('../utils/api')
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '发布规格',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark',
+      backgroundColor: '#efeff4',
+      'usingComponents': {
+        'i-radio-group': '../iview/radio-group/index',
+        'i-radio': '../iview/radio/index',
+        'i-checkbox-group': '../iview/checkbox-group/index',
+        'i-checkbox': '../iview/checkbox/index',
+        'i-panel': '../iview/panel/index',
+        'i-button': '../iview/button/index',
+        'i-tag': '../iview/tag/index'
+      }
+    }
+    components = {}
+
+    watch = {
+      specialSkuIdList(newVal) {
+        this.specialSkuNameList = newVal.map(id => this.foodSkuMap[id].spec)
+      },
+      eleSkuId(id) {
+        if (!id) {
+          return
+        }
+        this.eleSkuName = this.foodSkuMap[id].spec
+      }
+    }
+
+    data = {
+      loading: false,
+      specialSkuIdList: [],
+      specialSkuNameList: [],
+      eleSkuId: '',
+      eleSkuName: '',
+      foodSkuList: [],
+      id: 0,
+      foodId: 0,
+      foodSkuMap: {},
+      foodName: ''
+    }
+
+    methods = {
+      handleSpecialSkuChange({ detail = {} }) {
+        const index = this.specialSkuNameList.indexOf(detail.value)
+        index === -1 ? this.specialSkuNameList.push(detail.value) : this.specialSkuNameList.splice(index, 1)
+        this.$apply()
+      },
+      handleEleSkuChange({ detail = {} }) {
+        this.eleSkuName = detail.value
+        this.$apply()
+      },
+      save() {
+        let self = this
+        wx.showModal({
+          title: '提示',
+          content: '确认发布所选规格吗？',
+          success(res) {
+            if (res.confirm) {
+              const specialSkuIdList = self.foodSkuList.filter(s => self.specialSkuNameList.indexOf(s.spec) > -1).map(s => s.skuId)
+              const eleSkuId = self.foodSkuList.filter(s => s.spec === self.eleSkuName).map(s => s.skuId)
+              api.storeUserFood.specialSku({id: self.id, specialSkuIdList, eleSkuId}).done(rs => {
+                let data = rs.data
+                if (data) {
+                  wx.showToast({
+                    title: '上架成功',
+                    icon: 'success',
+                    duration: 500
+                  })
+                  self.sale()
+                }
+              })
+            } else if (res.cancel) {
+
+            }
+          }
+        })
+      }
+    }
+
+    events = {}
+
+    onPullDownRefresh() {
+      this.loadData()
+    }
+
+    sale() {
+      wx.showLoading()
+      api.storeUserFood.sale({foodId: this.foodId}).done(rs => {
+        let data = rs.data
+        if (data) {
+          wx.showToast({
+            title: '发布成功',
+            icon: 'success',
+            duration: 500
+          })
+          wx.navigateBack()
+        }
+      }).always(function() {
+        wx.hideLoading()
+      })
+    }
+
+    loadData() {
+      return api.storeUserFood.sku({id: this.id}).done(rs => {
+        let data = rs.data
+        this.foodId = data.foodId
+        this.foodName = data.foodName
+        this.specialSkuIdList = data.specialSkuIdList
+        this.foodSkuList = data.foodSkuList
+        this.foodSkuList.forEach(fs => {
+          this.foodSkuMap[fs.skuId] = fs
+        })
+        this.eleSkuId = data.eleSkuId
+        this.$apply()
+      })
+    }
+
+    onLoad(options) {
+      this.id = +options.id
+      Deferred.when(this.loadData()).always(() => {
+        this.loaded = true
+      })
+    }
+  }
+</script>

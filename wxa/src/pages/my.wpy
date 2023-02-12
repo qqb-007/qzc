@@ -1,0 +1,403 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+
+  .page-head {
+    /*margin-bottom: 20rpx;*/
+    padding: 20rpx;
+    font-size: 40rpx;
+  }
+
+  .container {
+    padding: 20rpx;
+  }
+
+  .bottom {
+    padding-top: 50rpx;
+  }
+
+  .cell-group {
+    margin-top: 10px;
+  }
+
+  .modal-mask {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000;
+    opacity: 0.5;
+    overflow: hidden;
+    z-index: 9000;
+    color: #fff;
+  }
+
+  .modal-dialog {
+    width: 80%;
+    overflow: hidden;
+    position: fixed;
+    top: 10%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #f9f9f9;
+    margin: auto;
+    border-radius: 18px;
+  }
+
+  .modal-title {
+    padding-top: 25px;
+    font-size: 20px;
+    color: #030303;
+    text-align: center;
+  }
+
+  .modal-content {
+    padding: 25px 16px;
+  }
+
+  .modal-input {
+    display: flex;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    font-size: 18px;
+  }
+
+  .input {
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+    line-height: 18px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    color: #333;
+  }
+
+  .modal-footer {
+    display: flex;
+    flex-direction: row;
+    height: 43px;
+    border-top: 1px solid #dedede;
+    font-size: 17px;
+    line-height: 43px;
+  }
+
+  .btn-cancel {
+    width: 50%;
+    color: #666;
+    text-align: center;
+    border-right: 1px solid #dedede;
+  }
+
+  .btn-confirm {
+    width: 50%;
+    color: #ec5300;
+    text-align: center;
+  }
+
+  .search-input {
+    border-radius: 30px;
+    height: 30px;
+    line-height: 30px;
+    border: 1rpx solid #ddd;
+    padding: 0 20px;
+    font-size: 14px;
+    background-color: #ffffff;
+    flex: 1;
+
+    &-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: #efeff4;
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      padding: 5px 10px;
+      z-index: 1000;
+    }
+
+    &-btn {
+      border-radius: 30px;
+      height: 30px;
+      line-height: 30px;
+      width: 40px;
+      margin-left: 5px;
+      font-size: 14px;
+      color: #ffffff;
+      text-align: center;
+      background-color: @color-info;
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="page-head">
+      <text class="page-title text-title">个人中心</text>
+    </view>
+    <i-cell-group>
+      <i-cell title="商家ID" value="{{storeUser.id}}"></i-cell>
+      <i-cell title="商家编号" value="{{storeUser.code}}"></i-cell>
+      <i-cell title="名称" value="{{storeUser.name}}"></i-cell>
+      <i-cell title="手机号" value="{{storeUser.phone}}"></i-cell>
+      <i-cell title="地址" value="{{storeUser.address}}"></i-cell>
+    </i-cell-group>
+    <view class="cell-group">
+      <i-cell-group>
+        <i-cell title="我的供应商" @click="open('/pages/food-suppliers')" is-link></i-cell>
+      </i-cell-group>
+    </view>
+    <view class="cell-group">
+      <i-cell-group>
+        <i-cell title="业务经理" label="如遇问题，请联系我帮您解决问题"
+          @click="tel({{storeUser.bizManager ? storeUser.bizManager.phone : ''}})" is-link
+          value="{{storeUser.bizManager ? (storeUser.bizManager.name) : '未分配'}}"></i-cell>
+        <i-cell title="业务经理1" label="如遇问题，请联系我帮您解决问题"
+          @click="tel({{storeUser.bizManager2 ? storeUser.bizManager2.phone : ''}})" is-link
+          value="{{storeUser.bizManager2 ? (storeUser.bizManage2r.name) : '未分配'}}"></i-cell>
+      </i-cell-group>
+    </view>
+    <view class="cell-group">
+      <i-cell-group>
+        <i-cell title="打印机" label="点击扫描打印机底部二维码进行绑定" @click="addPrinter()" is-link
+          value="{{(storeUser.feiePrinterSn || storeUser.machineCode) ? ('已绑定 ' + storeUser.feiePrinterSn+storeUser.machineCode) : '未绑定'}}">
+        </i-cell>
+      </i-cell-group>
+    </view>
+
+    <view class="bottom">
+      <i-button type="error" @tap="logout()">退出登录</i-button>
+    </view>
+
+    <view class="modal-mask" bindtap="cancel" hidden="{{showBind}}"></view>
+    <view class="modal-dialog" hidden="{{showBind}}">
+      <view class="modal-title">输入账号密钥绑定</view>
+      <view class="modal-content">
+        <input class="search-input" placeholder="请输入终端号" value="{{machineCode}}" @input="machineCodeChange" focus />
+        <input class="search-input" placeholder="请输入密钥" value="{{msign}}" @input="msignChange" />
+      </view>
+      <view class="modal-footer">
+        <view class="btn-cancel" bindtap="cancel" data-status="cancel">取消</view>
+        <view class="btn-confirm" bindtap="confirmb" data-status="confirmb">确定</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Bind from '../mixins/bind'
+
+  let api = require('../utils/api')
+  let login = require('../utils/login')
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的',
+      enablePullDownRefresh: true,
+      usingComponents: {
+        'i-input': '../iview/input/index',
+        'i-button': '../iview/button/index',
+        'i-cell-group': '../iview/cell-group/index',
+        'i-cell': '../iview/cell/index'
+      }
+    }
+    mixins = [Bind]
+
+    data = {
+      storeUser: {},
+      showBind: true,
+      machineCode: '',
+      msign: ''
+    }
+
+    watch = {}
+
+    methods = {
+      machineCodeChange(e) {
+        this.machineCode = e.detail.value
+      },
+      msignChange(e) {
+        this.msign = e.detail.value
+      },
+      cancel() {
+        this.showBind = true
+      },
+      confirmb() {
+        this.showBind = true
+        wx.showLoading()
+        api.printer.bindYl({
+          machineCode: this.machineCode,
+          msign: this.msign
+        }).done(rs => {
+          this.loadData()
+          wx.showToast({
+            title: '打印机绑定成功',
+            icon: 'success',
+            duration: 1000
+          })
+        }).always(() => {
+          wx.hideLoading()
+        })
+      },
+      open(url) {
+        wx.navigateTo({
+          url
+        })
+      },
+      logout() {
+        login.invalidate().done(rs => {
+          api.logout().done(rs => {
+            wx.reLaunch({
+              url: 'login'
+            })
+          })
+        })
+      },
+      tel(phone) {
+        if (!phone) {
+          return
+        }
+        wx.makePhoneCall({
+          phoneNumber: phone // 仅为示例，并非真实的电话号码
+        })
+      },
+      addPrinter() {
+        let self = this
+        wx.showActionSheet({
+          itemList: ['扫描二维码添加飞蛾打印机', '测试打印', '扫描二维码添加易联云打印机', '手动输入账号密码添加易联云'],
+          success(res) {
+            switch (res.tapIndex) {
+              case 0:
+                self.scanBind()
+                break
+              case 1:
+                let sn = 'test'
+                if (self.storeUser.feiePrinterSn) {
+                  sn = self.storeUser.feiePrinterSn
+                }
+                api.printer.test({
+                  sn: sn
+                }).done(rs => {
+                  if (rs.data) {
+                    wx.showToast({
+                      title: '测试打印成功',
+                      icon: 'success',
+                      duration: 1000
+                    })
+                  } else {
+                    wx.showToast({
+                      title: '测试打印失败',
+                      icon: 'none',
+                      duration: 1000
+                    })
+                  }
+                })
+                break
+              case 2:
+                self.scanBindYiLian()
+                break
+              case 3:
+                self.showBind = false
+                self.$apply()
+                break
+            }
+          },
+          fail(res) {
+            console.log(res.errMsg)
+          }
+        })
+      }
+    }
+
+    events = {}
+
+    loadData() {
+      return api.page.my().done(rs => {
+        let data = rs.data
+        this.storeUser = data.storeUser
+        this.$apply()
+      })
+    }
+    scanBind() {
+      let self = this
+      wx.scanCode({
+        scanType: ['qrCode'],
+        success(res) {
+          wx.showModal({
+            title: '提示',
+            content: '确定绑定该打印机吗？',
+            success(_res) {
+              if (_res.confirm) {
+                let data = res.result.split(':')
+                wx.showLoading()
+                api.printer.bind({
+                  sn: data[0],
+                  key: data[1]
+                }).done(rs => {
+                  self.loadData()
+                  wx.showToast({
+                    title: '打印机绑定成功',
+                    icon: 'success',
+                    duration: 1000
+                  })
+                }).always(() => {
+                  wx.hideLoading()
+                })
+              }
+            }
+          })
+        }
+      })
+    }
+    scanBindYiLian() {
+      let self = this
+      wx.scanCode({
+        scanType: ['qrCode'],
+        success(res) {
+          wx.showModal({
+            title: '提示',
+            content: '确定绑定该打印机吗？',
+            success(_res) {
+              if (_res.confirm) {
+                let data = res.result.split('"')
+                wx.showLoading()
+                api.printer.bindYl({
+                  machineCode: data[3],
+                  msign: data[7]
+                }).done(rs => {
+                  self.loadData()
+                  wx.showToast({
+                    title: '打印机绑定成功',
+                    icon: 'success',
+                    duration: 1000
+                  })
+                }).always(() => {
+                  wx.hideLoading()
+                })
+              }
+            }
+          })
+        }
+      })
+    }
+
+    onPullDownRefresh() {
+      this.loadData().done(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    onLoad() {
+      wx.startPullDownRefresh()
+    }
+  }
+</script>

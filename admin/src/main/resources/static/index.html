@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>王小菜业务管理系统 - http://www.wangxiaocai.cn</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link href="/css/font-awesome-4.6.3/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
+	<link href="/css/pe-icon-7-stroke/css/pe-icon-7-stroke.css" type="text/css" rel="stylesheet"/>
+	<link href="/css/pe-icon-7-stroke/css/helper.css" type="text/css" rel="stylesheet"/>
+	<link href="/css/zTreeStyle/zTreeStyle.css" type="text/css" rel="stylesheet"/>
+	<link href="/css/animate.css" type="text/css" rel="stylesheet"/>
+	<link href="/css/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+	<link href="/css/ismart.min.css" type="text/css" rel="stylesheet"/>
+	<link href="/css/style.css" type="text/css" rel="stylesheet"/>
+	<link href="//at.alicdn.com/t/font_548032_0c76s0p0jd53tyb9.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="/js/aliyun-oss-sdk.js"></script>
+	<script type="text/javascript" src="/js/3rd/jquery-1.12.2.min.js"></script>
+	<script type="text/javascript" src="/js/3rd/jquery-ui-1.10.4.custom.min.js"></script>
+	<script type="text/javascript" src="/js/3rd/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/js/3rd/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/js/3rd/bootstrap-datetimepicker.min.js"></script>
+	<script type="text/javascript" src="/js/3rd/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script type="text/javascript" src="/js/3rd/jquery-dateFormat.min.js"></script>
+	<script type="text/javascript" src="/js/bootstrap-plugins.min.js"></script>
+	<script type="text/javascript" src="/js/3rd/echarts.min.js"></script>
+	<script type="text/javascript" src="/js/ismartjs.all.js?v=2"></script>
+	<script type="text/javascript" src="/js/jquery.ztree.all-3.5.min.js"></script>
+	<link rel="stylesheet" href="/css/bootstrap/bootstrap-multiselect.css" type="text/css"/>
+	<script type="text/javascript" src="/js/bootstrap/bootstrap-multiselect.js"></script>
+	<link rel="stylesheet" href="/css/bootstrap/bootstrap-select.min.css" type="text/css"/>
+	<script type="text/javascript" src="/js/bootstrap/bootstrap-select.js"></script>
+
+	<script type="text/javascript">
+		var bizTimeList = []
+		for (var i = 0; i <= 23; i++) {
+			var time = (i < 0 ? '0' + i : i) + ':00'
+			var time30 = (i < 0 ? '0' + i : i) + ':30'
+			bizTimeList.push({
+				id: time,
+				name: time,
+			})
+			bizTimeList.push({
+				id: time30,
+				name: time30,
+			})
+		}
+		var mtpsCategoryList = [
+			{
+				id: 150,
+				title: '生鲜果蔬'
+			}
+		]
+		var mtpsSecondCategoryList = [
+			{
+				id: 150001,
+				title: '果蔬'
+			}
+		]
+		$.ajaxSetup({
+			traditional: true
+		})
+		$(function () {
+			var layoutArgs = {
+				config: {
+					/**
+					 * 菜单的url
+					 * */
+					menuUrl: "/api/menu",
+					asideTopUrl: "asideTop.html",
+					headerUrl: "header.html"
+				}
+			};
+			Smart.UI.booting($("#root"), {
+				/**
+				 * 用于定义交互的模板，如弹出框，通知，警告框，确认框等等
+				 * */
+				uiTemplateUrl: "ui-template.html"
+			}).done(function ($root) {
+				$root.get("/api/login/check").done(function (rs) {
+					if (rs.authenticated) {
+						window.APP_CONTEXT = rs;
+						$root.load("layout-spring.html", layoutArgs);
+					} else {
+						$root.load("login.html");
+						$root.node.on("login:success", function (e, status) {
+							if (status) {
+								window.logined = status;
+								$root.load("layout-spring.html", layoutArgs);
+							}
+						});
+					}
+				})
+
+			})
+		});
+	</script>
+</head>
+<body>
+<div id="root" s="window"></div>
+</body>
+</html>

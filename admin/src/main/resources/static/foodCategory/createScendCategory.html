@@ -1,0 +1,53 @@
+<metat title="创建二级分类" width="500px" args="multi:false"/>
+<style>
+
+</style>
+<div class="p">
+    <div class="btn-group" style="width: 100%">
+        <input type="text" readonly class="form-control dropdown-toggle first-category" placeholder="一级分类名"
+               id="categoryName"
+               s-valid-error="require()"
+               name="categoryName" data-toggle="dropdown"/>
+        <ul class="dropdown-menu" s="tpl"
+            s-datac-ig="true"
+            s-data="S.get('/api/food-category/firstcategorylist')"
+            style="width: 100%; max-height: 200px; overflow: auto">
+            {%$.each(this, function() {%}
+            <li><a href="javascript:;"
+                   s-click="$categoryName.node.val(this.node.text())">{%=this.name%}</a></li>
+            {%})%}
+        </ul>
+    </div>
+    二级分类名称：<input type="text" autocomplete="off" class="form-control category-name"/>
+    <span class="input-group-btn">
+		<input type="button" class="btn btn-default btn-info" s-click="creat(this)" value="创建">
+	</span>
+</div>
+<script>
+    S.meta.btns = [
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+
+    function creat($this) {
+        var parent = $this.parent()
+        var nameNode = parent.node.find('.category-name')
+        var parentNameNode = parent.node.find('.first-category')
+        var name = nameNode.val().trim()
+        var parentName = parentNameNode.val().trim()
+        if (!name) {
+            return
+        }
+        if (!parentName) {
+            return
+        }
+        S.put('/api/food-category/createScend?name=' + name + '&parentName=' + parentName).done(function () {
+            S.close()
+        })
+    }
+</script>

@@ -1,0 +1,1 @@
+ALTER TABLE wxc_order ADD uu_peisong_id varchar(50) NULL;

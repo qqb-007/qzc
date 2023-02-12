@@ -1,0 +1,14 @@
+module.exports = {
+  toFixed: function(val, i = 0) {
+    val = +val
+    return val.toFixed(i)
+  },
+  money: function(val, prefix = '¥', plus = '') {
+    val = +val
+    if (val >= 0) {
+      return plus + ' ' + prefix + val.toFixed(2)
+    } else {
+      return '- ' + prefix + (-val.toFixed(2))
+    }
+  }
+}

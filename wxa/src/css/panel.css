@@ -1,0 +1,10 @@
+.panel {
+  background-color: #ffffff;
+  margin: 10px 0;
+  border-top: 1rpx solid #ddd;
+  border-bottom: 1rpx solid #ddd;
+}
+.panel-body {
+  padding: 10px;
+}
+/*# sourceMappingURL=panel.css.map */

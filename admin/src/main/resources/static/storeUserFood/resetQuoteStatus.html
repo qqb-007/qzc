@@ -1,0 +1,37 @@
+<meta title="选择状态" width="500"/>
+<div class="p">
+	<table class="table table-bordered table-stripped">
+		<tr>
+			<th style="width: 100px;">选择重置后的状态</th>
+			<td>
+				<select class="form-control input-sm" s="select"
+								id="quoteStatus"
+								s-build="S.get('/api/enum/valuesMap/core.enums.QuoteStatus')"
+								name="quoteStatus">
+				</select>
+			</td>
+		</tr>
+	</table>
+</div>
+<script type="text/javascript">
+
+	var sale = false;
+	S.meta.btns = [
+		{
+			name: "提交修改",
+			style: "btn btn-primary",
+			click: function () {
+				var data = $quoteStatus.getSelectData()
+				S.close(data)
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+</script>

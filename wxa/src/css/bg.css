@@ -1,0 +1,46 @@
+.bg-primary {
+  background: #2d8cf0;
+}
+.bg-primary-light {
+  background: #5cadff;
+}
+.bg-primary-dark {
+  background: #2b85e4;
+}
+.bg-info {
+  background: #2d8cf0;
+}
+.bg-success {
+  background: #19be6b;
+}
+.bg-warning {
+  background: #ff9900;
+}
+.bg-warning-light {
+  background: #ffeac2;
+}
+.bg-danger {
+  background: #ed3f14;
+}
+.bg-muted {
+  background: #80848f;
+}
+.bg-title {
+  background: #1c2438;
+}
+.bg-content {
+  background: #495060;
+}
+.bg-disabled {
+  background: #bbbec4;
+}
+.bg-bg {
+  background: #f8f8f9;
+}
+.bg-divider {
+  background: #e9eaec;
+}
+.bg-border {
+  background: #dddee1;
+}
+/*# sourceMappingURL=bg.css.map */

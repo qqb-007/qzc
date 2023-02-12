@@ -1,0 +1,37 @@
+<meta title="拒审" args="id" width="600px" />
+<form class="p" id="form" s="form,valid" method="put" action="/api/food-quote-sheet/reject/{id}">
+    <input type="hidden" name="id" s s-data="id" />
+    <table class="table table-bordered table-stripped">
+        <tr>
+            <th>拒审备注：</th>
+            <td>
+                <textarea id="verifyRemark" class="form-control" rows="5" name="verifyRemark"></textarea>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<script>
+    S.meta.btns = [
+        {
+            name: "确认",
+            style: "btn btn-primary",
+            click: function() {
+                if($verifyRemark.node.val().trim() == "") {
+                    S.toast("请输入审核备注", 'warning');
+                    return;
+                }
+                return $form.submit().done(function(rs) {
+                    S.close(rs);
+                })
+            }
+        },
+        {
+            name: "取消",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+</script>

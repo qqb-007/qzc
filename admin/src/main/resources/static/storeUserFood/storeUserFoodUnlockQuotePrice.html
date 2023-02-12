@@ -1,0 +1,189 @@
+<meta title="解锁门店商品报价" width="1000"/>
+<div class="p">
+	<form id="form" s="valid,nda">
+		<div class="p-b clearfix">
+			<table class="table table-bordered table-stripped">
+				<tr>
+					<th style="width: 100px;">目标门店</th>
+					<td class="form-inline">
+						<select class="form-control" id="allStoreUser"
+								s-change="$storeUserPanel.node.add($storeUserSelectBtn.node)[this.node.val() == 'false' ? 'show' : 'hide']()"
+								name="allStoreUser">
+							<option value="true">所有门店</option>
+							<option value="false" selected>指定门店</option>
+						</select>
+						<input type="button" class="btn btn-xs btn-outline btn-success" value="选择门店"
+							   s-click="selectStoreUser()" id="storeUserSelectBtn"/>
+						<div id="storeUserPanel">
+							<div s="tpl" id="storeUserList">
+								{%$.each(this, function(i) {%}
+								<label style="display: inline-block; margin-right: 5px; margin-bottom: 5px;"
+									   class="label label-info store-info">
+									{%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()"
+													  class="fa fa-times"></a>
+									<input type="hidden" name="storeUserIdList" class="store-user-id"
+										   value="{%=this.id%}"/>
+								</label>
+								{%})%}
+							</div>
+
+						</div>
+					</td>
+				</tr>
+			</table>
+			<div>
+				<input type="button" class="btn btn-success btn-xs" s-click="selectFood()" value="选择商品"/>
+			</div>
+		</div>
+		<div class="" id="foodQuoteSheetsGrid" s='check,datac,nda'
+			 style="max-height: 500px; overflow: auto">
+			<table
+					class="table table-striped table-bordered form-inline table-hover">
+				<tr>
+					<th>图片</th>
+					<th>商品名</th>
+					<th class="text-right">操作</th>
+				</tr>
+				<tbody s="loop" id="foodList">
+				<tr s-loop-role="empty">
+					<td colspan="5" class="alert alert-warning">
+						暂无商品
+					</td>
+				</tr>
+				<tr s-loop-role="row" class="food-quote-row" s="datac">
+					<td s="tpl">
+						<img src="{%=this.foodPicture%}" style="max-width: 40px; max-height: 40px;"/>
+						<input type="hidden" class="food-id" value="{%=this.foodId%}"/>
+					</td>
+					<td>
+						<input type="text" class="form-control food-name" name="foodName"/>
+					</td>
+					<td class="text-right">
+						<a href="javascript:;" class="btn btn-xs btn-danger" s-click="this.node.closest('tr').remove()">删除</a>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+
+	var currentStoreUser = null;
+	var sale = false;
+	S.meta.btns = [
+		{
+			name: "确定",
+			style: "btn btn-primary",
+			click: function () {
+				var deferred = $.Deferred()
+				if ($allStoreUser.node.val() == 'false' && S.node.find('.store-user-id').size() == 0) {
+					S.alert('请选择目标门店')
+					return deferred.reject()
+				}
+				$form.validate().done(function () {
+					var list = []
+					S.node.find('.food-quote-row').each(function () {
+						var row = $(this)
+						var foodId = row.find('.food-id').val()
+						var foodNameNode = row.find('.food-name');
+						var detail = {
+							foodId: foodId,
+							foodName: foodNameNode.val()
+						}
+						list.push(detail)
+					})
+					if (list.length == 0) {
+						S.alert('请选择商品', 'warning')
+						deferred.reject()
+						return
+					}
+					var loadingDeferred = S.loading()
+					var param = Smart.serializeToObject($form.node);
+					param.foodList = list
+					param.storeUserIdList = []
+					S.node.find('.store-user-id').each(function () {
+						param.storeUserIdList.push($(this).val())
+					})
+					S.post('/api/store-user-food/unlock', {json: JSON.stringify(param)}).done(function (rs) {
+						if (rs) {
+							S.toast('解锁成功', 'success')
+							S.close(true)
+						} else {
+							deferred.reject()
+						}
+					}).fail(function () {
+						deferred.reject()
+					}).always(function () {
+						loadingDeferred.resolve()
+					})
+
+				}).fail(function () {
+					deferred.reject()
+				})
+				return deferred
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function selectStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: true}).done(function (storeUserList) {
+			if (storeUserList) {
+				$storeUserList.prependData(storeUserList)
+			}
+		})
+	}
+
+	function selectStoreFood() {
+		S.popupOpen('/store/store-selector.html', {
+			multi: false,
+			storeUserId: currentStoreUser.id
+		}).done(function (storeList) {
+			if (storeList) {
+				var store = storeList[0]
+				S.get('/api/food/online-store/' + store.id).done(function (foodList) {
+					foodList.forEach(function (food) {
+						food.salePrice = food.price
+						food.price = 0
+						food.sale = true
+					})
+					addFoodsToGrid(foodList)
+				})
+			} else {
+			}
+		}).fail(function () {
+		})
+	}
+
+	function selectFood() {
+		S.popupOpen('/food/foodSelector.html', {multi: false, quotable: true}).done(function (foodList) {
+			if (foodList) {
+				addFoodsToGrid(foodList)
+			}
+		})
+	}
+
+	function addFoodsToGrid(foodList) {
+		var list = []
+		foodList.forEach(function (f) {
+			list.push({
+				foodPicture: f.picture,
+				foodId: f.id,
+				foodName: f.name,
+				foodSkuList: f.skuList,
+				price: f.price,
+				salePrice: f.salePrice || 0,
+				foodUnit: f.quoteUnit,
+				foodPerIncrease: f.perIncrease
+			})
+		})
+		$foodList.addRows(list)
+	}
+</script>

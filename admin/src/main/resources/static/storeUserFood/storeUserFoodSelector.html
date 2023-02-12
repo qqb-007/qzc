@@ -1,0 +1,174 @@
+<metat title="门店商品选择器" args="multi:true,storeUserId,foodName" width="800px"/>
+<style>
+	.page-food-list {
+		display: flex;
+		flex-direction: row;
+		/*position: absolute;*/
+		/*top: 0;*/
+		/*right: 0;*/
+		/*left: 0;*/
+		/*bottom: 0;*/
+		align-items: stretch;
+	}
+
+	.page-food-list .category-list {
+		/*width: 200px;*/
+		/*margin-right: 20px;*/
+		overflow: auto;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.page-food-list .category-list .nav > li > a {
+		padding: 10px 20px;
+		border-radius: 0;
+	}
+
+	.page-food-list .category-list .nav > li.active > a {
+		background-color: #ffffff;
+		color: #333;
+	}
+
+	.page-food-list .category-list .nav {
+		background-color: #EAEDF1;
+	}
+
+	.page-food-list .category-bar {
+
+	}
+
+	.page-food-list .nav-pills {
+		flex: 1;
+		overflow: auto;
+	}
+
+	.page-food-list .food-list-panel {
+		flex: 1;
+		overflow: auto;
+		display: flex;
+		flex-direction: column;
+		background-color: #ffffff;
+	}
+
+	.page-food-list .food-list-table {
+		flex: 1;
+		overflow: auto;
+		margin-bottom: 10px;
+	}
+
+	.store-user-dropdown {
+		border: 1px solid #ddd;
+		margin-right: 10px;
+		padding: 0px 10px;
+		height: 30px;
+		line-height: 30px;
+		border-radius: 5px;
+		vertical-align: middle;
+	}
+</style>
+<div class="page-food-list clearfix" style="height: 500px;">
+	<div class="food-list-panel p">
+		<div class="p-b-xs">
+			<form class="form-inline" id="form" style="display: inline-block">
+				<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品编码"
+					   style="width:200px;" name="foodCode"/>
+				<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品名" s s-data="foodName.split(' ')[0]"
+					   style="width:200px;" name="foodName"/>
+				<input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+				<input autocomplete="off" type="hidden" name="storeUserId" s s-data="storeUserId" id="storeUserId"/>
+				<button type="button" class="btn btn-success btn-outline btn-sm"
+						s-click="$page.node.val(1); $foodsGrid.refresh()">查询
+				</button>
+			</form>
+		</div>
+		<div class="food-list-table">
+			<table id="foodsGrid"
+				   s='datac,nda'
+				   s-datac="{targets:[$pager]}"
+				   s-data="S.get('/api/store-user-food/search', $form.node.serialize())"
+				   class="table table-striped table-bordered form-inline">
+				<tr>
+					<th style="width: 1px;">
+						<label class="s-checkbox">
+							<input autocomplete="off" type="checkbox" s-check-role="checkall-h"/>
+							<span class="s-checkbox-indicator"></span>
+						</label>
+					</th>
+					<th>图片</th>
+					<th>商品名</th>
+					<th>门店</th>
+					<th class="text-center">分类名</th>
+					<th class="text-center">报价单位</th>
+					<th class="text-right">报价</th>
+				</tr>
+				<tbody s="loop" s-data-filter="'results'">
+				<tr s-loop-role="empty">
+					<td colspan="7" class="alert alert-warning">
+						暂无商品
+					</td>
+				</tr>
+				<tr s-loop-role="row" s="datac" class="food-row">
+					<td>
+						<label class="s-checkbox">
+							<input autocomplete="off" type="checkbox" s-check-role="h"/>
+							<span class="s-checkbox-indicator"></span>
+						</label>
+					</td>
+					<td s="tpl">
+						<img src="{%=this.food.picture%}" style="max-width: 40px; max-height: 40px;"/>
+					</td>
+					<td>
+						<span name="food.name"></span>
+					</td>
+					<td>
+						<span s="tpl"><span
+								class="label {%=this.storeUser.opened ? 'label-success' : 'label-default'%}">{%=this.storeUser.opened ? '已开' : '未开'%}</span></span>
+						<a href="javascript:;" name="storeUser.name"
+						   s-click="selectStoreUser(this.parent().data().storeUser)"></a>
+					</td>
+					<td name="food.categoryName" class="text-center"></td>
+					<td name="foodUnit" class="text-center"></td>
+					<td name="quotePrice.toFixed(1)" class="text-right text-warning"></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="text-right" id="pager" s="datac,nda">
+			共有<span name="total"></span>个数据
+			<ul s="pagination"
+				s-pagination="{action:function(){$page.node.val(this); $foodsGrid.refresh()}}"
+				class="pagination pagination-sm">
+			</ul>
+		</div>
+	</div>
+</div>
+<script>
+	S.meta.btns = [
+		{
+			name: "选择",
+			style: "btn btn-primary",
+			click: function () {
+				var datas = $foodsGrid.getCheckedData();
+				if (datas.length) {
+					S.close(datas);
+				} else {
+					S.toast("您还没有选择商品！", "warning");
+				}
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	S.node.delegate('.food-row', 'dblclick', function (e) {
+		var node = $(e.currentTarget);
+		S.close([Smart.of(node).data()])
+	})
+
+</script>

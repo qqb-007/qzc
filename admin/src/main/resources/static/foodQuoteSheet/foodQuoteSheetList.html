@@ -1,0 +1,174 @@
+<meta title="报价单"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<span class="h3">报价单</span>
+		</div>
+		<div class="panel-body">
+			<div class="p-b clearfix">
+				<form class="form-inline pull-left" id="foodQuoteSheetsSearchForm" s="form"
+					  s-form="{action:function(){$page.node.val(1); $foodQuoteSheetsGrid.refresh()}}"
+				>
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商家ID"
+						   style="width:150px;" name="storeUserId"/>
+					<select class="form-control input-sm"
+							name="published">
+						<option value="">发布状态</option>
+						<option value="false">未发布</option>
+						<option value="true">已发布</option>
+					</select>
+					<select class="form-control input-sm" s="select"
+							name="status"
+							s-build="S.get('/api/enum/valuesMap/core.enums.FoodQuoteSheetStatus?igNames=DELETED')">
+						<option value="">选择状态</option>
+					</select>
+					<input autocomplete="off" type="hidden" name="page" id="page"/>
+					<input autocomplete="off" type="submit" class="btn btn-primary btn-sm" value="查找"/>
+				</form>
+				<input type="button" class="btn btn-sm btn-success pull-right" value="新增" s-click="create()"/>
+			</div>
+			<div class="" id="foodQuoteSheetsGrid" s='check,datac,nda'
+				 s-data="S.get('/api/food-quote-sheet/search', $foodQuoteSheetsSearchForm.node.serialize())">
+				<table class="table table-striped table-hover table-bordered" style="width: 100%;">
+					<tr>
+						<th style="width: 1px;">
+							<label class="s-checkbox">
+								<input autocomplete="off" type="checkbox" s-check-role="checkall-h"/>
+								<span class="s-checkbox-indicator"></span>
+							</label>
+						</th>
+						<th>ID</th>
+						<th>报价人</th>
+						<th class="text-right">商品数量</th>
+						<th class="text-center">创建时间</th>
+						<th class="text-center">发布信息</th>
+						<th class="text-center">状态</th>
+						<th class="text-right">操作</th>
+					</tr>
+					<tbody s="loop" s-data-filter="'results'">
+					<tr s-loop-role="empty">
+						<td colspan="8">
+							<div class="s-ui-none-data-info text-center"><i class="fa fa-info-circle text-info"></i>
+								未查询到数据
+							</div>
+						</td>
+					</tr>
+					<tr s-loop-role="row" s="datac,row" s-check-role="i">
+						<td>
+							<label class="s-checkbox">
+								<input autocomplete="off" type="checkbox" s-check-role="h"/>
+								<span class="s-checkbox-indicator"></span>
+							</label>
+						</td>
+						<td name="id"></td>
+						<td>
+							<span name="storeUser.name"></span>
+							<div>ID: <span name="storeUser.id"></span></div>
+						</td>
+						<td name="foodNum" class="text-right"></td>
+						<td name="createTime" class="text-center"></td>
+						<td s="tpl" class="text-center">
+							<label class="label
+                            {%
+                                switch(this.publishStatus) {
+                                    case 'WAIT': out.print('label-warning'); break;
+                                    case 'SUCCESS': out.print('label-success'); break;
+                                    case 'FAIL': out.print('label-danger'); break;
+                                    default: out.print('label-default');break;
+                                }
+                            %}
+                            ">{%=this.publishStatusTitle%}</label>
+							<div>{%=this.publishTime%}</div>
+						</td>
+						<td class="text-center" s="tpl">
+							<label class="label
+                            {%
+                                switch(this.status) {
+                                    case 'WAIT_VERIFY': out.print('label-warning'); break;
+                                    case 'VERIFY_SUCCESS': out.print('label-success'); break;
+                                    case 'VERIFY_FAIL': out.print('label-danger'); break;
+                                    default: out.print('label-default');break;
+                                }
+                            %}
+                            ">{%=this.statusTitle%}</label>
+						</td>
+						<td class="text-right" s="tpl">
+							<div style="display: inline-block" >
+								{%if(this.status == 'WAIT_VERIFY') {%}
+								<a href="javascript:;" class="btn btn-warning btn-outline btn-xs"
+								   s-click="verify(this)">审核</a>
+								{%} else {%}
+								<a href="javascript:;" class="btn btn-success btn-outline btn-xs"
+								   s-click="view(this)">详情</a>
+								{%}%}
+								{%if(this.status == 'VERIFY_SUCCESS' && !this.published) {%}
+								<a href="javascript:;" class="btn btn-primary btn-outline btn-xs"
+								   s-click="return publish(this)"><i class="fa fa-circle-o-notch s-loading-spinner"></i> 发布</a>
+								{%}%}
+							</div>
+							<div class="p-t-xs">
+								{%if(this.publishStatus != 'WAIT') {%}
+								<input type="button" class="btn btn-xs btn-outline btn-success" s-click="trace(this)" value="发布跟踪" />
+								{%}%}
+							</div>
+						</td>
+					</tr>
+					</tbody>
+					<tfoot>
+					<tr>
+						<td colspan="8" class="text-right" style="vertical-align: middle">
+							<ul s="pagination" id="foodQuoteSheetPagination"
+								s-pagination="{action:function(){$page.node.val(this); $foodQuoteSheetsGrid.refresh()}}"
+								class="pagination pagination-sm">
+							</ul>
+						</td>
+					</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+  function verify($this) {
+    S.popupOpen('/foodQuoteSheet/foodQuoteSheetVerify.html', {id: $this.parent().data().id}).done(function (rs) {
+      rs && $foodQuoteSheetsGrid.refresh()
+    })
+  }
+
+  function publish($this) {
+    var deferred = $.Deferred()
+    var id = $this.parent().data().id
+    S.confirm('确定发布吗？').done(function () {
+      S.put('/api/food-quote-sheet/publish/' + id).done(function (rs) {
+        $foodQuoteSheetsGrid.refresh()
+        trace($this)
+      }).always(function() {
+        deferred.resolve()
+	  })
+    }).fail(function() {
+      deferred.resolve()
+	})
+	return deferred;
+  }
+
+  function create() {
+    S.popupOpen('/foodQuoteSheet/foodQuoteSheetAdd.html').done(function(rs) {
+      rs && $foodQuoteSheetsGrid.refresh()
+	})
+  }
+
+  function trace($this) {
+    var data = $this.parent().data()
+    S.popupOpen('/publishTrace/food-quote-sheet-publish-trace.html', {relationId: data.id}).done(function(rs) {
+
+    })
+  }
+
+  function view($this) {
+    S.popupOpen('/foodQuoteSheet/foodQuoteSheetView.html', {id: $this.parent().data().id}).done(function (rs) {
+
+    })
+  }
+</script>

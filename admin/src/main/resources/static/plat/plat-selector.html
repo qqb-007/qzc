@@ -1,0 +1,69 @@
+<meta title="选择平台" width="500" args="plat"/>
+<style>
+</style>
+<div class="p">
+	<table id="platGrid"
+				 class="table table-striped table-middle table-bordered form-inline">
+		<tr>
+			<th style="width: 100px;">选择平台</th>
+			<td s="tpl" s-data="S.get('/api/enum/valuesMap/core.enums.Plat')">
+				{%$.each(this, function(key, val){%}
+				<label class="checkbox-inline">
+					<input autocomplete="off" type="checkbox" class="plat-checkbox plat-{%=key%}" name="platList" value="{%=key%}"> {%=val%}
+				</label>
+				{%})%}
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+	S.meta.btns = [
+		{
+			name: "选择",
+			style: "btn btn-primary",
+			click: function () {
+				S.getPlatList(function(platList) {
+					S.close(platList)
+				})
+
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	S.getPlatList = function(callback) {
+		var platNodes = S.N('.plat-checkbox:checked')
+		if (!platNodes) {
+			S.toast('请选择平台', 'warning')
+			return
+		}
+		var platList = []
+		platNodes.each(function() {
+			platList.push($(this).val())
+		})
+		if (!$.isArray(platList)) {
+			platList = [platList]
+		}
+		if (!platList.length) {
+			S.toast('请选择平台', 'warning')
+			return
+		}
+		callback(platList)
+	}
+
+	S.ready(function() {
+		if (plat) {
+			S.N('.plat-checkbox').prop('checked', true)
+		} else {
+			S.N('.plat-checkbox').prop('checked', false)
+		}
+	})
+
+</script>

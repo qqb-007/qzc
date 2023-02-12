@@ -1,0 +1,43 @@
+<meta title="门店中心" />
+<style>
+	.store-center-main {
+		padding: 0;
+	}
+</style>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<div role="presentation" class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+					<h3><span id="storeUserName">全部门店</span> <span class="caret"></span></h3>
+				</a>
+				<div class="dropdown-menu" style="width: 600px;" s="window" s-window="{href: '/storeUser/storeUserSelectorLight.html', args: {select: storeUserSelect}}">
+
+				</div>
+			</div>
+		</div>
+		<div class="panel-body store-center-main">
+			<div s="window" s-window="{href: '/pages/tabs.html', args: tabArgs}"></div>
+			<script>
+				var tabArgs = {
+					"title": "门店管理",
+					"navList": [
+						{
+							"title": "商品校对",
+							"url": '/food/foodSkuList.html'
+						},
+						// {
+						// 	"title": "门店商品",
+						// 	"url": '/food/foodSkuList.html'
+						// },
+					]
+				}
+			</script>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	function storeUserSelect(storeUser) {
+		$storeUserName.node.html(storeUser.name || '全部门店')
+	}
+</script>

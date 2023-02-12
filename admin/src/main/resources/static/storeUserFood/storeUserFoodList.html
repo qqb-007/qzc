@@ -1,0 +1,1223 @@
+<metat title="商品列表"/>
+<style>
+    .page-food-list {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        align-items: stretch;
+    }
+
+    .page-food-list .category-list {
+        /*width: 200px;*/
+        /*margin-right: 20px;*/
+        overflow: auto;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .page-food-list .category-list .nav > li > a {
+        padding: 10px 20px;
+        border-radius: 0;
+    }
+
+    .page-food-list .category-list .nav > li.active > a {
+        background-color: #ffffff;
+        color: #333;
+    }
+
+    .page-food-list .category-list .nav {
+        background-color: #EAEDF1;
+    }
+
+    .page-food-list .category-bar {
+
+    }
+
+    .page-food-list .nav-pills {
+        flex: 1;
+        overflow: auto;
+    }
+
+    .page-food-list .food-list-panel {
+        flex: 1;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        background-color: #ffffff;
+    }
+
+    .page-food-list .food-list-table {
+        flex: 1;
+        overflow: auto;
+        margin-bottom: 10px;
+    }
+
+    .store-user-dropdown {
+        border: 1px solid #ddd;
+        margin-right: 10px;
+        padding: 0px 10px;
+        height: 30px;
+        line-height: 30px;
+        border-radius: 5px;
+        vertical-align: middle;
+    }
+
+    .price-input, .price-increase-input {
+        padding: 2px !important;
+        height: 20px;
+    }
+
+    .price-table td {
+        padding: 2px !important;
+        font-size: 12px !important;
+    }
+</style>
+<div class="page-food-list clearfix">
+    <div class="category-list">
+        <ul class="nav nav-pills nav-stacked p-b"
+            s="nda,loop"
+            id="foodCategoryList"
+            s-data="categoryList()">
+            <ul s-loop-role="row" s="datac" class="category-li" s-click="findFood(this)">
+                <a href="javascript:;" class="text-ellipsis"><i class="fa fa-angle-right text-info"></i> <span
+                        name="name" class="fircategory-name"></span></a>
+                <ul class="nav nav-pills nav-stacked p-b form-inline"
+                    s="nda,loop"
+                    name="foodCategories">
+                    <li s-loop-role="row" s="datac,nda" class="category-li">
+                        <div class="input-group">&nbsp;&nbsp;
+                            <a href="javascript:;" class="text-ellipsis"><i class="fa fa-angle-right text-info"></i>
+                                <span
+                                        name="name" class="category-name"></span></a>
+                        </div>
+                    </li>
+                </ul>
+            </ul>
+        </ul>
+    </div>
+    <div class="food-list-panel p ">
+        <div class="p-b-sm clearfix">
+            <div class="p-xs">
+
+                <form class="form-inline" id="form" style="display: inline-block">
+                    <div role="presentation" class="dropdown store-user-dropdown" style="display: inline-block">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            <div><span id="storeUserName">全部门店</span> <span class="fa fa-times"
+                                                                            s-click="clearStoreUser(e)"></span></div>
+                        </a>
+                        <div class="dropdown-menu" style="width: 600px;" s="window"
+                             s-window="{href: '/storeUser/storeUserSelectorLight.html', args: {select: storeUserSelect}}">
+                        </div>
+                    </div>
+                    <select class="form-control input-sm" s="select"
+                            id="foodSupplierSelect"
+                            s-data="''"
+                            s-build="S.get('/api/food-supplier/list-by-store-user/{storeUserId}')"
+                            name="foodSupplierId">
+                        <option value="">供应商</option>
+                        <option value="-1">未指定</option>
+                    </select>
+                    <input autocomplete="off" type="number" class="form-control input-sm" placeholder="商品ID"
+                           style="width:150px;" name="foodId" id="foodId"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品编码"
+                           style="width:200px;" name="foodCode" id="foodCode"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品名"
+                           style="width:200px;" name="foodName"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="最低报价"
+                           style="width:80px;" name="minQuotePrice"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="最高报价"
+                           style="width:80px;" name="maxQuotePrice"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="最低加价"
+                           style="width:80px;" name="priceIncreaseLow"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="最高加价"
+                           style="width:80px;" name="priceIncreaseHeigh"/>
+                    <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+                    <input autocomplete="off" type="hidden" name="storeUserId" id="storeUserId"/>
+                    <input type="hidden" class="form-control dropdown-toggle input-sm" placeholder="分类名"
+                           id="categoryName"
+                           name="foodCategoryName" data-toggle="dropdown"/>
+                    <div style="padding-top: 10px;">
+                        <select class="form-control input-sm" name="storeUserOpened">
+                            <option value="">开店状态</option>
+                            <option value="true">已开店</option>
+                            <option value="false">未开店</option>
+                        </select>
+                        <select class="form-control input-sm" name="sale">
+                            <option value="">上架状态</option>
+                            <option value="true">已上架</option>
+                            <option value="false">未上架</option>
+                        </select>
+                        <select class="form-control input-sm" name="quotePriceLock">
+                            <option value="">报价状态</option>
+                            <option value="true">已锁定</option>
+                            <option value="false">未锁定</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.QuoteStatus')"
+                                name="quoteStatus">
+                            <option value="">审核状态</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.PublishStatus')"
+                                name="meituanPublishStatus">
+                            <option value="">美团发布</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.PublishStatus')"
+                                name="elePublishStatus">
+                            <option value="">饿百发布</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.PublishStatus')"
+                                name="wantePublishStatus">
+                            <option value="">客户端发布</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.PublishStatus')"
+                                name="clbmPublishStatus">
+                            <option value="">菜老板美发布</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.PublishStatus')"
+                                name="jddjPublishStatus">
+                            <option value="">京东到家发布</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.QuoteContrast')"
+                                name="quoteContrast">
+                            <option value="">报价对比</option>
+                        </select>
+                        <select class="form-control input-sm" s="select"
+                                s-build="S.get('/api/enum/valuesMap/core.enums.StoreUserFoodSort')"
+                                name="sort">
+                            <option value="">排序</option>
+                        </select>
+                        <button type="button" class="btn btn-success btn-outline btn-sm"
+                                s-click="$page.node.val(1); $foodsGrid.refresh()">查询
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="form-inline">
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchPublish()">批量发布</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchSoldOutByFood()">批量下架单商品</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchPublishCategory()">发布分类</a>
+                <span class="p-l-sm p-r-sm"> | </span>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchVerify()">批量审核</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchDelete()">批量删除</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchJddjSoldOut()">下架京东门店商品</a>
+                <span class="p-l-sm p-r-sm"> | </span>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return detectChange()">检测变动</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return resetQuoteStatus()">重置审核</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return resetPublish()">重置发布</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return resetStatus()">重置状态</a>
+                <span class="p-l-sm p-r-sm"> | </span>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return proofSoldOut()"> 校对上架</a>
+                <span class="p-l-sm p-r-sm"> | </span>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return addToStore()"><i
+                        class="fa fa-plus"></i>
+                    添加到门店</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchAdd()"><i
+                        class="fa fa-plus"></i>
+                    批量添加</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchCheckPlatFood()"><i
+                        class="fa fa-plus"></i>
+                    核对平台商品状态</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchChangePrice()">
+                    批量改报价</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchChangePriceIncrease()">
+                    批量改百分比</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return copy()"><i class="fa fa-copy"></i>
+                    复制</a>
+                <span class="p-l-sm p-r-sm"> | </span>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return setquoteIncrease()"> 报价加价</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return setPriceIncrease()"> 设置加价</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return setPriceIncreaseByPrice()">
+                    按照价格区间修改加价</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return setElePrice()">
+                    修改饿了么价格</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return setFixedPriceIncrease()">
+                    设置固定加价</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchLock()">
+                    报价锁定</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchUnlock()">
+                    报价解锁</a>
+                <span class="p-l-sm p-r-sm"> | </span>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return alignStoreUserFood()"> 商品对齐</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return activeFullPublish()">批量折扣</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return activePublish()">批量满减</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchSoltOutByCagetory()">
+                    批量下架</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchSaleTime()">
+                    售卖时间</a>
+                <span class="p-l-sm p-r-sm"> | </span>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-info btn-sm"
+                            s-click="return exportFood()"><i class="fa fa-download"></i>导出
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="food-list-table">
+            <table id="foodsGrid"
+                   s='datac,nda'
+                   s-datac="{targets:[$pager]}"
+                   s-data="S.get('/api/store-user-food/search', $form.node.serialize())"
+                   class="table table-striped table-bordered form-inline">
+                <tr>
+                    <th>图片</th>
+                    <th>视频</th>
+                    <th>商品名</th>
+                    <th>门店</th>
+                    <th class="text-center">自定分类</th>
+                    <th class="text-center">报价单位</th>
+                    <th class="" style="width: 150px;">参考价</th>
+                    <th class="text-right">供应商报价</th>
+                    <th class="text-right">门店报价</th>
+                    <th class="text-center">审核</th>
+                    <th class="text-center">发布</th>
+                    <th class="text-center">库位</th>
+                    <th class="text-right form-inline">
+                        操作
+                    </th>
+                </tr>
+                <tbody s="loop" s-data-filter="'results'">
+                <tr s-loop-role="empty">
+                    <td colspan="11" class="alert alert-warning">
+                        暂无商品
+                    </td>
+                </tr>
+                <tr s-loop-role="row" s="datac">
+                    <td s="tpl">
+                        <img src="{%=this.food.picture%}" style="max-width: 40px; max-height: 40px;"/>
+                    </td>
+                    <td s="tpl">
+                        <video src="{%=this.food.video%}" autoplay muted="true"
+                               style="max-width: 40px; max-height: 40px;">
+                            您的浏览器不支持播放视频。
+                        </video>
+                    </td>
+                    <td>
+                        <div s="tpl" style="max-width: 200px;">
+                            {%if(this.food.actualFoodId) {%}
+                            <label class="label label-warning">镜像</label>
+                            {%}%}
+                            {%if(this.food.promotional) {%}
+                            <label class="label label-warning">促销</label>
+                            {%}%}
+                            <span name="name">{%=this.food.name%}</span>
+                            <div class="text-muted f-xs">
+                                商品ID: <span name="id">{%=this.food.id%}</span>
+                                <br/>商品编码：<span name="food.code" class="text-info">{%=this.food.code%}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="max-width: 200px;">
+                            <a href="javascript:;" name="storeUser.name"
+                               s-click="selectStoreUser(this.parent().data().storeUser)"></a>
+                            <div s="tpl"><span
+                                    class="label {%=this.storeUser.opened ? 'label-success' : 'label-default'%}">{%=this.storeUser.opened ? '已开' : '未开'%}</span>
+                            </div>
+                            <div class="" s="tpl">
+								<span>
+									供应商：
+									{%if(this.foodSupplier) {%}
+									{%=this.foodSupplier.name%}
+									{%}%}
+								</span>
+                                <input type="button" class="btn btn-xs btn-default" value="设置"
+                                       s-click="bindFoodSupplier(this)"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center" s="tpl">
+                        {%if(this.category){%}
+                        <label class="label label-info" s-click="clearCategory(this)">
+                            {%=this.category.name%} &times;
+                        </label> <br/>
+                        {%}else{%}
+
+                        {%}%}
+                        <div name="food.categoryName" class="f-xs text-muted">{%=this.food.categoryName%}</div>
+                        <a href="javascript:;" s-click="setCategory(this)">设置</a>
+                    </td>
+                    <td name="foodUnit" class="text-center"></td>
+                    <td>
+                        <div style="width: 200px;">
+                            <span class="text-muted f-xs">参考价:</span> <span name="refPrice.toFixed(1)"
+                                                                            class="text-right"></span>
+                            <div>
+                                <span class="text-muted f-xs">警戒价:</span> <span name="warningPrice.toFixed(1)"
+                                                                                class="text-right"></span>
+                            </div>
+                            <div>
+                                <span class="text-muted f-xs">平均价:</span> <span name="avgQuotePrice.toFixed(1)"
+                                                                                class="text-right"></span>
+                                <span class="text-muted f-xs">&nbsp;&nbsp;最高价:</span> <span
+                                    name="maxQuotePrice.toFixed(1)"
+                                    class="text-right"></span>
+                                <span class="text-muted f-xs">&nbsp;&nbsp;最低价:</span> <span
+                                    name="minQuotePrice.toFixed(1)" class="text-right"></span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-right text-warning">
+                        <table class="table table-condensed table-bordered price-table">
+                            <tr>
+                                <td style="width: 35px;">报价</td>
+                                <td style="width: 80px;">
+                                    <div s="tpl">
+                                        <input autocomplete="off" step="0.1" type="number" style="width: 60px;"
+                                               class="form-control text-right input-sm price-input"
+                                               s-change="supplierAlterQuotePriceChange(this)"
+                                               value="{%=(this.supplierAlterQuotePrice || 0).toFixed(1)%}"/>
+                                        {%if(this.food.warningPrice > 0 && (this.supplierAlterQuotePrice || 0) >
+                                        this.food.warningPrice) {%}
+                                        <span class="label label-danger f-xs" s="tooltip" title="警戒价">+{%=((this.supplierAlterQuotePrice || 0) - this.food.warningPrice).toFixed(1)%}元</span>
+                                        {%}%}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 35px;">当前</td>
+                                <td style="width: 80px;">
+                                    <div s="tpl">
+                                        <input autocomplete="off" step="0.1" type="number" style="width: 60px;"
+                                               class="form-control text-right input-sm price-input" readonly
+                                               value="{%=(this.supplierQuotePrice || 0).toFixed(1)%}"/>
+                                        {%if(this.food.warningPrice > 0 && (this.supplierQuotePrice || 0) >
+                                        this.food.warningPrice) {%}
+                                        <span class="label label-danger f-xs" s="tooltip" title="警戒价">+{%=((this.supplierQuotePrice || 0) - this.food.warningPrice).toFixed(1)%}元</span>
+                                        {%}%}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>加价</td>
+                                <td s="tpl">
+                                    <input autocomplete="off" step="1" type="number" style="width: 60px;"
+                                           class="form-control text-right input-sm price-input"
+                                           value="{%=this.supplierIncrease%}" s-change="supplierIncreaseChange(this)"/>%
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="text-right text-warning">
+                        <table class="table table-condensed table-bordered price-table">
+                            <tr>
+                                <td style="width: 35px;">待审</td>
+                                <td style="width: 80px;">
+                                    <span name="alterQuotePrice.toFixed(1)"></span>
+                                    <div s="tpl">
+                                        {%if(this.food.warningPrice > 0 && this.alterQuotePrice >
+                                        this.food.warningPrice) {%}
+                                        <span class="label label-danger f-xs" s="tooltip" title="警戒价">+{%=(this.alterQuotePrice - this.food.warningPrice).toFixed(1)%}元</span>
+                                        {%}%}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>当前</td>
+                                <td s="tpl">
+                                    {%if(this.food.actualFoodId) {%}
+                                    <input autocomplete="off" step="0.1" type="number" style="width: 60px;"
+                                           class="form-control text-right input-sm price-input" readonly
+                                           value="{%=this.quotePrice.toFixed(1)%}" s-change="quotePriceChange(this)"/>
+                                    {%} else {%}
+                                    <input autocomplete="off" step="0.1" type="number" style="width: 60px;"
+                                           class="form-control text-right input-sm price-input"
+                                           value="{%=this.quotePrice.toFixed(1)%}" s-change="quotePriceChange(this)"/>
+                                    {%}%}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>售价</td>
+                                <td s="tpl">
+                                    <span name="salePrice.toFixed(1)">{%=this.salePrice.toFixed(1)%}</span> <span
+                                        name="priceIncrease" class="f-xs text-warning"></span>
+                                    <div>
+                                        {%if(this.food.price > 0 && this.quotePrice > this.food.price) {%}
+                                        <span class="label label-danger f-xs" s="tooltip" title="参考价">+{%=(this.quotePrice - this.food.price).toFixed(1)%}元</span>
+                                        {%}%}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>加价</td>
+                                <td s="tpl">
+                                    <div>
+                                        <input autocomplete="off" step="1" type="number" style="width: 60px;"
+                                               class="form-control text-right input-sm price-increase-input"
+                                               value="{%=this.priceIncrease%}" s-change="priceIncreaseChange(this)"/>%
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td class="text-center" s="tpl">
+                        <a href="javascript:;" s-click="showPublishMsg(this)" class="label
+                            {%
+                                switch(this.quoteStatus) {
+                                    case 'WAIT_VERIFY':
+                                        out.print('label-warning'); break;
+                                    case 'WAIT_PUBLISH':
+                                    	out.print('label-info'); break;
+                                    case 'VERIFY_SUCCESS':
+                                        out.print('label-success'); break;
+                                    default:
+                                        out.print('label-danger');break;
+                                }
+                            %}
+                        ">{%if(this.publishMsg) {%}
+                            <i class="fa fa-warning"></i>
+                            {%}%} {%=this.quoteStatusTitle%}</a>
+                    </td>
+                    <td style="width: 150px;">
+                        <div s="tpl">
+                            <table class="table table-condensed table-bordered table-fixed"
+                                   style="table-layout: fixed; margin-bottom: 10px;">
+                                <tr class="{%=this.storeUser.meituanOpened || 'hide'%}">
+                                    <td style="width: 40px;">美团</td>
+                                    <td style="width: 120px !important;">
+                                        <div>
+                                            <label class="label {%=getPublishStatusStyle(this.meituanPublishStatus)%}">{%=this.meituanPublishStatusTitle%}</label>
+                                            {%if(this.meituanPublishStatus === 'WAIT' || this.meituanPublishStatus ===
+                                            'FAIL' || this.meituanPublishStatus === 'IN_STOCK') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="上架"
+                                                   s-click="return publish(this, 'MEITUAN')"/>
+                                            {%} else if(this.meituanPublishStatus === 'SUCCESS') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="下架"
+                                                   s-click="return soldOut(this, 'MEITUAN')"/>
+                                            {%}%}
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr class="{%=this.storeUser.clbmOpened || 'hide'%}">
+                                    <td style="width: 40px;">菜老板美</td>
+                                    <td style="width: 120px !important;">
+                                        <div>
+                                            <label class="label {%=getPublishStatusStyle(this.clbmPublishStatus)%}">{%=this.clbmPublishStatusTitle%}</label>
+                                            {%if(this.clbmPublishStatus === 'WAIT' || this.clbmPublishStatus === 'FAIL'
+                                            || this.clbmPublishStatus === 'IN_STOCK') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="上架"
+                                                   s-click="return publish(this, 'CLBM')"/>
+                                            {%} else if(this.clbmPublishStatus === 'SUCCESS') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="下架"
+                                                   s-click="return soldOut(this, 'CLBM')"/>
+                                            {%}%}
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr class="{%=this.storeUser.eleOpened || 'hide'%}">
+                                    <td>饿了么</td>
+                                    <td>
+                                        <div>
+                                            <label class="label {%=getPublishStatusStyle(this.elePublishStatus)%}">{%=this.elePublishStatusTitle%}</label>
+                                            {%if(this.elePublishStatus === 'WAIT' || this.elePublishStatus === 'FAIL' ||
+                                            this.elePublishStatus === 'IN_STOCK') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="上架"
+                                                   s-click="return publish(this, 'ELE')"/>
+                                            {%} else if(this.elePublishStatus === 'SUCCESS') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="下架"
+                                                   s-click="return soldOut(this, 'ELE')"/>
+                                            {%}%}
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr class="{%=this.storeUser.wanteOpened || 'hide'%}">
+                                    <td style="width: 40px;">客户端</td>
+                                    <td style="width: 120px !important;">
+                                        <div>
+                                            <label class="label {%=getPublishStatusStyle(this.wantePublishStatus)%}">{%=this.wantePublishStatusTitle%}</label>
+                                            {%if(this.wantePublishStatus === 'WAIT' || this.wantePublishStatus ===
+                                            'FAIL' || this.wantePublishStatus === 'IN_STOCK') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="上架"
+                                                   s-click="return publish(this, 'WANTE')"/>
+                                            {%} else if(this.wantePublishStatus === 'SUCCESS') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="下架"
+                                                   s-click="return soldOut(this, 'WANTE')"/>
+                                            {%}%}
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr class="{%=this.storeUser.jddjOpened || 'hide'%}">
+                                    <td style="width: 40px;">京东到家</td>
+                                    <td style="width: 120px !important;">
+                                        <div>
+                                            <label class="label {%=getPublishStatusStyle(this.jddjPublishStatus)%}">{%=this.jddjPublishStatusTitle%}</label>
+                                            {%if(this.jddjPublishStatus === 'WAIT' || this.jddjPublishStatus === 'FAIL'
+                                            || this.jddjPublishStatus === 'IN_STOCK') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="上架"
+                                                   s-click="return publish(this, 'JDDJ')"/>
+                                            {%} else if(this.jddjPublishStatus === 'SUCCESS') {%}
+                                            <input type="button" class="btn btn-info btn-outline btn-xs" value="下架"
+                                                   s-click="return soldOut(this, 'JDDJ')"/>
+                                            {%}%}
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                    <td class="text-center" s="tpl">
+                        <div name="warehouseName" class="f-xs text-muted">{%=this.warehouseName%}</div>
+                        <a href="javascript:;" s-click="bindWarehouse(this)">绑定库位</a>
+                        <a href="javascript:;" s-click="delWarehouse(this)">解绑库位</a>
+                    </td>
+                    <!--<td name="warehouseName" class="text-center"></td>-->
+                    <td class="text-right" s="tpl">
+                        {%if(this.quoteStatus == 'WAIT_VERIFY') {%}
+                        <div style="padding-bottom: 2px;">
+                            <input type="button" class="btn btn-warning btn-outline btn-xs" value="审核"
+                                   s-click="return verify(this)"/>
+                        </div>
+                        {%}%}
+                        <!--{%if(this.sale) {%}-->
+                        <!--<div class="btn-group btn-group">-->
+                        <!--<button type="button" class="btn btn-danger btn-outline btn-xs"-->
+                        <!--s-click="return soldOut(this)">下架-->
+                        <!--</button>-->
+                        <!--<button type="button" class="btn btn-danger btn-xs btn-outline dropdown-toggle"-->
+                        <!--data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                        <!--<span class="caret"></span>-->
+                        <!--<span class="sr-only">Toggle Dropdown</span>-->
+                        <!--</button>-->
+                        <!--<ul class="dropdown-menu dropdown-menu-right" style="width: 100px;">-->
+                        <!--<li><a href="javascript:;" s-click="batchSoldOut(this)"><i class="fa fa-level-down"></i>-->
+                        <!--批量下架</a></li>-->
+                        <!--</ul>-->
+                        <!--</div>-->
+                        <!--{%}%}-->
+                        <div style="padding-bottom: 2px;">
+                            <input type="button" class="btn btn-xs btn-outline btn-warning" s-click="skuList(this)"
+                                   value="SKU({%=this.specialSkuIdList ? this.specialSkuIdList.split(',').length : 0%})"/>
+                        </div>
+                        {%if(this.quotePriceLock) {%}
+                        <div style="padding-bottom: 2px;">
+                            <input type="button" class="btn btn-warning btn-outline btn-xs" value="解锁报价"
+                                   s-click="return unlock(this)"/>
+                            <input type="text" readonly class="btn btn-warning btn-outline btn-xs"
+                                   value="{%=getTime(this.unlockTime*1000)%}"/>
+                        </div>
+                        {%}%}
+                        <input type="button" class="btn btn-danger btn-outline btn-xs" value="删除"
+                               s-click="return del(this)"/>
+                        <div style="padding-bottom: 2px;">
+                            <input type="button" class="btn btn-warning btn-outline btn-xs" value="起售份数"
+                                   s-click="return setMinCount(this)"/>
+                        </div>
+                        <!--<input type="button" class="btn btn-danger btn-outline btn-xs" value="绑定库位"-->
+                               <!--s-click="return del(this)"/>-->
+                        <div style="padding-bottom: 2px;">
+                        <!--<div style="padding-bottom: 2px;">-->
+                            <!--<input type="button" class="btn btn-warning btn-outline btn-xs" value="创建活动"-->
+                                   <!--s-click="return publishActive(this, 'MEITUAN')"/>-->
+                        <!--</div>-->
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="text-right" id="pager" s="datac,nda">
+            共有<span name="total"></span>个数据
+            <ul s="pagination"
+                s-pagination="{action:function(){$page.node.val(this); $foodsGrid.refresh()}}"
+                class="pagination pagination-sm">
+            </ul>
+        </div>
+    </div>
+</div>
+<script>
+
+    var storeUserId = 0
+
+    function categoryList() {
+        var deferred = $.Deferred()
+        S.get('/api/food-category/firstcategorylist').done(function (rs) {
+            rs.unshift({name: '全部分类', foodNum: '0'})
+            deferred.resolve(rs);
+        })
+        return deferred
+    }
+
+
+    function soldOut($this, plat) {
+        var data = $this.parent().data()
+        S.confirm('确认下架吗？').done(function (rs) {
+            var loader = S.loading()
+            S.put('/api/store-user-food/sold-out/' + data.id, {plat: plat}).done(function (rs) {
+                rs && $foodsGrid.refresh()
+            }).always(function () {
+                loader.resolve()
+            })
+        })
+    }
+
+    function del($this) {
+        var data = $this.parent().data()
+        S.confirm('确认删除吗？').done(function (rs) {
+            S.remove('/api/store-user-food/' + data.id).done(function (rs) {
+                rs && $foodsGrid.refresh()
+            })
+        })
+    }
+
+    function bindFoodSupplier($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/food-supplier/foodSupplierSelector.html', {storeUser: data.storeUser}).done(list => {
+            if (list && list.length) {
+                var foodSupplier = list[0]
+                S.put('/api/store-user-food/' + data.id + '/food-supplier', {
+                    foodSupplierId: foodSupplier.id
+                }).done(rs => {
+                    data.foodSupplier = foodSupplier
+                    $this.parent().data(data)
+                })
+            }
+        })
+    }
+
+    function bindWarehouse($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/warehouse/WarehouserSelector.html', {storeUser: data.storeUser}).done(list => {
+            //console.log(list);
+            if (list && list.length) {
+                var foodSupplier = list[0]
+                S.put('/api/warehouse/bizsuf/' + data.id , {
+                    wid: foodSupplier.id
+                }).done(rs => {
+                    $foodsGrid.refresh()
+                })
+            }
+        })
+    }
+
+    function delWarehouse($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/warehouse/WarehouserdelSelector.html', {suf: data}).done(list => {
+            $foodsGrid.refresh()
+            // console.log(list);
+            // if (list && list.length) {
+            //     var foodSupplier = list[0]
+            //     S.put('/api/warehouse/bizsuf/' + data.id , {
+            //         wid: foodSupplier.id
+            //     }).done(rs => {
+            //         $foodsGrid.refresh()
+            //     })
+            // }
+        })
+    }
+
+    function bindFoodSupplier($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/food-supplier/foodSupplierSelector.html', {storeUser: data.storeUser}).done(list => {
+            if (list && list.length) {
+                var foodSupplier = list[0]
+                S.put('/api/store-user-food/' + data.id + '/food-supplier', {
+                    foodSupplierId: foodSupplier.id
+                }).done(rs => {
+                    data.foodSupplier = foodSupplier
+                    $this.parent().data(data)
+                })
+            }
+        })
+    }
+
+    function detectProblematicFood() {
+        var loadingDeferred = S.loading()
+        return S.get('/api/food/detect-problematic-food').done(function (rs) {
+            $foodsGrid.data({
+                results: rs,
+                page: 1,
+                pageSize: 20,
+                total: rs.length
+            })
+        }).always(function () {
+            loadingDeferred.resolve()
+        })
+    }
+
+    function showPublishMsg($this) {
+        var data = $this.parent().data()
+        S.alert(data.publishMsg, 'danger')
+    }
+
+    function skuList($this) {
+        openSkuList($this.parent().data(), $this.parent())
+    }
+
+    function openSkuList(data, row) {
+        S.popupOpen('/storeUserFood/specialSkuList.html', {
+            id: data.id,
+            specialSkuIdList: data.specialSkuIdList,
+            foodId: data.food.id,
+            eleSkuId: data.eleSkuId
+        }).done(function (rs) {
+            rs && $foodsGrid.refresh()
+        })
+    }
+
+    function initCategory() {
+        return S.post('/api/food-category/init').done(function () {
+            $foodCategoryList.refresh()
+        })
+    }
+
+    function getPublishStatusStyle(status) {
+        switch (status) {
+            case 'WAIT':
+                return 'label-info'
+            case 'SUCCESS':
+                return 'label-success'
+            case 'FAIL':
+                return 'label-danger'
+            default:
+                return 'label-default'
+        }
+    }
+
+    S.on('s-ready', function () {
+        $foodCategoryList.node.sortable({
+            axis: "y",
+            update: function () {
+                saveCategoryIdx()
+            }
+        });
+    })
+
+    $foodCategoryList.node.delegate('li.category-li', 'click', function () {
+        event.stopPropagation();
+        var li = $(this)
+        var categoryName = li.find('.category-name').text()
+        $categoryName.node.val(categoryName == '全部分类' ? '' : categoryName)
+        $page.node.val(1)
+        $foodsGrid.refresh()
+        li.addClass('active').siblings('.active').removeClass('active')
+    })
+
+    function findFood($this) {
+        var parent = $this
+        var nameNode = parent.node.find('.fircategory-name').text()
+        $categoryName.node.val(nameNode == '全部分类' ? '' : nameNode)
+        $page.node.val(1)
+        $foodsGrid.refresh()
+    }
+
+    function storeUserSelect(storeUser) {
+        selectStoreUser(storeUser)
+    }
+
+    function selectStoreUser(storeUser) {
+        $storeUserName.node.html(storeUser.name || '全部门店')
+        $storeUserId.node.val(storeUser.id || '')
+        storeUserId = storeUser.id || 0
+        $foodSupplierSelect.refresh()
+        $page.node.val(1)
+        $foodsGrid.refresh();
+    }
+
+    function clearStoreUser(e) {
+        selectStoreUser({})
+        e.stopPropagation()
+    }
+
+    function quotePriceChange($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.put('/api/store-user-food/quote-price/' + data.id, {quotePrice: $this.node.val()}).done(function (ufd) {
+            row.data(ufd)
+        })
+    }
+
+    function priceIncreaseChange($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.put('/api/store-user-food/price-increase/' + data.id, {priceIncrease: $this.node.val()}).done(function (ufd) {
+            row.data(ufd)
+        })
+    }
+
+    function supplierAlterQuotePriceChange($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.put('/api/store-user-food/supplier-alter-quote-price/' + data.id, {supplierAlterQuotePrice: $this.node.val()}).done(function (ufd) {
+            row.data(ufd)
+        })
+    }
+
+    function supplierIncreaseChange($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.put('/api/store-user-food/supplier-increase/' + data.id, {supplierIncrease: $this.node.val()}).done(function (ufd) {
+            row.data(ufd)
+        })
+    }
+
+    function addToStore() {
+        S.popupOpen('/storeUserFood/storeUserFoodAdd.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchAdd() {
+        S.popupOpen('/storeUserFood/storeUserFoodBatchAdd.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchCheckPlatFood() {
+        S.popupOpen('/storeUserFood/batchCheckPlatFood.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchLock() {
+        S.popupOpen('/storeUserFood/storeUserFoodLockQuotePrice.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchSaleTime() {
+        S.popupOpen('/storeUserFood/batchSaleTime.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+
+
+    function batchChangePrice() {
+        S.popupOpen('/storeUserFood/batchChangePrice.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchChangePriceIncrease() {
+        S.popupOpen('/storeUserFood/batchChangePriceIncrease.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchUnlock() {
+        S.popupOpen('/storeUserFood/storeUserFoodUnlockQuotePrice.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function detectChange() {
+        return S.popupOpen('/storeUserFood/storeUserFoodDetect.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function copy() {
+        return S.popupOpen('/storeUserFood/storeUserFoodCopy.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchPublish() {
+        S.popupOpen('/storeUserFood/storeUserFoodBatchPublish.html').done(function (rs) {
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchPublishCategory() {
+        return S.popupOpen('/storeUserFood/storeUserCategoryPublish.html').done(function (rs) {
+        })
+    }
+
+    function resetPublish() {
+        return S.popupOpen('/storeUserFood/storeUserFoodResetPublish.html').done(function (rs) {
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function activePublish() {
+        return S.popupOpen('/storeUserFood/storeUserFoodFullDiscountPublish.html').done(function (rs) {
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function activeFullPublish() {
+        return S.popupOpen('/storeUserFood/storeUserFoodActivePublish.html').done(function (rs) {
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function batchSoldOutByFood() {
+        return S.popupOpen('/storeUserFood/batchSoldOutByPlat.html').done(function (rs) {
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function resetStatus() {
+        return S.popupOpen('/storeUserFood/storeUserFoodResetStatus.html').done(function (rs) {
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function publish($this, plat) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.popupOpen('/storeUserFood/checkExists.html', {plat: plat}).done(function (checkExists, platList) {
+            if (checkExists === undefined) {
+                return
+            }
+            if (platList && platList.length) {
+                var param = Smart.serializeToObject($form.node);
+                param.checkExists = checkExists
+                var deferred = S.loading()
+                S.post('/api/store-user-food/publish/' + data.id, {
+                    checkExists: checkExists,
+                    platList: platList
+                }).done(function (dto) {
+                    S.toast('发布完成')
+                    row.data(dto)
+                }).always(function () {
+                    deferred.resolve()
+                })
+            }
+        })
+
+    }
+
+    function publishActive($this, plat) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.popupOpen('/storeUserFood/checkExists.html', {plat: plat}).done(function (checkExists, platList) {
+            if (checkExists === undefined) {
+                return
+            }
+            if (platList && platList.length) {
+                var param = Smart.serializeToObject($form.node);
+                param.checkExists = checkExists
+                var deferred = S.loading()
+                S.post('/api/store-user-food/publishActive/' + data.id, {
+                    checkExists: checkExists,
+                    platList: platList
+                }).done(function (dto) {
+                    S.toast('创建活动完成')
+                    row.data(dto)
+                }).always(function () {
+                    deferred.resolve()
+                })
+            }
+        })
+
+    }
+
+    function setCategory($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.popupOpen('/foodCategory/foodCategorySelector.html').done(function (rs) {
+            if (rs) {
+                S.put('/api/store-user-food/category/' + data.id, {categoryId: rs[0].id}).done(function () {
+                    data.category = rs[0]
+                    row.data(data)
+                })
+            }
+        })
+    }
+
+    function clearCategory($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.put('/api/store-user-food/category/' + data.id).done(function () {
+            data.category = null
+            row.data(data)
+        })
+    }
+
+    function verify($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        var loadingDeferred = S.loading()
+        return S.put('/api/store-user-food/verify/' + data.id).done(function (dto) {
+            row.data(dto)
+            loadingDeferred.resolve()
+        })
+    }
+
+    function setMinCount($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/storeUserFood/setMinCount.html', {storeUserFood: data})
+    }
+
+    function getTime(time) {
+        var date = new Date(time)
+        var Y = date.getFullYear() + '-'
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+        var D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
+        var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+        var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+        var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+        return Y + M + D + h + m + s
+
+    }
+
+    function unlock($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        var loadingDeferred = S.loading()
+        return S.put('/api/store-user-food/unlock/' + data.id).done(function () {
+            $foodsGrid.refresh();
+        }).always(function () {
+            loadingDeferred.resolve()
+        })
+    }
+
+    function batchVerify() {
+        S.confirm('确定批量审核当前查询条件下的所有商品吗？').done(function () {
+            var loadingDeferred = S.loading()
+            var param = Smart.serializeToObject($form.node);
+            return S.put('/api/store-user-food/batch-verify', param).done(function () {
+                $foodsGrid.refresh();
+            }).always(function () {
+                loadingDeferred.resolve()
+            })
+        })
+    }
+
+    function proofSoldOut() {
+        S.popupOpen('/storeUser/storeUserSelector.html').done(function (storeUsers) {
+            if (storeUsers) {
+                var loadingDeferred = S.loading()
+                S.put('/api/store-user-food/proofread/sold-out', {storeUserId: storeUsers[0].id}).done(function () {
+
+                    $foodsGrid.refresh();
+                }).always(function () {
+                    loadingDeferred.resolve()
+                })
+            }
+        })
+    }
+
+
+    function setPriceIncrease() {
+        S.popupOpen('/storeUserFood/priceIncreaseChange.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+    function setquoteIncrease() {
+        S.popupOpen('/storeUserFood/quoteChange.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+    function setPriceIncreaseByPrice() {
+        S.popupOpen('/storeUserFood/priceIncreaseChangeByPrice.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+
+    function setElePrice() {
+        S.popupOpen('/storeUserFood/ChangeElePrice.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+
+    function batchJddjSoldOut() {
+        S.popupOpen('/storeUserFood/batchSoldOutJddj.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+    function setFixedPriceIncrease() {
+        S.popupOpen('/storeUserFood/fixedPriceIncreaseChange.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+
+    function batchSoltOutByCagetory() {
+        S.popupOpen('/storeUserFood/batchSoltOutByCategory.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+    function alignStoreUserFood() {
+        S.popupOpen('/storeUserFood/alignStoreUserFood.html').done(function (data) {
+            if (data) {
+                $foodsGrid.refresh();
+            }
+        })
+    }
+
+    function resetQuoteStatus() {
+        S.popupOpen('/storeUserFood/resetQuoteStatus.html').done(function (data) {
+            if (data) {
+                console.info(data)
+                S.confirm('确定将当前查询条件下的所有商品的审核设置为：' + data.title).done(function () {
+                    var param = Smart.serializeToObject($form.node)
+                    var loadingDeferred = S.loading()
+                    param.targetQuoteStatus = data.id
+                    S.put("/api/store-user-food/batch/reset-quote-status", param).done(function () {
+                        $foodsGrid.refresh();
+                    }).always(function () {
+                        loadingDeferred.resolve()
+                    })
+                })
+            }
+        })
+    }
+
+    function batchDelete() {
+        if ($foodCode.node.val().length == 0 && $foodId.node.val().length == 0) {
+            S.alert('请输入商品编码或者商品id进行批量删除操作');
+            return
+        }
+        S.confirm('确定删除当前查询条件下的所有商品吗？').done(function () {
+            var loadingDeferred = S.loading()
+            var param = Smart.serializeToObject($form.node);
+            return S.put('/api/store-user-food/batch/del', param).done(function () {
+                $foodsGrid.refresh();
+            }).always(function () {
+                loadingDeferred.resolve()
+            })
+        })
+    }
+
+    function exportFood() {
+        window.open('/api/store-user-food/export?' + $form.node.serialize())
+    }
+</script>

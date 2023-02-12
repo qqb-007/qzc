@@ -1,0 +1,1 @@
+"use strict";Component({externalClasses:["i-class"],options:{multipleSlots:!0},properties:{full:{type:Boolean,value:!1},thumb:{type:String,value:""},title:{type:String,value:""},extra:{type:String,value:""}}});

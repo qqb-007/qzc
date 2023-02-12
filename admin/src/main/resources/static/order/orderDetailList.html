@@ -1,0 +1,139 @@
+<metat title="订单明细" width="1000px" args="order"/>
+<style>
+
+</style>
+<div class="p">
+	<form class="form-inline pull-left" s="valid,form,nda,datac" id="form" s-data="order" style="display: none">
+		<input autocomplete="off" type="text" class="form-control input-sm" placeholder="平台订单ID"
+			   s-data-filter="'platOrderId'"
+			   style="width:200px;" name="platOrderId"/>
+		<input type="hidden" id="page" name="page" />
+	</form>
+	<table id="orderDetailsGrid"
+		   s='datac,nda'
+		   s-data="S.get('/api/order-detail/search', $form.node.serialize())"
+		   class="table table-striped table-bordered">
+		<tr>
+			<th class="">商品</th>
+			<th class="text-right">售价</th>
+			<th class="text-right">报价</th>
+			<th class="text-right">规格</th>
+			<th class="text-center">包装</th>
+			<th class="text-right">数量</th>
+			<th class="text-right">库位</th>
+			<th class="text-right">销售/退</th>
+			<th class="text-right">成本/退</th>
+			<th class="text-right">操作</th>
+		</tr>
+		<tbody s="loop" s-data-filter="'results'">
+		<tr s-loop-role="empty">
+			<td colspan="9" class="alert alert-warning">
+				暂无明细
+			</td>
+		</tr>
+		<tr s-loop-role="row" s="datac">
+			<td s="tpl">
+				<span>{%=this.foodName%}</span>
+				{%if(!this.ok) {%}
+				<div class="alert alert-warning p-xs">{%=this.remark%}</div>
+				{%}%}
+			</td>
+			<td>
+				<div class="text-right" name="price" s="tooltip" title="售价"></div>
+			</td>
+			<td>
+				<div class="text-right" name="quotePrice" s="tooltip" title="报价"></div>
+			</td>
+			<td class="text-right">
+				<div name="skuId"></div>
+				<div name="spec"></div>
+			</td>
+			<td class="text-center">
+				¥<span name="boxPrice"></span>&times;<span name="boxNum"></span>
+			</td>
+			<td class="text-center">
+				<span name="quantity" title="下单数量"></span> - <span title="退款数量" name="refundQuantity"></span>
+			</td>
+			<td class="text-center">
+				<span name="warehouseName" title="库位"></span>
+			</td>
+			<td class="text-right" s="tpl">
+				<span class="text-success">{%=(this.total - this.refund).toFixed(2)%}</span>
+				{%if(this.refund){%}
+				<div>
+					<span class="text-success">{%=(this.total).toFixed(2)%}</span>-<span class="text-danger"
+																						 s="tooltip" title="退款">{%=(this.refund).toFixed(2)%}</span>
+				</div>
+				{%}%}
+			</td>
+			<td class="text-right" s="tpl">
+				<span class="text-success">{%=(this.costTotal - this.costRefund).toFixed(2)%}</span>
+				{%if(this.costRefund){%}
+				<div>
+					<span class="text-success">{%=(this.costTotal).toFixed(2)%}</span>-<span class="text-danger"
+																							 s="tooltip"
+																							 title="退款">{%=(this.costRefund).toFixed(2)%}</span>
+				</div>
+				{%}%}
+			</td>
+			<td class="text-right">
+				<input type="button" class="btn btn-xs btn-link" s-click="check(this)" value="核对"/>
+			</td>
+		</tr>
+		</tbody>
+		<tfoot>
+		<tr>
+			<td colspan="9" class="text-right">
+				共有<span name="total"></span>个数据
+				<ul s="pagination"
+					s-pagination="{action:function(){$page.node.val(this); $orderDetailsGrid.refresh()}}"
+					class="pagination pagination-sm">
+				</ul>
+			</td>
+		</tr>
+
+		<tr>
+			<td colspan="9" class="text-left">
+				地址：<span s s-data="order" name="recipientAddress"></span>
+			</td>
+		</tr>
+
+
+		</tfoot>
+	</table>
+</div>
+<script type="text/javascript">
+	S.meta.btns = [
+		// {
+		// 	name: '核对明细',
+		// 	style: 'btn btn-primary',
+		// 	click: function() {
+		//
+		// 	}
+		// },
+		{
+			name: '关闭',
+			style: 'btn btn-default',
+			click: function() {
+				S.close()
+			}
+		}
+	]
+	function check($this) {
+		var data = $this.parent().data()
+		S.popupOpen('/food/foodSelector.html', {name: data.foodName}).done(function(rs) {
+			if(rs) {
+				var food = rs[0]
+				var skuList = food.skuList
+				S.popupOpen('/food/skuSelector.html', {skuList: skuList}).done(function(rs) {
+					if(rs) {
+						S.put('/api/order-detail/bind-sku/' + data.id, {foodId: food.id, skuId: rs.skuId}).done(function() {
+							$orderDetailsGrid.refresh()
+						})
+
+					}
+				})
+			}
+		})
+	}
+</script>

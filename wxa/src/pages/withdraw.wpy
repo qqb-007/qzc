@@ -1,0 +1,241 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+
+  @import "../css/var";
+
+  .container {
+
+  }
+
+  .panel {
+    padding: 20px;
+    background-color: #ffffff;
+  }
+
+  .bank {
+    &-card {
+      height: 60px;
+      border-radius: 5px;
+      background-image: linear-gradient(to right, #65AFE4, #1DB8A3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      &-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 54px;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #1DB8A3;
+        .iconfont {
+          font-size: 34px;
+        }
+      }
+    }
+    &-name {
+      color: #ffffff;
+      font-size: 14px;
+    }
+    &-account {
+      color: #ffffff;
+      font-size: 16px;
+    }
+    &-owner {
+      color: #ffffff;
+      font-size: 18px;
+    }
+  }
+
+  .tip {
+    color: @color-muted;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 5px;
+  }
+
+  .money {
+    font-size: 14px;
+    margin-top: 20px;
+    color: @color-title;
+    &-value {
+      font-size: 20px;
+      color: @color-danger;
+    }
+  }
+
+  .withdraw-input {
+    border-bottom: 1rpx solid #ddd;
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    &-y {
+      font-size: 18px;
+      color: #000;
+      width: 30px;
+      text-align: center;
+    }
+    &-val {
+      flex: 1;
+      height: 40px;
+      font-size: 20px;
+      line-height: 40px;
+    }
+  }
+
+  .bottom {
+    padding-top: 20rpx;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="panel">
+      <view class="bank-card">
+        <view class="bank-card-icon">
+          <view class="iconfont icon-bank-card"></view>
+        </view>
+        <view class="bank-card-info">
+          <view class="bank-name">{{storeUser.bankName ? storeUser.bankName : ''}}</view>
+          <view class="bank-account">{{storeUser.bankAccount ? storeUser.bankAccount : ''}}</view>
+        </view>
+        <view class="bank-owner">{{storeUser.bankAccountName ? storeUser.bankAccountName : ''}}</view>
+      </view>
+      <view class="tip">如需修改您的银行卡信息，请联系王小菜客服进行修改！</view>
+      <view class="money">可提现余额：¥
+        <text class="money-value">{{wallet.money}}</text>
+      </view>
+      <view class="withdraw-input">
+        <text class="withdraw-input-y">¥</text>
+        <input type="text" class="withdraw-input-val" @change="bindData" data-key="form.money" value="{{wallet.money}}" disabled="true"/>
+      </view>
+    </view>
+    <view class="bottom">
+      <i-button type="success" @tap="withdraw()">确认提现</i-button>
+      <view class="tip">预计3个工作日到账</view>
+    </view>
+    <i-message id="message"/>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Bind from '../mixins/bind'
+
+  let $Message = require('../iview/base/index').$Message
+
+  let api = require('../utils/api')
+  let bankFormat = require('../utils/bank-format')
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '余额提现',
+      enablePullDownRefresh: true,
+      backgroundColor: '#efeff4',
+      usingComponents: {
+        'i-input': '../iview/input/index',
+        'i-button': '../iview/button/index',
+        'i-cell-group': '../iview/cell-group/index',
+        'i-cell': '../iview/cell/index',
+        'i-message': '../iview/message/index'
+      }
+    }
+    mixins = [Bind]
+
+    data = {
+      storeUser: {},
+      wallet: {},
+      validateOk: false,
+      form: {
+        bankName: '',
+        bankAccount: '',
+        bankAccountName: '',
+        money: 0
+      }
+    }
+
+    watch = {
+      form() {
+        this.validateOk = this.validate()
+      }
+    }
+
+    methods = {
+      withdraw() {
+        if (!this.validate()) {
+          return
+        }
+        wx.showLoading()
+        api.withdraw(this.data.form).done(rs => {
+          wx.showModal({
+            title: '提示',
+            content: '提现成功，预计3个工作日内到账',
+            success (res) {
+              wx.navigateBack()
+            }
+          })
+        }).always(() => {
+          wx.hideLoading()
+        })
+      }
+    }
+
+    events = {}
+
+    validate() {
+      if (this.data.form.bankName.trim().length < 2) {
+        return false
+      }
+      if (this.data.form.bankAccount.length < 3) {
+        return false
+      }
+      if (this.data.form.bankAccountName.trim().length < 2) {
+        return false
+      }
+      if (!this.data.form.money || this.data.form.money <= 0) {
+        return false
+      }
+      if (this.data.form.money != this.wallet.money) {
+        $Message({
+          content: '只能提现所有金额',
+          type: 'error',
+          duration: 3
+        })
+        return false
+      }
+      return true
+    }
+
+    loadData() {
+      return api.page.withdraw().done(rs => {
+        let data = rs.data
+        this.storeUser = data.storeUser
+        this.wallet = data.wallet
+        this.wallet.moneyStr = this.wallet.money.toFixed(3)
+        this.storeUser.bankAccount = bankFormat(this.storeUser.bankAccount || '')
+        this.form.bankAccount = this.storeUser.bankAccount || ''
+        this.form.bankName = this.storeUser.bankName || ''
+        this.form.bankAccountName = this.storeUser.bankAccountName || ''
+        this.form.money = this.wallet.money
+        this.$apply()
+      })
+    }
+
+    onPullDownRefresh() {
+      this.loadData().done(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    onLoad() {
+      // wx.startPullDownRefresh()
+      this.loadData()
+    }
+  }
+</script>

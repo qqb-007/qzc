@@ -1,0 +1,1 @@
+"use strict";var input=function(t){for(var a=t.currentTarget.dataset,e=a.key.split("."),i=this.data,l=t.detail.detail?t.detail.detail.value:t.detail.value,d=0;d<e.length;d++)d==e.length-1?i[e[d]]=l:i=this.data[e[d]]={}};module.exports=input;

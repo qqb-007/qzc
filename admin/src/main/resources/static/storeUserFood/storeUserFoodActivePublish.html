@@ -1,0 +1,175 @@
+<meta title="批量发布折扣活动" width="1000"/>
+<style>
+    .store-info {
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        padding: 5px 10px;
+        margin: 3px;
+    }
+</style>
+<div class="p">
+    <form id="form" s="valid,form" method="put" action="/api/store-user-food/batch-active">
+        <table class="table table-bordered table-stripped">
+            <tr>
+                <th style="width: 100px;">目标门店</th>
+                <td class="form-inline">
+                    <select class="form-control" id="allStoreUser"
+                            s-change="$storeUserPanel.node.add($storeUserSelectBtn.node)[this.node.val() == 'false' ? 'show' : 'hide']()"
+                            name="allStoreUser">
+                        <option value="true">所有门店</option>
+                        <option value="false" selected>指定门店</option>
+                    </select>
+                    <input type="button" class="btn btn-xs btn-outline btn-success" value="选择门店"
+                           s-click="selectStoreUser()" id="storeUserSelectBtn"/>
+                    <div id="storeUserPanel">
+                        <div s="tpl" id="storeUserList">
+                            {%$.each(this, function(i) {%}
+                            <label style="display: inline-block; margin-right: 5px; margin-bottom: 5px;"
+                                   class="label label-info store-info">
+                                {%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()"
+                                                  class="fa fa-times"></a>
+                                <input type="hidden" name="storeUserIdList" class="store-user-id"
+                                       value="{%=this.id%}"/>
+                            </label>
+                            {%})%}
+                        </div>
+
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th style="width: 100px;">选择商品</th>
+                <td>
+                    <div s="tpl" id="foodList">
+                        {%$.each(this, function(i) {%}
+                        <div style="display: inline-block" class="store-info">
+                            <a href="javascript:;">{%=this.name%} <a href="javascript:;"
+                                                                     s-click="this.node.parent().remove()"
+                                                                     class="fa fa-times"></a></a>
+                            <input type="hidden" name="foodIdList" class="food-id" value="{%=this.id%}"/>
+                        </div>
+                        {%})%}
+                    </div>
+
+
+                    <input type="hidden" name="activeType" id="activeType" class="food-id"/>
+
+
+                    <div class="help-block">
+                        <input type="button" class="btn btn-xs btn-outline btn-success" value="选择商品"
+                               s-click="selectFood()"/>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th style="width: 100px;">选择平台</th>
+                <td>
+                    <div s="window" s-window="{href: '/plat/plat-selector.html'}" id="platSelector"></div>
+                </td>
+            </tr>
+
+            <tr>
+                <th style="width: 100px;">加价百分比</th>
+                <td>
+                    <input autocomplete="off" placeholder="输入加价百分比" type="number"
+                           class="form-control" name="priceIncrease" s-valid-error="require()"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script type="text/javascript">
+
+    S.meta.btns = [
+        {
+            name: "折扣一",
+            style: "btn btn-primary",
+            click: function () {
+                var nodes = S.node.find('.store-user-id')
+                // if (nodes.size() == 0) {
+                //     return;
+                // }
+                $platSelector.getPlatList(function (platList) {
+                    var loadingDeferred = S.loading()
+                    $activeType.node.val(1)
+                    $form.submit().done(function (rs) {
+                        S.toast(rs)
+                        S.close(true)
+                    }).always(function () {
+                        loadingDeferred.resolve()
+                    })
+                })
+
+            }
+        },
+        {
+            name: "折扣二",
+            style: "btn btn-primary",
+            click: function () {
+                var nodes = S.node.find('.store-user-id')
+                // if (nodes.size() == 0) {
+                //     return;
+                // }
+                $activeType.node.val(2)
+                $platSelector.getPlatList(function (platList) {
+                    var loadingDeferred = S.loading()
+                    $form.submit().done(function () {
+
+                        S.toast('发布完成')
+                        S.close(true)
+                    }).always(function () {
+                        loadingDeferred.resolve()
+                    })
+                })
+
+            }
+        },
+        // {
+        //     name: "满减活动",
+        //     style: "btn btn-primary",
+        //     click: function () {
+        //         var nodes = S.node.find('.store-user-id')
+        //         if (nodes.size() == 0) {
+        //             return;
+        //         }
+        //         $activeType.node.val(3)
+        //         $platSelector.getPlatList(function (platList) {
+        //             var loadingDeferred = S.loading()
+        //             $form.submit().done(function () {
+        //
+        //                 S.toast('重置完成')
+        //                 S.close(true)
+        //             }).always(function () {
+        //                 loadingDeferred.resolve()
+        //             })
+        //         })
+        //
+        //     }
+        // },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+
+    function selectStoreUser() {
+        S.popupOpen('/storeUser/storeUserSelector.html', {multi: false}).done(function (storeUserList) {
+            if (storeUserList && storeUserList.length) {
+                $storeUserList.prependData(storeUserList)
+            }
+        })
+    }
+
+    function selectFood() {
+        S.popupOpen('/food/foodSelector.html', {
+            multi: true,
+        }).done(function (foodList) {
+            if (foodList && foodList.length) {
+                $foodList.prependData(foodList)
+            }
+        })
+    }
+</script>

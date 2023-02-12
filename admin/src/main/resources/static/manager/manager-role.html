@@ -1,0 +1,37 @@
+<meta title="用户角色设置[{%=manager.username%}]" width="500px" args="manager"/>
+<form   style="padding: 10px"
+        id="form"
+        s-form="{action:'/api/manager-role/' + manager.id}"
+        method="put"
+        s="tpl,form" s-data="S.get('/api/manager-role/'+manager.id)">
+    {%$.each(this, function(i,role){%}
+    <label class="checkbox-inline">
+        {%if(role.checked){%}
+        <input autocomplete="off" type="checkbox" name="roleIds" checked value="{%=role.id%}"> {%=role.name%}
+        {%} else {%}
+        <input autocomplete="off" type="checkbox" name="roleIds" value="{%=role.id%}"> {%=role.name%}
+        {%}%}
+    </label>
+    {%})%}
+</form>
+<script type="text/javascript">
+    S.meta.btns = [
+        {
+            name: "保存",
+            style: "btn btn-primary",
+            click: function(){
+                return S.S("#form").submit().done(function(rs){
+                    S.close(true);
+                    S.notice("权限保存成功", "success");
+                });
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function(){
+                S.close();
+            }
+        }
+    ]
+</script>

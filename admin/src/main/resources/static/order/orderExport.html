@@ -1,0 +1,172 @@
+<metat title="订单导出"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<span class="h4">导出订单详细信息</span>
+		</div>
+		<div class="panel-body">
+			<form role="form" id="exportForm" s="valid,form"
+				  class="form-horizontal"
+				  s-form="{done: exportDone}"
+				  method="get"
+				  style="padding: 20px;" action="/api/order/export">
+				<table class="table table-bordered table-stripped">
+					<tr>
+						<th style="width: 100px;">选择门店</th>
+						<td>
+							<div s="tpl" id="storeUserList">
+								{%$.each(this, function(i) {%}
+								<label style="display: inline-block; margin-right: 10px;" class="label label-info store-info">
+									{%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()" class="fa fa-times"></a>
+									<input type="hidden" name="storeUserIdList" data-name="{%=this.name%}"
+										   class="target-store-user-id"
+										   value="{%=this.id%}"/>
+								</label>
+								{%})%}
+							</div>
+							<div>
+								<a href="javascript:;" class="h3" s-click="selectStoreUser()">选择门店 <i class="fa fa-plus"></i></a>
+								<div class="help-block">不选择门店则表示所有门店</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th>开始日期</th>
+						<td>
+							<input type="text" name="startTime" autocomplete="off" s-valid-error="require()" class="form-control" s="datetimepicker"/>
+							<input type="hidden" id="type" name="type"/>
+						</td>
+					</tr>
+					<tr>
+						<th>结束日期</th>
+						<td>
+							<input type="text" name="endTime" autocomplete="off" s-valid-error="require()" class="form-control" s="datetimepicker"/>
+						</td>
+					</tr>
+					<tr>
+						<th>订单状态</th>
+						<td>
+							<select class="form-control input-sm" s="select"
+									s-build="S.get('/api/enum/valuesMap/core.enums.OrderStatus')"
+									name="status">
+								<option value="">状态</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>业务状态</th>
+						<td>
+							<select class="form-control input-sm" s="select"
+									s-build="S.get('/api/enum/valuesMap/core.enums.OrderBizStatus')"
+									name="bizStatus">
+								<option value="">业务状态</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>选择平台</th>
+						<td>
+							<select class="form-control input-sm" s="select"
+											s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+											name="plat">
+								<option value="">所有平台</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th></th>
+						<td>
+							<input type="button" class="btn btn-primary" s-click="exportFile()" value="导出订单明细"/>
+							<input type="button" class="btn btn-primary" s-click="exportOrderFile()" value="导出订单报表"/>
+							<input type="button" class="btn btn-primary" s-click="exportHaiKuiFile()" value="导出海葵订单"/>
+							<input type="button" class="btn btn-primary" s-click="exportSSiFile()" value="导出闪送订单"/>
+							<input type="button" class="btn btn-primary" s-click="exportUUFile()" value="导出UU订单"/>
+							<input type="button" class="btn btn-primary" s-click="download()" value="下载"/>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+	function selectStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: true}).done(function (storeUserList) {
+			if (storeUserList) {
+				$storeUserList.prependData(storeUserList)
+			}
+		})
+	}
+
+	function exportFile() {
+        $type.node.val(1)
+		if(S.node.find('.target-store-user-id').size() == 0) {
+			S.confirm('确认导出所有门店订单明细吗？').done(function() {
+				$exportForm.submit();
+			})
+		} else {
+			$exportForm.submit();
+		}
+	}
+
+    function exportOrderFile() {
+        $type.node.val(2)
+        if(S.node.find('.target-store-user-id').size() == 0) {
+            S.confirm('确认导出所有门店订单报表吗？').done(function() {
+                $exportForm.submit();
+            })
+        } else {
+            $exportForm.submit();
+        }
+    }
+
+    function exportHaiKuiFile() {
+        $type.node.val(3)
+        if(S.node.find('.target-store-user-id').size() == 0) {
+            S.confirm('确认导出所有门店海葵订单吗？').done(function() {
+                $exportForm.submit();
+            })
+        } else {
+            $exportForm.submit();
+        }
+    }
+
+    function exportSSiFile() {
+        $type.node.val(4)
+        if(S.node.find('.target-store-user-id').size() == 0) {
+            S.confirm('确认导出所有门店闪送订单吗？').done(function() {
+                $exportForm.submit();
+            })
+        } else {
+            $exportForm.submit();
+        }
+    }
+
+    function exportUUFile() {
+        $type.node.val(5)
+        if(S.node.find('.target-store-user-id').size() == 0) {
+            S.confirm('确认导出所有门店UU订单吗？').done(function() {
+                $exportForm.submit();
+            })
+        } else {
+            $exportForm.submit();
+        }
+    }
+
+    function download(){
+        S.get('/api/order/download').done(function (rs) {
+            if(rs.file) {
+                window.open(rs.file)
+            } else {
+                S.toast('正在努力导出了,稍等一下', 'success')
+            }
+        })
+
+    }
+
+    function exportDone(rs) {
+		if(rs.file) {
+			window.open(rs.file)
+		}
+	}
+</script>

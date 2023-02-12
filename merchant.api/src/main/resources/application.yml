@@ -1,0 +1,11 @@
+spring:
+  session:
+    store-type: redis
+  kafka:
+    consumer:
+      group-id: merchant.api
+server:
+  session:
+    timeout: -1
+    persistent: true
+    tracking-modes: COOKIE,URL

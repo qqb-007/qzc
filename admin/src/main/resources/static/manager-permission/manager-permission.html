@@ -1,0 +1,54 @@
+<meta title="管理员权限" width="500px"  args="managerId"/>
+<div style="padding: 20px; height: 500px; overflow: auto">
+    <div id="permissionTree" class="ztree">
+
+    </div>
+</div>
+<script >
+    var permissionTree = S.N("#permissionTree");
+
+    var setting = {
+        check: {
+            enable: true,
+            chkboxType: { "Y" : "ps", "N" : "s" }
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        }
+    };
+    var zTree;
+    S.get("/api/manager/permission/" + managerId).done(function(rs){
+        zTree = $.fn.zTree.init(permissionTree, setting, rs);
+    });
+
+    S.meta.btns = [
+        {
+            name: "保存",
+            style: "btn btn-primary",
+            click: function(){
+                var treeDatas = zTree.getCheckedNodes(true);
+                if(treeDatas.length == 0){
+                    S.notice("请先选择权限节点", "danger");
+                    return;
+                }
+                var datas = [];
+                $.each(treeDatas, function(i, data){
+                    datas.push(data.id);
+                });
+                S.put("/api/manager/setPermissions/" + managerId, {permission: datas}).done(function(rs){
+                    S.close(true);
+                    S.notice("权限设置成功", "success");
+                });
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function(){
+                S.close();
+            }
+        }
+    ];
+</script>

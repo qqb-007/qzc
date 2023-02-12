@@ -1,0 +1,35 @@
+<meta title="修改密码[{%=manager.username%}]" width="500px" args="manager"/>
+<form role="form" id="form"
+      s="valid,form"
+      s-form="{done:submitDone, action: '/api/manager/modifyManagerPwd/' + manager.id}"
+      method="put" style="padding: 20px;">
+    <div class="form-group" s-valid-role="item">
+        <div class="input-group input-group-lg">
+            <span class="input-group-addon"><span class="fa fa-lock"></span></span>
+            <input autocomplete="off" type="password" name="password" class="form-control"
+                   s-valid-id="password"
+                   s-valid-label="新密码"
+                   placeholder="新密码" s-valid-error="require()">
+        </div>
+    </div>
+    <div class="form-group" s-valid-role="item">
+        <div class="input-group input-group-lg">
+            <span class="input-group-addon"><span class="fa fa-lock"></span></span>
+            <input autocomplete="off" type="password" name="rePassword"
+                   s-valid-label="确认密码"
+                   class="form-control" placeholder="确认密码" s-valid-error="require(),eq('password')" >
+        </div>
+    </div>
+    <div class="form-group">
+        <input autocomplete="off" type="submit" value="修 改" class="btn btn-lg btn-success" style="width: 100%" />
+    </div>
+</form>
+<script>
+    function submitDone(status) {
+        if(status == 1){
+            S.close(true);
+        } else if(status == -1){
+            S.alert("确认密码输入不正确");
+        }
+    }
+</script>

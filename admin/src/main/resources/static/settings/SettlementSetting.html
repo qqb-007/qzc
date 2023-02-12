@@ -1,0 +1,22 @@
+<meta title="结算配置" args="data"/>
+<style>
+
+</style>
+<form class="form-horizontal" id="form" s="form,datac,nda,valid" s-data="data" style="width: 600px;">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">结算周期(T+N)</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="number" class="form-control" name="intervalDay" placeholder="结算周期(T+N)"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    S.getContent = function () {
+        var deferred = $.Deferred();
+        $form.validate().done(function() {
+            deferred.resolve(Smart.serializeToObject($form.node))
+        })
+        return deferred;
+    }
+</script>

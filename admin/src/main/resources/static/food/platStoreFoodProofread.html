@@ -1,0 +1,220 @@
+<metat title="门店商品校对" args="storeId" width="1000px"/>
+<div class="p">
+	<div class="panel panel-orange"
+		 style="display: flex; flex-direction: column; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; margin-bottom: 0;">
+		<div class="panel-heading clearfix" style="display: flex; align-items: center; ">
+			<div class=" clearfix text-right">
+				<div class="input-group input-group-sm pull-left" style="width: 450px; margin-right: 10px;">
+					<input type="text" class="form-control input-sm" placeholder="选择门店" id="storeName" readonly>
+					<a href="javascript:;" s-click="selectStore()" class="input-group-addon">选择</a>
+				</div>
+				<a href="javascript:;" class="btn pull-right btn-warning btn-sm s-loading-icon btn-outline"
+				   s-click="return $foodsGrid.refresh()">
+					<i class="fa fa-refresh s-loading-spinner"></i> 刷新
+				</a>
+			</div>
+		</div>
+		<div class="panel-body" style="flex: 1; overflow: auto;">
+			<form id="form" s="valid,form" action="/api/food/code/publish-to-store/{storeId}" method="put">
+				<div class="" id="foodsGrid" s-data="loadFood()" s='check,datac,nda'>
+					<table
+							class="table table-striped table-bordered form-inline table-hover">
+						<tr>
+							<th>图片</th>
+							<th>商品名</th>
+							<th>编码</th>
+							<th>库商品</th>
+							<th>操作</th>
+						</tr>
+						<tbody s="loop">
+						<tr s-loop-role="empty">
+							<td colspan="5" class="alert alert-warning">
+								暂无商品
+							</td>
+						</tr>
+						<tr s-loop-role="row" class="food-quote-row" s="datac">
+							<td s="tpl">
+								<img src="{%=this.foodPicture%}" style="max-width: 40px; max-height: 40px;"/>
+								<input type="hidden" class="food-id" value="{%=this.foodId%}"/>
+								<input type="hidden" name="foodCategoryNameList" value="{%=this.foodCategoryName%}"/>
+								<input type="hidden" name="foodOriginCodeList" value="{%=this.originCode%}"/>
+							</td>
+							<td>
+								<input type="text" class="form-control" s-valid-error="require()"
+									   s-data-filter="'foodName'" name="foodNameList" readonly/>
+							</td>
+							<td s="tpl">
+								<input type="text" class="form-control"
+									   value="{%=this.foodId ? this.foodCode : ''%}" name="foodCodeList"/>
+							</td>
+							<td s="tpl">
+								{%if(this.foodId) {%}
+								<span>{%=this._foodName || this.foodName%}</span>
+								{%} else {%}
+								<label class="label label-danger">未对应</label>
+								{%}%}
+								<div>
+									{%if(this.originCode !== this.foodCode) {%}
+									<label class="label label-danger">待更新</label>
+									{%}%}
+								</div>
+							</td>
+							<td class="text-right" s="tpl">
+								<a href="javascript:;" class="btn btn-warning btn-xs" s-click="selectFood(this)">选择</a>
+								<a href="javascript:;" class="btn btn-primary btn-xs" s-click="createFood(this)">新建</a>
+								<a href="javascript:;" class="btn btn-danger btn-xs" s-click="removeFood(this)">删除</a>
+							</td>
+						</tr>
+						</tbody>
+						<tfoot>
+						<tr>
+							<td colspan="5" class="text-right">
+								共有<span name="length"></span>个数据
+							</td>
+						</tr>
+						</tfoot>
+					</table>
+				</div>
+			</form>
+		</div>
+		<div class="panel-footer text-center">
+			<input type="button" class="btn btn-primary" s-click="return save()" value="提交更新"/>
+		</div>
+	</div>
+</div>
+<script>
+
+	S.meta.btns = [
+		{
+			name: "更新店铺商品",
+			style: "btn btn-primary",
+			click: function () {
+
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function save() {
+		var deferred = $.Deferred()
+		S.confirm('发布前，请确认数据的准确性，确认发布吗？').done(function () {
+			var loadingDeferred = S.loading()
+			$form.submit().done(function (rs) {
+				if (rs.success) {
+					S.toast('商品编码发布成功')
+				} else {
+					S.alert('发布失败，原因：' + rs.msgList.join('<br />'))
+				}
+				deferred.resolve();
+			}).fail(function () {
+				deferred.reject();
+			}).always(function () {
+				loadingDeferred.resolve()
+			})
+		}).fail(function () {
+			deferred.reject();
+		})
+		return deferred;
+	}
+
+	function selectFood($this) {
+		var row = $this.parent().parent();
+		var data = row.data()
+		S.popupOpen('/food/foodSelector.html', {
+			multi: false,
+			name: data.foodName.split(/\s/)[0]
+		}).done(function (foodList) {
+			if (foodList) {
+				var food = foodList[0]
+				data.foodId = food.id
+				data.foodCode = food.code
+				data._foodName = food.name
+				row.data(data)
+			}
+		})
+	}
+
+	function createFood($this) {
+		var row = $this.parent().parent();
+		var data = row.data()
+		S.popupOpen('/food/food-save.html', {
+			food: {
+				name: data.foodName,
+				code: data.code,
+				picture: data.foodPicture,
+				unit: data.foodUnit,
+				categoryName: data.foodCategoryName
+			}
+		}).done(function (food) {
+			if (food) {
+				data.foodId = food.id
+				data.foodCode = food.code
+				data._foodName = food.name
+				row.data(data)
+			}
+		})
+	}
+
+	function removeFood($this) {
+		S.confirm('确认从美团删除吗？').done(function () {
+			var row = $this.parent().parent();
+			var data = row.data()
+			S.put('/api/meituan-waimai/retail/delete/' + data.storeCode, {appFoodCode: data.originCode}).done(function (rs) {
+				if (rs.success) {
+					S.toast('删除成功', 'success')
+					row.node.remove();
+				} else {
+					S.alert(rs.msg);
+				}
+			})
+		})
+	}
+
+	function loadFood() {
+		if (!storeId) {
+			return []
+		}
+		return S.get('/api/food/detect-plat-store/' + storeId).done(function (rs) {
+			rs.sort(function ($1, $2) {
+				if ($2.foodId) {
+					return -1;
+				}
+				if ($1.originCode !== $1.foodCode) {
+					return -1;
+				}
+				if ($2.originCode !== $2.foodCode) {
+					return 1;
+				}
+				if ($1.foodId) {
+					return 1;
+				}
+				if ($2.foodId) {
+					return -1;
+				}
+				return $1.foodName.localeCompare($2.foodName, 'zh')
+			})
+		})
+	}
+
+	function selectStore() {
+		S.popupOpen('/store/store-selector.html', {multi: false}).done(function (storeList) {
+			if (storeList) {
+				var store = storeList[0]
+				storeId = store.id
+				$storeName.node.val(store.name)
+				$foodsGrid.data([])
+				$foodsGrid.refresh()
+			}
+		}).fail(function () {
+		})
+	}
+
+	selectStore();
+
+</script>

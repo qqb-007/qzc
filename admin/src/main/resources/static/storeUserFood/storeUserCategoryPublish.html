@@ -1,0 +1,128 @@
+<meta title="发布分类到门店" width="1000"/>
+<style>
+	.store-info {
+		border-radius: 5px;
+		border: 1px solid #ddd;
+		padding: 5px 10px;
+		margin: 3px;
+	}
+</style>
+<div class="p">
+	<form id="form" s="valid,form" method="post" action="/api/store-user-food/category/publish">
+		<table class="table table-bordered table-stripped">
+			<tr>
+				<th style="width: 100px;">选择门店</th>
+				<td>
+					<div s="tpl" id="storeUserList">
+						{%$.each(this, function(i) {%}
+						<div style="display: inline-block" class="store-info">
+							<div>{%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()"
+												   class="fa fa-times"></a></div>
+							<input type="hidden" name="storeUserIdList" data-name="{%=this.name%}" class="store-user-id"
+								   value="{%=this.id%}"/>
+						</div>
+						{%})%}
+					</div>
+
+					<div class="help-block">
+						<input type="button" class="btn btn-xs btn-outline btn-success" value="选择门店"
+							   s-click="selectStoreUser()"/>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">选择平台</th>
+				<td s="tpl" s-data="S.get('/api/enum/valuesMap/core.enums.Plat')">
+					{%$.each(this, function(key, val){%}
+					<label class="checkbox-inline">
+						<input autocomplete="off" type="checkbox" class="plat-checkbox" name="platList" value="{%=key%}"> {%=val%}
+					</label>
+					{%})%}
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">发布完成</th>
+				<td>
+					<div s="tpl" id="finishedStoreUserList">
+						{%$.each(this, function(i) {%}
+						<label class="label {%=this.ok ? 'label-success' : 'label-danger'%}"
+							   style="display: inline-block" class="store-info">{%=this.plat%} - {%=this.name + (this.ok ? ' 成功' : '失败')%}</label>
+						{%})%}
+					</div>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<script type="text/javascript">
+
+	var sale = false;
+	S.meta.btns = [
+		{
+			name: "开始发布类目",
+			style: "btn btn-primary",
+			click: function () {
+				var nodes = S.node.find('.store-user-id')
+				if (nodes.size() == 0) {
+					S.alert('请选择门店')
+					return
+				} else {
+					var deferred = $.Deferred();
+					S.confirm('确认操作吗？').done(function () {
+						doPublish(deferred)
+					}).fail(function () {
+						deferred.resolve()
+					})
+				}
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function doPublish(deferred) {
+		var targetNode = S.node.find('.store-user-id')
+		if (targetNode.size() == 0) {
+			S.toast('复制完成', 'success')
+			deferred.resolve()
+			return
+		}
+		var storeUserId = $(targetNode.get(0)).val()
+		var loadingDeferred = S.loading()
+		var form = Smart.serializeToObject($form.node);
+		var platList = form.platList;
+		doPlatPublish(storeUserId, platList, targetNode, loadingDeferred)
+	}
+
+	function doPlatPublish(storeUserId, platList, targetNode, loadingDeferred) {
+		if (!$.isArray(platList)) {
+			platList = [platList]
+		}
+		var plat = platList.pop()
+		return S.post('/api/store-user-food/food-category/publish/' + storeUserId, {
+			plat: plat
+		}).done(function (rs) {
+			$finishedStoreUserList.prependData([{plat: plat, name: targetNode.attr('data-name') + ' ' + rs.msg, ok: rs.success}])
+			if (platList.length) {
+				doPlatPublish(storeUserId, platList, targetNode, loadingDeferred)
+			}
+		}).always(function() {
+			if (platList.length == 0) {
+				loadingDeferred.resolve()
+			}
+		})
+	}
+
+	function selectStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: false}).done(function (storeUserList) {
+			if (storeUserList) {
+				$storeUserList.prependData(storeUserList)
+			}
+		})
+	}
+</script>

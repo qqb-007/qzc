@@ -1,0 +1,9 @@
+
+  <view class="container">
+    <view  wx:for="{{foodSupplierList}}" wx:key="{{item.id}}" class="supplier-info" bindtap="open" data-wpyopen-a="/pages/supplier-food-list?foodSupplierId={{item.id}}">
+      <view class="supplier-name">{{item.name}}</view>
+      <view class="supplier-phone"><text class="iconfont icon-phone supplier-icon"/> <text bindtap="tel" data-wpytel-a="{{item.phone}}">{{item.phone}}</text></view>
+      <view class="supplier-address"><text class="iconfont icon-dizhi supplier-icon"/> {{item.address}}</view>
+      <view class="supplier-status supplier-status-{{item.status}}">{{item.statusTitle}}</view>
+    </view>
+  </view>

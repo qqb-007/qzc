@@ -1,0 +1,52 @@
+
+  <view class="container">
+    <view class="search-input-wrapper">
+      <input focus="{true}" value="{{searchParam.name}}" placeholder="输入商品名进行筛选" class="search-input" bindinput="searchInputChange"/>
+      <view class="search-input-btn" bindtap="searchBtnChange">搜索</view>
+    </view>
+    <scroll-view scroll-y class="category-view">
+      <view class="category {{searchParam.categoryName === '' ? 'category-selected' : ''}}" bindtap="selectCategory"  wx:key="" data-wpyselectcategory-a="">所有分类
+      </view>
+      <view  wx:for="{{foodCategoryList}}" class="category {{searchParam.categoryName === item ? 'category-selected' : ''}}" bindtap="selectCategory" wx:key="{{item}}" data-wpyselectcategory-a="{{item}}">{{item}}</view>
+    </scroll-view>
+    <view class="food-list">
+      <block wx:for="{{foodList}}">
+        <view class="food" wx:key="{{item.id}}">
+          <view class="food-info">
+            <image src="{{item.picture}}" bindtap="preview" class="food-pic" mode="aspectFill" data-wpypreview-a="{{item.picture}}"/>
+            <view class="food-detail">
+              <view class="food-title">{{item.name}}</view>
+              <view class="flex-row space-between align-flex-end">
+                <view class="food-price">售价: ¥<text class="food-price-val">{{item.price}}</text>元/{{item.quoteUnit}}</view>
+              </view>
+            </view>
+          </view>
+          <view class="food-footer">
+            <i-input-number value="{{item.priceShow}}" min="0" max="10000" data-idx="{{index}}" step="0.1" bindchange="priceChange"/>
+            <view class="food-sale-btn {{item.added ? 'food-sale-btn-on' : ''}}" bindtap="add" data-wpyadd-a="{{index}}">{{item.added ? '已添加' : '添加'}}</view>
+          </view>
+        </view>
+      </block>
+      <view wx:if="{{!hasNext}}" class="empty-tip">
+        <i-button type="info" shape="circle" size="small" bindtap="addNew" data-wpyaddnew-a="">未找到商品，手动添加</i-button>
+      </view>
+    </view>
+    <view class="scrolltop-btn" bindtap="scrollTop">
+      <text class="iconfont icon-fold"/>
+    </view>
+    <view class="return" bindtap="back">返回首页</view>
+    <!--<modal hidden="{{hideModel}}" title="输入商品名搜索" confirm-text="确认" cancel-text="取消" bindcancel="cancel" bindconfirm="confirmb">
+      <input class="search-input" placeholder="请输入商品名称" value="{{item.quotePriceShow}}" bindinput="searchInputChange" focus/>
+    </modal>-->
+    <view class="modal-mask" bindtap="cancel" hidden="{{hideModel}}"/>
+    <view class="modal-dialog" hidden="{{hideModel}}">
+      <view class="modal-title">输入商品名搜索</view>
+      <view class="modal-content">
+        <input class="search-input" placeholder="请输入商品名称" value="{{item.quotePriceShow}}" bindinput="searchInputChange" focus/>
+      </view>
+      <view class="modal-footer">
+        <view class="btn-cancel" bindtap="cancel" data-status="cancel">取消</view>
+        <view class="btn-confirm" bindtap="confirmb" data-status="confirmb">确定</view>
+      </view>
+    </view>
+  </view>

@@ -1,0 +1,32 @@
+<metat title="创建一级分类" width="500px"/>
+<style>
+
+</style>
+<div class="p">
+		一级分类名称：<input type="text" autocomplete="off" class="form-control category-name"/>
+	<span class="input-group-btn">
+		<input type="button" class="btn btn-default btn-info" s-click="creat(this)" value="创建">
+	</span>
+</div>
+<script type="text/javascript">
+	S.meta.btns = [
+		{
+			name: '关闭',
+			style: 'btn btn-default',
+			click: function() {
+				S.close()
+			}
+		}
+	]
+    function creat($this) {
+        var parent = $this.parent()
+        var nameNode = parent.node.find('.category-name')
+        var name = nameNode.val().trim()
+        if (!name) {
+            return
+        }
+        S.put('/api/food-category/createFirst?name='+name).done(function () {
+            S.close()
+        })
+    }
+</script>

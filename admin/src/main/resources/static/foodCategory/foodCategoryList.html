@@ -1,0 +1,295 @@
+<metat title="分类列表"/>
+<style>
+	.page-food-list {
+
+	}
+
+	.page-food-list .category-list {
+		/*width: 200px;*/
+		/*margin-right: 20px;*/
+		overflow: auto;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.page-food-list .category-list .nav > li > a {
+		padding: 5px 20px;
+		border-radius: 0;
+	}
+
+	.page-food-list .category-list .nav > li.active > a {
+		background-color: #ffffff;
+		color: #333;
+	}
+
+	.page-food-list .category-list .nav {
+		background-color: #EAEDF1;
+	}
+
+	.page-food-list .category-bar {
+
+	}
+
+	.page-food-list .nav-pills {
+		flex: 1;
+		overflow: auto;
+	}
+
+	.page-food-list .category-bar {
+		background-color: #D9DEE4;
+		padding: 10px;
+	}
+</style>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<div class="category-bar">
+				<a href="javascript:;" class="btn btn-xs btn-default s-loading-icon" s-click="return initCategory()"
+				   title="同步校对分类">
+					<i class="fa fa-spinner s-loading-spinner"></i> 同步分类
+				</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" class="btn btn-default btn-info" s-click="creatFirstCategory()" value="创建一级分类">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" class="btn btn-default btn-info" s-click="creatScendCategory()" value="创建二级分类">
+			</div>
+
+		</div>
+		<div class="panel-body">
+
+			<ul class="nav nav-pills nav-stacked p-b form-inline"
+				style="width: 300px;"
+				s="nda,loop"
+				id="foodCategoryList"
+				s-data="categoryList()">
+				<li s-loop-role="row" s="datac" class="category-li">
+					<div class="input-group">
+						<div class="input-group-addon">一级分类</div>
+						<span class="input-group-btn">
+							<input type="text" autocomplete="off" class="form-control category-name" name="name"
+								   style="width: 200px;"/>
+						</span>
+						<span class="input-group-btn">
+							<input type="hidden" class="form-control dropdown-toggle firstmeituanTagId" placeholder="美团类目"
+								   s-valid-error="require()"
+								   name="meituanTagId" data-toggle="dropdown"/>
+						<input type="text" readonly s-click="selectFirstMeituanTag(this)" class="form-control dropdown-toggle firstmeituanTagName"
+							   placeholder="美团类目" s-valid-error="require()"
+							   name="meituanTagName" data-toggle="dropdown"/>
+						</span>
+						<span class="input-group-btn">
+							<input type="hidden" class="form-control dropdown-toggle firstjingdongTagId" placeholder="京东类目"
+								   s-valid-error="require()"
+								   name="jingdongTagId" data-toggle="dropdown"/>
+						<input type="text" readonly s-click="selectFirstJingDongTag(this)" class="form-control dropdown-toggle firstjingdongTagName"
+							   placeholder="京东类目" s-valid-error="require()"
+							   name="jingdongTagName" data-toggle="dropdown"/>
+						</span>
+						<span class="input-group-btn">
+							<input type="button" class="btn btn-default btn-save" s-click="save(this)" value="保存">
+							<input type="button" class="btn btn-default btn-save" s-click="saveFirstTag(this)" value="保存类目">
+							<input type="button" class="btn btn-default btn-danger" s-click="deletecategory(this)" value="删除">
+						</span>
+					</div>
+					<ul class="nav nav-pills nav-stacked p-b form-inline"
+						style="width: 300px;"
+						s="nda,loop"
+						name="foodCategories">
+						<li s-loop-role="row" s="datac,nda" class="category-li">
+							<div class="input-group">&nbsp;&nbsp;&nbsp;
+								<div class="input-group-addon">子分类</div>
+								<span class="input-group-btn">
+								<input type="text" autocomplete="off" class="form-control scendcategory-name" name="name"
+									   style="width: 100px;"/>
+									</span>
+								<span class="input-group-btn">
+								<input type="text" autocomplete="off" class="form-control scendcategory-idx" name="idx"
+									   style="width: 100px;"/>
+								</span>
+								<span class="input-group-btn">
+									<input type="hidden" class="form-control dropdown-toggle meituanTagId" placeholder="美团类目"
+										   s-valid-error="require()"
+										   name="meituanTagId" data-toggle="dropdown"/>
+									<input type="text" readonly s-click="selectMeituanTag(this)" class="form-control dropdown-toggle meituanTagName"
+							   placeholder="美团类目"  s-valid-error="require()"
+							   name="meituanTagName" data-toggle="dropdown"/>
+								</span>
+								<span class="input-group-btn">
+									<input type="hidden" class="form-control dropdown-toggle jingdongTagId" placeholder="京东类目"
+										   s-valid-error="require()"
+										   name="jingdongTagId" data-toggle="dropdown"/>
+									<input type="text" readonly s-click="selectJingdongTag(this)" class="form-control dropdown-toggle jingdongTagName"
+										   placeholder="京东类目"  s-valid-error="require()"
+										   name="jingdongTagName" data-toggle="dropdown"/>
+								</span>
+								<span class="input-group-btn">
+									<input type="button" class="btn btn-default btn-save" s-click="savescend(this)" value="保存">
+									<input type="button" class="btn btn-default btn-save" s-click="saveJingDongTag(this)" value="保存类目">
+									<input type="button" class="btn btn-default btn-danger" s-click="deletecategory(this)" value="删除">
+								</span>
+							</div>
+						</li>>
+					</ul>
+
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<script>
+	function categoryList() {
+		var deferred = $.Deferred()
+		S.get('/api/food-category/firstcategorylist').done(function (rs) {
+			deferred.resolve(rs);
+		})
+		return deferred
+	}
+
+	function initCategory() {
+		return S.post('/api/food-category/init').done(function () {
+			$foodCategoryList.refresh()
+		})
+	}
+
+	S.on('s-ready', function () {
+		$foodCategoryList.node.sortable({
+			axis: "y",
+			update: function () {
+				saveCategoryIdx()
+			}
+		});
+	})
+
+	function saveCategoryIdx() {
+		var list = []
+		S.node.find('.category-name').each(function (i) {
+			list.push($(this).val())
+		})
+		S.put('/api/food-category/sort', {categoryNameList: list}).done(function () {
+
+		})
+	}
+
+	S.node.delegate('.category-name', 'change', function () {
+		var parent = $(this).parent()
+		parent.find('.btn-save').prop('disabled', false).addClass('btn-success')
+	})
+
+	function saveFirstTag($this) {
+		var parent = $this.parent()
+		var mtnameNode = parent.node.find('.firstmeituanTagName')
+        var jdnameNode = parent.node.find('.firstjingdongTagName')
+		var mttagId = parent.node.find('.firstmeituanTagId')
+        var jdtagId = parent.node.find('.firstjingdongTagId')
+
+		var mtname = mtnameNode.val().trim()
+        var jdname = jdnameNode.val().trim()
+		var mttagId = mttagId.val().trim()
+        var jdtagId = jdtagId.val().trim()
+
+		var data = parent.data()
+		S.put('/api/food-category/saveTag/' + data.id, {mtname: mtname,mttagId: mttagId,jdname: jdname,jdtagId: jdtagId}).done(function () {
+			parent.node.find('.btn-save').removeClass('btn-success')
+		})
+	}
+
+    function saveJingDongTag($this) {
+        var parent = $this.parent()
+        var mtnameNode = parent.node.find('.meituanTagName')
+        var jdnameNode = parent.node.find('.jingdongTagName')
+        var mttagId = parent.node.find('.meituanTagId')
+        var jdtagId = parent.node.find('.jingdongTagId')
+
+        var mtname = mtnameNode.val().trim()
+        var jdname = jdnameNode.val().trim()
+        var mttagId = mttagId.val().trim()
+        var jdtagId = jdtagId.val().trim()
+        var data = parent.data()
+        S.put('/api/food-category/saveTag/' + data.id, {mtname: mtname,mttagId: mttagId,jdname: jdname,jdtagId: jdtagId}).done(function () {
+            parent.node.find('.btn-save').removeClass('btn-success')
+        })
+    }
+
+    function save($this) {
+        var parent = $this.parent()
+        var nameNode = parent.node.find('.category-name')
+        var name = nameNode.val().trim()
+        if (!name) {
+            return
+        }
+        var data = parent.data()
+        S.put('/api/food-category/' + data.id, {name: name,idx:null}).done(function () {
+            parent.node.find('.btn-save').removeClass('btn-success')
+        })
+    }
+    function selectMeituanTag($this) {
+        S.popupOpen("/meituan-waimai/tag-selector.html", {prefix: 'adv'}).done(function (tag) {
+            if (tag) {
+                $this.parent().node.find('.meituanTagName').val(tag.namePath)
+                $this.parent().node.find('.meituanTagId').val(tag.id)
+            }
+        })
+    }
+
+    function selectJingdongTag($this) {
+        S.popupOpen("/jingdong-waimai/tag-selector.html", {prefix: 'adv'}).done(function (tag) {
+            if (tag) {
+                $this.parent().node.find('.jingdongTagName').val(tag.categoryName)
+                $this.parent().node.find('.jingdongTagId').val(tag.id)
+            }
+        })
+    }
+    function selectFirstMeituanTag($this) {
+        S.popupOpen("/meituan-waimai/tag-selector.html", {prefix: 'adv'}).done(function (tag) {
+            if (tag) {
+                $this.parent().node.find('.firstmeituanTagName').val(tag.namePath)
+                $this.parent().node.find('.firstmeituanTagId').val(tag.id)
+            }
+        })
+    }
+
+    function selectFirstJingDongTag($this) {
+        S.popupOpen("/jingdong-waimai/tag-selector.html", {prefix: 'adv'}).done(function (tag) {
+            if (tag) {
+                $this.parent().node.find('.firstjingdongTagName').val(tag.categoryName)
+                $this.parent().node.find('.firstjingdongTagId').val(tag.id)
+            }
+        })
+    }
+
+
+    function deletecategory($this) {
+        var parent = $this.parent()
+        var data = parent.data()
+        S.confirm("确定要删除该分类吗？请确保该分类下没有子类或者商品，删除分类将会同步到平台！").done(function(){
+            S.remove('/api/food-category/' + data.id).done(function () {
+                $foodCategoryList.refresh()
+            })
+        })
+    }
+    function savescend($this) {
+        var parent = $this.parent()
+        var nameNode = parent.node.find('.scendcategory-name')
+        var idxNode = parent.node.find('.scendcategory-idx')
+        var name = nameNode.val().trim()
+		var idx = idxNode.val().trim()
+        if (!name) {
+            return
+        }
+        var data = parent.data()
+        S.put('/api/food-category/' + data.id, {name: name,idx: idx}).done(function () {
+            parent.node.find('.btn-save').removeClass('btn-success')
+        })
+    }
+    function creatFirstCategory() {
+        S.popupOpen('/foodCategory/createFirstCategory.html').done(function () {
+            $foodCategoryList.refresh()
+        })
+    }
+    function creatScendCategory() {
+        S.popupOpen('/foodCategory/createScendCategory.html').done(function () {
+            $foodCategoryList.refresh()
+        })
+    }
+
+
+</script>

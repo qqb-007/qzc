@@ -1,0 +1,478 @@
+<metat title="订单列表" args="bizStatus"/>
+<div class="p">
+    <div class="panel panel-orange">
+        <div class="panel-heading">
+            <span class="h3">订单列表</span>
+        </div>
+        <div class="panel-body">
+            <div class="m-b clearfix">
+                <form class="form-inline pull-left" id="form">
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="平台订单ID"
+                           style="width:200px;" name="platOrderId"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店名称"
+                           style="width:200px;" name="storeUserName"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店ID"
+                           style="width:200px;" name="storeId"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="商家ID"
+                           style="width:200px;" name="storeUserId"/>
+                    <input type="text" class="form-control input-sm" name="startDate" placeholder="开始时间"
+                           s="datetimepicker"/> -
+                    <input type="text" class="form-control input-sm" name="endDate" placeholder="结束时间"
+                           s="datetimepicker"/>
+                    <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+                    <input autocomplete="off" type="hidden" name="fetchDetail" value="false"/>
+                    <select class="form-control input-sm" s="select"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+                            name="plat">
+                        <option value="">平台</option>
+                    </select>
+                    <select class="form-control input-sm" s="select"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.OrderStatus')"
+                            name="status">
+                        <option value="">状态</option>
+                    </select>
+                    <select class="form-control input-sm" s="select" s-data="bizStatus || ''"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.OrderBizStatus')"
+                            name="bizStatus">
+                        <option value="">业务状态</option>
+                    </select>
+                    <select class="form-control input-sm" s="select"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.DeliveryType')"
+                            name="deliveryType">
+                        <option value="">配送方式</option>
+                    </select>
+                    <select class="form-control input-sm"
+                            name="cansun">
+                        <option value="">餐损</option>
+                        <option value="true">已补</option>
+                        <option value="false">未补</option>
+                    </select>
+                    <select class="form-control input-sm" s="select"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.DeliveryStatus')"
+                            name="deliveryStatus">
+                        <option value="">美团开放平台配送状态</option>
+                    </select>
+                    <button type="button" class="btn btn-default btn-sm"
+                            s-click="$page.node.val(1); $ordersGrid.refresh()">查询
+                    </button>
+                </form>
+            </div>
+            <table id="ordersGrid"
+                   s='datac,nda'
+                   s-data="S.get('/api/order/search', $form.node.serialize())"
+                   class="table table-striped table-bordered">
+                <tr>
+                    <th>ID</th>
+                    <th>平台</th>
+                    <th>平台订单ID</th>
+                    <th>平台流水ID</th>
+                    <th>时间</th>
+                    <th>门店</th>
+                    <th class="text-right">总价</th>
+                    <th class="text-right">总价退款</th>
+                    <th class="text-right">成本</th>
+                    <th class="text-right">餐损</th>
+                    <th class="text-right">成本退款</th>
+                    <th class="text-right">合计成本</th>
+                    <th class="text-center">时间</th>
+                    <th class="text-center">状态</th>
+                    <th class="text-center">配送方式</th>
+                    <th class="text-center">业务状态</th>
+                    <th class="text-right">操作</th>
+                </tr>
+                <tbody s="loop" s-data-filter="'results'">
+                <tr s-loop-role="empty">
+                    <td colspan="17" class="alert alert-warning">
+                        暂无订单
+                    </td>
+                </tr>
+                <tr s-loop-role="row" s="datac">
+                    <td name="id"></td>
+                    <td name="platTitle"></td>
+                    <td name="platOrderId"></td>
+                    <td name="daySeq"></td>
+                    <td name="createTime"></td>
+                    <td name="store.name"></td>
+                    <td class="text-right" s="tpl">
+                        <span>{%=(this.total || 0).toFixed(2)%}</span>
+                    </td>
+                    <td class="text-right" s="tpl">
+                        <span>{%=(this.refundMoney || 0).toFixed(2)%}</span>
+                    </td>
+                    <td class="text-right" s="tpl">
+                        <span>{%=(this.costTotal || 0).toFixed(2)%}</span>
+                    </td>
+                    <td class="text-right" s="tpl">
+                        <span>{%=(this.cansun || 0).toFixed(2)%}</span>
+                    </td>
+                    <td class="text-right" s="tpl">
+                        <span>{%=(this.costRefund || 0).toFixed(2)%}</span>
+                    </td>
+                    <td class="text-right" s="tpl">
+                        <span>{%=(this.costTotal + this.cansun - this.costRefund).toFixed(2)%}</span>
+                    </td>
+                    <td class="text-center">
+                        <label class="label-info label" name="createTime"> </label> <br/>
+                        <label class="label label-warning" name="updateTime"> </label>
+                    </td>
+                    <td s="tpl" class="text-center">
+                        <label class="label
+                            {%
+                                switch(this.status) {
+                                    case 'WAIT_MERCHANT_CONFIRM': out.print('label-warning'); break;
+                                    case 'MERCHANT_CONFIRMED': out.print('label-info'); break;
+                                    case 'FINISHED': out.print('label-success'); break;
+                                    default: out.print('label-default');break;
+                                }
+                            %}
+                            ">{%=this.statusTitle%}</label>
+                    </td>
+                    <td>
+                        <span name="deliveryTypeTitle"></span>
+                        <label s-click="testDelivery(this)" class="label label-info" name="deliveryStatusTitle"></label>
+                    </td>
+                    <td s="tpl" class="text-center">
+                        <label class="label
+                            {%
+                                switch(this.bizStatus) {
+                                    case 'WAIT_CHECK': out.print('label-warning'); break;
+                                    case 'WAIT_SETTLE': out.print('label-info'); break;
+                                    case 'SETTLED': out.print('label-success'); break;
+                                    default: out.print('label-default'); break;
+                                }
+                            %}
+                            ">{%=this.bizStatusTitle%}</label>
+                    </td>
+                    <td s="tpl" class="text-right">
+                        {%if(this.status == 'WAIT_MERCHANT_CONFIRM') {%}
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="receipt(this)"
+                               value="接单"/>
+                        <input type="button" class="btn btn-xs btn-danger btn-outline" s-click="cancel(this)"
+                               value="取消"/>
+                        {%}%}
+                        {%if(this.plat == 'WANTE' && this.status != 'FINISHED') {%}
+                        <input type="button" class="btn btn-xs btn-danger btn-outline" s-click="cancel(this)"
+                               value="取消"/>
+                        <input type="button" class="btn btn-xs btn-info btn-outline" s-click="send(this)"
+                               value="发货"/>
+                        <input type="button" class="btn btn-xs btn-info btn-outline" s-click="finish(this)"
+                               value="确认送达"/>
+                        {%}%}
+                        {%if(this.status == 'MERCHANT_CONFIRMED' && ((!this.mtPeisongId && !this.sfPeisongId &&
+                        !this.ssPeisongId && !this.uuPeisongId && !this.ddPeisongId && this.deliveryStatus != 'TURNRUN') ||
+                        this.deliveryStatus === 'CANCELED') && (this.deliveryType === 'MEITUAN_OPEN' ||
+                        this.deliveryType ==='SHUFENG_OPEN' || this.deliveryType ==='UU_OPEN' || this.deliveryType ==='DD_OPEN' || this.deliveryType ==='UNDETERMINED' || this.deliveryType
+                        ==='SS_OPEN' || this.deliveryType ==='ZHONGBAO')) {%}
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="sendDelivery(this)"
+                               value="发起配送"/>
+                        {%}%}
+
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="sendCallDelivery(this)"
+                               value="配送补发"/>
+
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="addCansun(this)"
+                               value="补餐损"/>
+
+                        {%if(this.status == 'MERCHANT_CONFIRMED' && (this.deliveryStatus === 'CANCELED' ||
+                        !this.sfPeisongId || this.deliveryStatus === 'WAIT_SCHEDULE') && this.deliveryType
+                        ==='SHUFENG_OPEN') {%}
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="addFee(this)"
+                               value="加小费"/>
+                        {%}%}
+
+                        {%if(this.status == 'MERCHANT_CONFIRMED' && (this.deliveryStatus === 'WAIT_DELIVERY' ||
+                        this.deliveryStatus === 'WAIT_SCHEDULE' || this.deliveryStatus === 'CANCELED' ||
+                        this.deliveryStatus === 'OUTRANGE' || this.deliveryStatus == 'TURNRUN') && (this.deliveryType
+                        === 'MEITUAN_OPEN'||this.deliveryType ==='SHUFENG_OPEN' || this.deliveryType === 'DD_OPEN' || this.deliveryType === 'UU_OPEN' ||
+                        this.deliveryType === 'SS_OPEN' || this.deliveryType ==='ZHONGBAO')) {%}
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="switchDelivery(this)"
+                               value="切换配送"/>
+                        {%}%}
+
+                        {%if(this.status == 'MERCHANT_CONFIRMED' && (this.deliveryStatus === 'WAIT_SCHEDULE' ||
+                        this.deliveryStatus === 'ACCEPT' || this.deliveryStatus === 'WAIT_DELIVERY' ||
+                        this.deliveryStatus === 'TAKEN' || this.deliveryStatus == 'TURNRUN') && (this.deliveryType ===
+                        'MEITUAN_OPEN'||this.deliveryType ==='SHUFENG_OPEN' || this.deliveryType === 'DD_OPEN' ||this.deliveryType ==='UNDETERMINED' || this.deliveryType === 'UU_OPEN' ||
+                        this.deliveryType === 'SS_OPEN' || this.deliveryType ==='ZHONGBAO')) {%}
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="cancelDelivery(this)"
+                               value="取消配送"/>
+                        {%}%}
+                        {%if(this.refundStatus == 'PENDING') {%}
+                        <input type="button" class="btn btn-xs btn-success btn-outline" s-click="agreeRefund(this)"
+                               value="同意退货"/>
+                        <input type="button" class="btn btn-xs btn-danger btn-outline" s-click="rejectRefund(this)"
+                               value="驳回退货"/>
+                        {%}%}
+                        {%if(this.bizStatus == 'WAIT_SETTLE' || this.bizStatus == 'WAIT_CHECK') {%}
+                        <input type="button" class="btn btn-xs btn-info btn-outline" s-click="syncOrder(this)"
+                               value="同步"/>
+                        {%}%}
+                        <input type="button" class="btn btn-xs btn-info btn-outline" s-click="showDetail(this)"
+                               value="明细"/>
+                        <input type="button" class="btn btn-xs btn-info btn-outline" s-click="print(this)"
+                               value="打印"/>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="17" class="text-right">
+                        共有<span name="total"></span>个数据
+                        <ul s="pagination"
+                            s-pagination="{action:function(){$page.node.val(this); $ordersGrid.refresh()}}"
+                            class="pagination pagination-sm">
+                        </ul>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    function receipt($this) {
+        var data = $this.parent().data()
+        S.confirm('确认接单吗').done(function () {
+            S.put('/api/order/receipt/' + data.id).done(function (rs) {
+                if (rs) {
+                    S.toast('接单成功', 'success')
+                    $ordersGrid.refresh()
+                } else {
+                    S.toast('接单失败', 'danger')
+                }
+            })
+        })
+    }
+
+    function syncOrder($this) {
+        var data = $this.parent().data()
+        var deferred = S.loading()
+        return S.post('/api/order/sync-plat-order', {
+            plat: data.plat,
+            platOrderId: data.platOrderId
+        }).done(function (rs) {
+            $ordersGrid.refresh()
+        }).always(function () {
+            deferred.resolve()
+        })
+    }
+
+    function cancel($this) {
+        var data = $this.parent().data()
+        S.confirm('确认取消吗？').done(function () {
+            S.put('/api/order/cancel/' + data.id, {reason: '商家取消', reasonCode: '1001'}).done(function (rs) {
+                if (rs) {
+                    S.toast('取消成功', 'success')
+                    $ordersGrid.refresh()
+                } else {
+                    S.toast('取消失败', 'danger')
+                }
+            })
+        })
+    }
+
+    function agreeRefund($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/order/orderRefund.html', {order: data})
+    }
+
+
+    function switchDelivery($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.popupOpen('/order/ordercheckExists.html').done(function (checkExists, platList) {
+            if (checkExists === undefined) {
+                return
+            }
+            if (platList) {
+                var deferred = S.loading()
+                var type = 0;
+                if (platList == 'MEITUAN_OPEN') {
+                    type = 1;
+                } else if (platList == 'ZHONGBAO') {
+                    type = 2;
+                } else if (platList == 'UU_OPEN') {
+                    type = 3;
+                } else if (platList == 'SS_OPEN') {
+                    type = 4;
+                }else if (platList == 'DD_OPEN') {
+                    type = 5;
+                } else if (platList == 'SHUFENG_OPEN'){
+                    type = 6;
+                }else {
+                    S.toast('暂不支持')
+                    deferred.resolve()
+                    return
+                }
+                // var param = Smart.serializeToObject($form.node);
+                // param.checkExists = checkExists
+
+                S.post('/api/order/switch/order', {
+                    type: type,
+                    id: data.id
+                }).done(function (dto) {
+                    if (dto) {
+                        S.toast('切换完成')
+                        $ordersGrid.refresh()
+                    } else {
+                        S.toast('切换失败')
+                        $ordersGrid.refresh()
+                    }
+
+                }).always(function () {
+                    deferred.resolve()
+                })
+            }
+        })
+
+    }
+
+
+    function addFee($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/order/orderAddFee.html', {order: data})
+    }
+
+    function addCansun($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/order/orderAddCansun.html', {order: data})
+    }
+
+
+    function sendCallDelivery($this) {
+        var row = $this.parent().parent()
+        var data = row.data()
+        S.popupOpen('/order/orderAddPeiSong.html').done(function (checkExists, platList) {
+            if (checkExists === undefined) {
+                return
+            }
+            if (platList) {
+                var deferred = S.loading()
+                var type = '';
+                if (platList == 'MEITUAN_OPEN') {
+                    type = 1;
+                } else if (platList == 'UU_OPEN') {
+                    type = 3;
+                } else if (platList == 'SS_OPEN') {
+                    type = 4;
+                } else if (platList == 'DD_OPEN') {
+                    type = 5;
+                } else if(platList == 'SHUFENG_OPEN'){
+                    type = 6;
+                }else {
+                    S.toast('暂不支持')
+                    deferred.resolve()
+                    return
+                }
+                // var param = Smart.serializeToObject($form.node);
+                // param.checkExists = checkExists
+
+                S.post('/api/order/call-delivery', {
+                    type: platList,
+                    id: data.id
+                }).done(function (dto) {
+                    if (dto) {
+                        S.toast('补发成功')
+                        $ordersGrid.refresh()
+                    } else {
+                        S.toast('补发失败')
+                        $ordersGrid.refresh()
+                    }
+
+                }).always(function () {
+                    deferred.resolve()
+                })
+            }
+        })
+    }
+
+    function sendDelivery($this) {
+        var data = $this.parent().data()
+        var deferred = S.loading()
+        S.put('/api/order/send-delivery/' + data.id).done(function (rs) {
+            if (rs) {
+                S.toast('发起配送成功', 'success')
+                $ordersGrid.refresh()
+            } else {
+                S.toast('发起配送失败', 'danger')
+            }
+        }).always(function () {
+            deferred.resolve()
+        })
+    }
+
+    function cancelDelivery($this) {
+        var data = $this.parent().data()
+        var deferred = S.loading()
+        S.put('/api/order/cancel-delivery/' + data.id).done(function (rs) {
+            if (rs) {
+                S.toast('取消配送成功', 'success')
+                $ordersGrid.refresh()
+            } else {
+                S.toast('取消配送失败', 'danger')
+            }
+        }).always(function () {
+            deferred.resolve()
+        })
+    }
+
+    function rejectRefund($this) {
+        var data = $this.parent().data()
+        S.confirm('确认驳回退货吗？').done(function () {
+            S.put('/api/order/refund/reject/' + data.id, {reason: '同意退货'}).done(function (rs) {
+                if (rs) {
+                    S.toast('驳回成功', 'success')
+                    $ordersGrid.refresh()
+                } else {
+                    S.toast('驳回失败', 'danger')
+                }
+            })
+        })
+    }
+
+    function testDelivery($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/order/test-delivery.html', {order: data})
+    }
+
+    function showDetail($this) {
+        var data = $this.parent().data()
+        S.popupOpen('/order/orderDetailList.html' , {order: data})
+    }
+
+    function print($this) {
+        var data = $this.parent().data()
+        S.put('/api/order/print/' + data.id).done(function (flag) {
+            if (flag) {
+                S.toast('打印成功')
+            }
+        })
+    }
+
+    function send($this) {
+        var data = $this.parent().data()
+        S.put('/api/order/send/' + data.id).done(function (flag) {
+            if (flag) {
+                S.toast('发货成功')
+            }
+        })
+    }
+
+    function finish($this) {
+        var data = $this.parent().data()
+        S.put('/api/order/finish/' + data.id).done(function (flag) {
+            if (flag) {
+                S.toast('确认成功')
+            }
+        })
+    }
+
+    function nonSettle($this) {
+        var data = $this.parent().data()
+        S.put('/api/order/non-settle/' + data.id).done(function (flag) {
+            if (flag) {
+                $ordersGrid.refresh()
+            }
+        })
+    }
+</script>

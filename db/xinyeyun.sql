@@ -1,0 +1,1 @@
+ALTER TABLE store_user ADD xyy_sn varchar(40) NULL;

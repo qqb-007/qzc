@@ -1,0 +1,103 @@
+{
+	"pages": [
+		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/login",
+			"style": {
+				"navigationBarTitleText": "供应商登录"
+			}
+		},
+		{
+			"path": "pages/index",
+			"style": {
+				"navigationBarTitleText": "王小菜报价版",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/store-user-food-list",
+			"style": {
+				"navigationBarTitleText": "商品管理",
+				"enablePullDownRefresh": true,
+				"backgroundTextStyle": "dark",
+				"backgroundColor": "#efeff4"
+			}
+		},
+		{
+			"path": "pages/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/orders",
+			"style": {
+				"navigationBarTitleText": "订单",
+				"enablePullDownRefresh": true,
+				"backgroundTextStyle": "dark"
+			}
+		},
+		{
+			"path": "pages/food-list",
+			"style": {
+				"navigationBarTitleText": "商品搜索",
+				"enablePullDownRefresh": true,
+				"backgroundTextStyle": "dark",
+				"backgroundColor": "#efeff4"
+			}
+		},
+		{
+			"path": "pages/food-apply",
+			"style": {
+				"navigationBarTitleText": "商品申请",
+				"enablePullDownRefresh": true,
+				"backgroundTextStyle": "dark",
+				"backgroundColor": "#efeff4"
+			}
+		},
+		{
+			"path": "pages/store-user-food-sku",
+			"style": {
+				"navigationBarTitleText": "商品规格",
+				"enablePullDownRefresh": true,
+				"backgroundTextStyle": "dark",
+				"backgroundColor": "#efeff4"
+			}
+		}
+	],
+	"tabBar": {
+		"color": "#666",
+		"selectedColor": "#06c0ab",
+		"list": [
+			{
+				"pagePath": "pages/index",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/orders",
+				"text": "订单"
+			},
+			{
+				"pagePath": "pages/store-user-food-list",
+				"text": "商品"
+			},
+			{
+				"pagePath": "pages/my",
+				"text": "我的"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarBackgroundColor": "#25374f",
+		"backgroundColor": "#25374f",
+		"navigationBarTitleText": "王小菜报价版",
+		"navigationBarTextStyle": "white"
+	},
+	"usingComponts": true,
+		"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": []
+	}
+
+}

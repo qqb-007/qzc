@@ -1,0 +1,163 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+  .container {
+    padding: 10px;
+    background-color: #efeff4;
+  }
+  .food {
+    background-color: #ffffff;
+    margin-bottom: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    position: relative;
+    &-quote-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 10px;
+      background-color: @color-warning;
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
+    &-pic {
+      border-radius: 5px;
+      width: 60px;
+      height: 60px;
+    }
+    &-detail {
+      flex: 1;
+      padding-left: 10px;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+    }
+    &-title {
+      font-size: 16px;
+    }
+    &-price {
+      font-size: 14px;
+      color: @color-muted;
+      &-val {
+        font-size: 16px;
+        color: @color-success;
+        font-weight: 500;
+      }
+    }
+  }
+  .search-input {
+    border-radius: 30px;
+    height: 30px;
+    line-height: 30px;
+    border: 1rpx solid #ddd;
+    padding: 0 20px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+  }
+</style>
+<template>
+  <view class="container">
+    <input placeholder="输入商品名进行筛选" class="search-input" @input="searchInputChange"/>
+    <block wx:for="{{detailList}}" wx:key="{{item.id}}">
+      <view class="food" wx:if="{{!item.hide}}">
+        <image src="{{item.food.picture}}" class="food-pic" mode="aspectFill"></image>
+        <view class="food-detail">
+          <view class="food-title">{{item.food.name}}</view>
+          <view class="flex-row space-between align-flex-end">
+            <view class="food-price">
+              <text class="text-muted">报价:</text>
+              <text class="food-price-val text-danger"> ¥{{item.price}}/{{item.foodUnit}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  let Deferred = require('../utils/deferred')
+  let api = require('../utils/api')
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '报价列表',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark'
+    }
+    components = {}
+
+    data = {
+      loading: false,
+      detailList: [],
+      foodQuoteSheetId: 0,
+      keyword: ''
+    }
+
+    methods = {
+      searchInputChange(e) {
+        this.keyword = e.detail.value
+        this.handleFoodShow()
+        this.$apply()
+      }
+    }
+
+    events = {}
+
+    onPullDownRefresh() {
+      this.resetSearchParam()
+      this.search().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    handleFoodShow() {
+      let self = this
+      this.detailList.forEach(detail => {
+        if (self.keyword) {
+          detail.hide = detail.food.name.indexOf(self.keyword) === -1
+        } else {
+          detail.hide = false
+        }
+      })
+      this.$apply()
+    }
+
+    search (append, callback) {
+      wx.showLoading({
+        title: '加载中'
+      })
+      return api.foodQuoteSheetDetail.list({
+        foodQuoteSheetId: this.foodQuoteSheetId
+      }).done((rs) => {
+        if (append) {
+          this.detailList = this.detailList.concat(rs.data)
+        } else {
+          this.detailList = rs.data
+        }
+        let paging = rs.data
+        this.hasNext = paging.hasNext
+        this.$apply()
+      }).always(() => {
+        wx.hideLoading()
+        callback && callback()
+      })
+    }
+
+    onLoad(options) {
+      this.foodQuoteSheetId = options.foodQuoteSheetId
+      Deferred.when(this.search()).always(() => {
+        this.loaded = true
+      })
+    }
+  }
+</script>

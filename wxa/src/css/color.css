@@ -1,0 +1,43 @@
+.text-primary {
+  color: #243850;
+}
+.text-primary-light {
+  color: #345173;
+}
+.text-primary-dark {
+  color: #141f2d;
+}
+.text-info {
+  color: #4dafff;
+}
+.text-success {
+  color: #06c0ab;
+}
+.text-warning {
+  color: #febf4e;
+}
+.text-danger {
+  color: #ff6e6a;
+}
+.text-muted {
+  color: #80848f;
+}
+.text-title {
+  color: #1c2438;
+}
+.text-content {
+  color: #495060;
+}
+.text-disabled {
+  color: #bbbec4;
+}
+.text-bg {
+  color: #f8f8f9;
+}
+.text-divider {
+  color: #e9eaec;
+}
+.text-border {
+  color: #dddee1;
+}
+/*# sourceMappingURL=color.css.map */

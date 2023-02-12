@@ -1,0 +1,485 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+
+  .container {
+    padding: 10px;
+    background-color: #efeff4;
+    padding-top: 40px;
+  }
+
+  .food {
+    background-color: #ffffff;
+    margin-bottom: 5px;
+    padding: 10px;
+    position: relative;
+    &-info {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    }
+    &-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      background-color: #e9e9e9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: @color-success;
+      &-checked {
+        background-color: @color-success;
+        color: #ffffff;
+      }
+    }
+    &-pic {
+      border-radius: 5px;
+      width: 60px;
+      height: 60px;
+    }
+    &-detail {
+      flex: 1;
+      padding-left: 10px;
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+    }
+    &-title {
+      font-size: 16px;
+    }
+    &-price {
+      font-size: 14px;
+      color: @color-muted;
+      &-val {
+        font-size: 16px;
+        color: @color-success;
+        font-weight: 500;
+      }
+    }
+    &-footer {
+      /*border-top: 1rpx dashed #ddd;*/
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    &-sku-btn {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      background-color: @color-info;
+      color: #ffffff;
+    }
+    &-publish-sku-btn {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      background-color: @color-warning;
+      color: #ffffff;
+    }
+    &-sale {
+      font-size: 14px;
+      color: @color-title;
+      &-btn {
+        /*border: 1rpx solid #ddd;*/
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 2px;
+        background-color: @color-danger;
+        color: #ffffff;
+      }
+      &-btn-on {
+        /*border: 1rpx solid #ddd;*/
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 2px;
+        background-color: @color-success;
+        color: #ffffff;
+      }
+    }
+  }
+
+  .search-input {
+    border-radius: 30px;
+    height: 30px;
+    line-height: 30px;
+    border: 1rpx solid #ddd;
+    padding: 0 20px;
+    font-size: 14px;
+    background-color: #ffffff;
+    flex: 1;
+    &-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background-color: #efeff4;
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      padding: 5px 10px;
+      z-index: 1000;
+    }
+    &-btn {
+      border-radius: 30px;
+      height: 30px;
+      line-height: 30px;
+      width: 40px;
+      margin-left: 5px;
+      font-size: 14px;
+      color: #ffffff;
+      text-align: center;
+      background-color: @color-info;
+    }
+  }
+
+  .category-view {
+    position: fixed;
+    top: 40px;
+    width: 100px;
+    background-color: #fff;
+    left: 0;
+    z-index: 10;
+    bottom: 0;
+  }
+
+  .category {
+    font-size: 14px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    color: @color-title;
+    &-selected {
+      background-color: #efeff4;
+      font-weight: bold;
+    }
+  }
+
+  .food-list {
+    padding-left: 95px;
+    margin-top: 34px;
+  }
+
+  .filter-bar {
+    position: fixed;
+    left: 100px;
+    padding-left: 10px;
+    top: 40px;
+    right: 0;
+    height: 34px;
+    line-height: 34px;
+    background-color: #efeff4;
+    text-align: center;
+    font-size: 14px;
+    z-index: 10;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="search-input-wrapper">
+      <input placeholder="输入商品名进行筛选" class="search-input" @input="searchInputChange"/>
+    </view>
+    <scroll-view
+      scroll-y
+      class="category-view">
+      <view class="category {{searchParam.foodCategoryName === '' ? 'category-selected' : ''}}"
+            @tap="selectCategory('')" wx:key="">所有分类</view>
+      <view wx:for="{{foodCategoryList}}"
+            class="category {{searchParam.foodCategoryName === item ? 'category-selected' : ''}}"
+            @tap="selectCategory({{item}})" wx:key="{{item}}">{{item}}</view>
+    </scroll-view>
+    <picker @change="saleChange" mode="selector" value="{{saleIndex}}" range="{{saleList}}">
+      <view class="filter-bar">{{saleShow}}<text class="iconfont status-select-icon icon-unfold"></text></view>
+    </picker>
+    <view class="food-list">
+      <block wx:for="{{sufList}}">
+        <view class="food" wx:key="{{item.id}}">
+          <view class="food-info">
+            <image src="{{item.food.picture}}" @tap="preview({{item.food.picture}})" class="food-pic" mode="aspectFill"></image>
+            <view class="food-detail">
+              <view class="food-title">{{item.food.name}}</view>
+              <view class="flex-row space-between align-flex-end">
+                <view class="food-price">售价: ¥ <text class="food-price-val">{{item.quotePriceShow}}</text>元/{{item.foodUnit}}</view>
+              </view>
+            </view>
+          </view>
+          <view class="food-footer">
+            <i-input-number value="{{item.alterQuotePriceShow}}" min="0" max="10000" data-idx="{{index}}"
+                            step="0.1" @change="quotePriceChange"/>
+          </view>
+          <i-tag class="i-tags" color="yellow" wx:if="{{item.warningPrice && item.alterQuotePrice > item.warningPrice}}">此产品价格过高影响销售，请降低报价</i-tag>
+          <view class="food-footer">
+            <i-tag
+              class="i-tags"
+              name="{{item.sale ? '已上架' : '已下架'}}"
+              color="{{item.sale ? 'green' : 'default'}}">{{item.sale ? '已上架' : '已下架'}}</i-tag>
+            <i-tag
+              class="i-tags"
+              name="{{item.quoteStatusTitle}}"
+              color="{{item.quoteStatus === 'WAIT_VERIFY' ? 'yellow' : ''}}">
+              {{item.quoteStatusTitle}}
+            </i-tag>
+            <view class="food-sale-btn" wx:if="{{item.sale}}" @tap="soldOut({{index}})">下架</view>
+            <view class="food-sale-btn-on" wx:if="{{!item.sale}}"
+                  @tap="sale({{index}})">上架</view>
+          </view>
+        </view>
+      </block>
+    </view>
+    <view class="scrolltop-btn" @tap="scrollTop">
+      <text class="iconfont icon-fold"></text>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let Deferred = require('../utils/deferred')
+  let api = require('../utils/api')
+  const DEFAULT_SEARCH_PARAM = {
+    page: 1,
+    foodCategoryName: ''
+  }
+
+  var changeTimeout = 0
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '供应商商品',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark',
+      backgroundColor: '#efeff4',
+      'usingComponents': {
+        'i-input-number': '../iview/input-number/index',
+        'i-tag': '../iview/tag/index'
+      }
+    }
+    components = {}
+
+    data = {
+      searchParam: Object.assign({}, DEFAULT_SEARCH_PARAM),
+      loading: false,
+      hasNext: true,
+      sufList: [],
+      foodSupplierId: 0,
+      foodCategoryList: [],
+      keyword: '',
+      saleList: ['全部', '已上架', '未上架'],
+      saleIndex: 1,
+      saleShow: '全部'
+    }
+
+    methods = {
+      quotePriceChange(e) {
+        let dataset = e.currentTarget.dataset
+        let idx = dataset.idx
+        let suf = this.sufList[idx]
+        suf.$lastAlterQuotePrice = suf.alterQuotePrice
+        suf.alterQuotePrice = parseFloat(e.detail.value)
+        suf.alterQuotePriceShow = suf.alterQuotePrice.toFixed(1)
+        if (changeTimeout) {
+          clearTimeout(changeTimeout)
+        }
+        changeTimeout = setTimeout(() => {
+          api.storeUserFood.changeAlterQuotePrice({
+            id: suf.id, alterQuotePrice: suf.alterQuotePrice
+          }).done(rs => {
+            Object.assign(suf, rs.data)
+            this.$apply()
+          })
+        }, 500)
+      },
+      preview(url) {
+        wx.previewImage({
+          current: '', // 当前显示图片的http链接
+          urls: [url] // 需要预览的图片http链接列表
+        })
+      },
+      saleChange({detail}) {
+        this.selectSale(detail.value)
+        this.resetSearchParam()
+        this.loadingSearch()
+      },
+      scrollTop() {
+        wx.pageScrollTo({
+          scrollTop: 0,
+          duration: 300
+        })
+      },
+      searchInputChange(e) {
+        DEFAULT_SEARCH_PARAM.foodName = e.detail.value
+        this.resetSearchParam()
+        this.loadingSearch()
+      },
+      selectCategory(category) {
+        DEFAULT_SEARCH_PARAM.foodCategoryName = category
+        this.selectSale(0)
+        this.resetSearchParam()
+        this.loadingSearch()
+      },
+      open(url) {
+        wx.navigateTo({
+          url: url
+        })
+      },
+      soldOut(idx) {
+        let suf = this.sufList[idx]
+        let self = this
+        wx.showModal({
+          title: '提示',
+          content: '确认下架该商品吗？',
+          success(res) {
+            if (res.confirm) {
+              api.storeUserFood.soldOut({foodId: suf.food.id}).done(rs => {
+                let data = rs.data
+                if (data) {
+                  suf.sale = false
+                  wx.showToast({
+                    title: '下架成功',
+                    icon: 'success',
+                    duration: 500
+                  })
+                  self.$apply()
+                }
+              })
+            } else if (res.cancel) {
+
+            }
+          }
+        })
+      },
+      addSku(idx) {
+        let suf = this.sufList[idx]
+        wx.navigateTo({
+          url: '/pages/food-apply?foodId=' + suf.food.id
+        })
+      },
+      publishSku(idx) {
+        let suf = this.sufList[idx]
+        wx.navigateTo({
+          url: '/pages/store-user-food-sku?id=' + suf.id
+        })
+      },
+      sale(idx) {
+        let suf = this.sufList[idx]
+        let self = this
+        wx.showModal({
+          title: '提示',
+          content: '确认上架该商品吗？',
+          success(res) {
+            if (res.confirm) {
+              api.storeUserFood.sale({foodId: suf.food.id}).done(rs => {
+                let data = rs.data
+                if (data) {
+                  suf.sale = true
+                  wx.showToast({
+                    title: '上架成功',
+                    icon: 'success',
+                    duration: 500
+                  })
+                  self.$apply()
+                }
+              })
+            } else if (res.cancel) {
+
+            }
+          }
+        })
+      }
+    }
+
+    events = {}
+
+    resetSearchParam() {
+      Object.assign(this.searchParam, DEFAULT_SEARCH_PARAM)
+      this.hasNext = true
+    }
+
+    selectSale(idx) {
+      this.saleIndex = idx
+      this.saleShow = this.saleList[idx]
+      switch (idx + '') {
+        case '0':
+          DEFAULT_SEARCH_PARAM.sale = ''
+          break
+        case '1':
+          DEFAULT_SEARCH_PARAM.sale = true
+          break
+        case '2':
+          DEFAULT_SEARCH_PARAM.sale = false
+          break
+      }
+    }
+
+    onReachBottom() {
+      if (this.hasNext) {
+        this.searchParam.page++
+        this.search(true)
+      }
+    }
+
+    onPullDownRefresh() {
+      this.resetSearchParam()
+      this.loadData()
+      this.search().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    loadingSearch(flag) {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+      this.searchTimeout = setTimeout(() => {
+        wx.showLoading()
+        this.search(flag).always(() => {
+          wx.hideLoading()
+        })
+      }, 500)
+    }
+
+    search(append, callback) {
+      return api.storeUserFood.search({
+        ...this.searchParam,
+        foodSupplierId: this.foodSupplierId
+      }).done((rs) => {
+        rs.data.results.forEach(suf => {
+          suf.quotePriceShow = suf.quotePrice.toFixed(1)
+          suf.alterQuotePrice = suf.alterQuotePrice || suf.quotePrice
+          suf.alterQuotePriceShow = suf.alterQuotePrice.toFixed(1)
+        })
+        if (append) {
+          this.sufList = this.sufList.concat(rs.data.results)
+        } else {
+          this.sufList = rs.data.results
+        }
+        let paging = rs.data
+        this.hasNext = paging.hasNext
+        this.$apply()
+      }).always(() => {
+        callback && callback()
+      })
+    }
+
+    loadData() {
+      return api.page.supplierFoodList({ foodSupplierId: this.foodSupplierId}).done(rs => {
+        this.foodCategoryList = rs.data.foodCategoryList
+        this.$apply()
+      })
+    }
+
+    onLoad(options) {
+      this.foodSupplierId = +options.foodSupplierId
+      this.selectSale(1)
+      Deferred.when(this.loadData(), this.search()).always(() => {
+        this.loaded = true
+      })
+    }
+  }
+</script>

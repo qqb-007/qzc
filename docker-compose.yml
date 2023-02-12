@@ -1,0 +1,47 @@
+version: '3.7'
+services:
+  eureka:
+      image: registry.cn-shanghai.aliyuncs.com/batcloud/eureka.server:1.0.0
+      ports:
+        - '8761:8761'
+      volumes:
+        - /var/log/eureka:/usr/local/iscto
+      environment:
+        - TZ=Asia/Shanghai
+      networks:
+        - wxc-net
+      deploy:
+        replicas: 1
+      container_name: eureka
+      hostname: eurekaserver
+  config:
+      image: registry.cn-shanghai.aliyuncs.com/batcloud/config.server:1.0.0
+      ports:
+        - '8761:8761'
+      volumes:
+        - /var/log/eureka:/usr/local/iscto
+      environment:
+        - TZ=Asia/Shanghai
+      networks:
+        - wxc-net
+      deploy:
+        replicas: 1
+      hostname: configserver
+      container_name: eureka
+  merchantapi:
+      image: registry.cn-shanghai.aliyuncs.com/wangxiaocai/merhcant-api:SUPPLIER-SNAPSHOT
+      ports:
+        - '8080:8080'
+      volumes:
+        - /var/log/merchant-api:/usr/local/iscto
+      environment:
+        - TZ=Asia/Shanghai
+        - JAVA_OPTS=-Dspring.cloud.config.uri=http://configserver:8888/ -Dspring.cloud.config.path= -Dspring.cloud.config.label= -Dspring.cloud.config.profile=pro -Dspring.cloud.config.name=wxc -Deureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+      networks:
+        - wxc-net
+      deploy:
+        replicas: 1
+      container_name: merchantapi
+networks:
+  wxc-net:
+    driver: overlay

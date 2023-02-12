@@ -1,0 +1,15 @@
+
+  <view class="container">
+    <view class="page-head">
+      <text class="page-title text-title">欢迎登录菜助手</text>
+    </view>
+    <view class="form-container">
+      <i-input type="number" maxlength="11" bindchange="bindData" data-key="form.phone" title="手机号" autofocus="autofocus" placeholder="请输入商家手机号"/>
+      <view class="verify-code-wrapper">
+        <i-input type="password" class="verify-code" maxlength="16" bindchange="bindData" data-key="form.verifyCode" title="密码" placeholder="请输入密码"/>
+      </view>
+    </view>
+    <view class="bottom">
+      <i-button type="success" bindtap="login" disabled="{{!validateOk}}" data-wpylogin-a="">登 录</i-button>
+    </view>
+  </view>

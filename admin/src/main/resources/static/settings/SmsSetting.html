@@ -1,0 +1,71 @@
+<meta meta="短信配置" args="data"/>
+<style>
+
+</style>
+<form class="form-horizontal" id="form" s="form,datac,nda,valid" s-data="data" style="width: 600px;">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">短信签名</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" name="signName" placeholder="短信签名"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">注册模板CODE</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" placeholder="用户注册短信验证码模板CODE" name="registerTemplateCode"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">找回密码模板CODE</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" placeholder="用户找回密码短信验证码模板CODE" name="findPwdTemplateCode"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">手机验证码登录模板CODE</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" placeholder="手机验证码登录模板CODE" name="phoneLoginTemplateCode"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">手机绑定验证码模板CODE</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" placeholder="手机绑定验证码模板CODE" name="phoneBindTemplateCode"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">提现操作验证码模板CODE</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="text" class="form-control" placeholder="提现操作验证码模板CODE" name="withdrawTemplateCode"
+                   s-valid-error="require()"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">短信冷却秒数</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="number" min="1" class="form-control" name="cooldown" placeholder="短信冷却秒数"
+                   s-valid-error="require(),min(1)"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">短信有效秒数</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="number" min="1" class="form-control" name="expireSeconds" placeholder="短信有效秒数"
+                   s-valid-error="require(),min(1)"/>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    S.getContent = function () {
+        var deferred = $.Deferred();
+        $form.validate().done(function() {
+            deferred.resolve(Smart.serializeToObject($form.node))
+        })
+        return deferred;
+    }
+</script>

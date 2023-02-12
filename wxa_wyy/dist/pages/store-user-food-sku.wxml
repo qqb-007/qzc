@@ -1,0 +1,18 @@
+
+  <view class="container">
+    <view class="food-name">{{foodName}}</view>
+    <i-panel title="美团规格(美团平台不指定规格，则发布所有规格)">
+      <i-checkbox-group shape="square" current="{{specialSkuNameList}}" bindchange="handleSpecialSkuChange">
+        <i-checkbox  wx:for="{{foodSkuList}}" position="right" wx:key="{{item.skuId}}" value="{{item.spec}}">
+        </i-checkbox>
+      </i-checkbox-group>
+    </i-panel>
+    <i-panel title="饿百规格">
+      <i-radio-group current="{{eleSkuName}}" bindchange="handleEleSkuChange">
+        <i-radio  wx:for="{{foodSkuList}}" position="right" wx:key="{{item.skuId}}" value="{{item.spec}}"/>
+      </i-radio-group>
+    </i-panel>
+    <view style="margin-top: 40px;">
+      <i-button type="success" bindtap="save" data-wpysave-a="">发布规格</i-button>
+    </view>
+  </view>

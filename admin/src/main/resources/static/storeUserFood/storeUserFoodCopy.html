@@ -1,0 +1,133 @@
+<meta title="门店商品复制" width="1000"/>
+<style>
+	.store-info {
+		border-radius: 5px;
+		border: 1px solid #ddd;
+		padding: 5px 10px;
+		margin: 3px;
+	}
+</style>
+<div class="p">
+	<form id="form" s="valid,form" method="post" action="/api/store-user-food/copy">
+		<table class="table table-bordered table-stripped">
+			<tr>
+			<th style="width: 100px;">源门店</th>
+			<td>
+				<div s-valid-role="item" s="tpl" id="sourceStoreUser" s-data="{}" s-valid-label="门店"
+						 s-click="selectSourceStoreUser()" style="display: inline-block">
+					<a href="javascript:;" class="h3">{%=this.name || '选择源门店'%} <i class="fa fa-plus"></i></a>
+					<input type="hidden" name="sourceStoreUserId" class="sourceStoreUserId" value="{%=this.id%}"
+								 s-valid-error="require()"/>
+				</div>
+			</td>
+		</tr>
+			<tr>
+				<th style="width: 100px;">目标门店</th>
+				<td>
+					<div s="tpl" id="storeUserList">
+						{%$.each(this, function(i) {%}
+						<div style="display: inline-block" class="store-info">
+							<a href="javascript:;">{%=this.name%} <a href="javascript:;"
+																	 s-click="this.node.parent().remove()"
+																	 class="fa fa-times"></a></a>
+							<input type="hidden" name="storeUserIdList" data-name="{%=this.name%}"
+								   class="target-store-user-id"
+								   value="{%=this.id%}"/>
+						</div>
+						{%})%}
+					</div>
+
+					<div>
+						<a href="javascript:;" class="h3" s-click="selectStoreUser()">选择目标门店 <i class="fa fa-plus"></i></a>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">复制完成</th>
+				<td>
+					<div s="tpl" id="finishedStoreUserList">
+						{%$.each(this, function(i) {%}
+						<label class="label {%=this.ok ? 'label-success' : 'label-danger'%}"
+							   style="display: inline-block" class="store-info">{%=this.name + (this.ok ? ' 成功' : ' 失败')%}</label>
+						{%})%}
+					</div>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<script type="text/javascript">
+
+	var sale = false;
+	S.meta.btns = [
+		{
+			name: "开始复制",
+			style: "btn btn-primary",
+			click: function () {
+				var nodes = S.node.find('.target-store-user-id')
+				if (nodes.size() == 0) {
+					S.alert('请选择目标门店')
+					return
+				} else {
+					var deferred = $.Deferred();
+					S.confirm('确认操作吗？').done(function () {
+						doCopy(deferred)
+					}).fail(function () {
+						deferred.resolve()
+					})
+				}
+				return deferred;
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function selectStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: true}).done(function (storeUserList) {
+			if (storeUserList) {
+				$storeUserList.prependData(storeUserList)
+			}
+		})
+	}
+
+	function selectSourceStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: false}).done(function (storeUserList) {
+			if (storeUserList) {
+				$sourceStoreUser.data(storeUserList[0])
+			}
+		})
+	}
+
+	function doCopy(deferred) {
+		var sourceStoreUserIdNode = S.node.find('.sourceStoreUserId')
+		var sourceStoreUserId = sourceStoreUserIdNode.val()
+		if (!sourceStoreUserId) {
+			S.alert('请选择源门店ID')
+			return
+		}
+		var targetNode = S.node.find('.target-store-user-id')
+		if (targetNode.size() == 0) {
+			S.toast('复制完成', 'success')
+			deferred.resolve()
+			return
+		}
+		var targetStoreUserId = $(targetNode.get(0)).val()
+		var loadingDeferred = S.loading()
+		S.post('/api/store-user-food/copy', {
+			sourceStoreUserId: sourceStoreUserId,
+			targetStoreUserId: targetStoreUserId
+		}).done(function (ok) {
+			$finishedStoreUserList.prependData([{name: targetNode.attr('data-name'), ok: ok}])
+			targetNode.parent().remove()
+			doCopy(deferred)
+		}).allways(function() {
+			loadingDeferred.resolve()
+		})
+	}
+</script>

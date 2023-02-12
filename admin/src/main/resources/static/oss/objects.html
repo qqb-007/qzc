@@ -1,0 +1,157 @@
+<meta title="选择文件" args="prefix,multi:false,directory:false" width="900px"/>
+<div class="p">
+    <div>
+        <ol class="breadcrumb" s="tpl" id="breadcrumb" s-data="{}">
+            <li class="file-dir"><a href="javascript:;">根目录</a></li>
+            {%$.each(path_stack, function(i){
+            if(this=='') return;
+            %}
+            <li class="file-dir" data-idx="{%=i%}"><a href="javascript:;">{%=this%}</a></li>
+            {%})%}
+            <li>
+                <button type="button" class="btn btn-default btn-xs s-loading-icon"
+                        s-click="return $vfilesGrid.refresh()">
+                    <i class="fa fa-refresh s-loading-spinner"></i>
+                </button>
+            </li>
+        </ol>
+    </div>
+    <div id="vfilesGrid"
+         class="m"
+         s='datac,nda,check'
+         s-check="{multiple:multi}"
+         s-data="listFile()">
+        <div class="clearfix vfile-list" s="loop" id="vfileContainer" s-data-filter="'results'">
+            <div s-loop-role="empty" class="vfile">暂无文件</div>
+            <div class="vfile" s-loop-role="row" s-check-role="i" s="tpl">
+                <div class="file-pic {%if(!directory && this.type == 'DIRECTORY'){out.print('s-check-ig')}%}"
+                     title="{%=this.name%}"
+                     style="background-image: url({%=this.type == 'DIRECTORY' ? '/images/directory.png': this.smallUrl%})"
+                     class="file-pic" alt="{%=this.name%})"></div>
+                <div class="file-name {%if(!directory && this.type == 'DIRECTORY'){out.print('s-check-ig')}%}"
+                     title="{%=this.name%}">{%=this.name%}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ul s="contextmenu" s-contextmenu="{target: $vfilesGrid.node, filter: contextMenuFilter}" class="s-contextmenu">
+    <li s-click="upload()">
+        <i class="fa fa-upload"></i><span>上传文件</span>
+    </li>
+    <li s-click="createDir()">
+        <i class="fa fa-folder"></i><span>新建目录</span>
+    </li>
+    <li s-click="show()">
+        <i class="fa fa-image"></i><span>查看</span>
+    </li>
+    <li s-click="del()" menuid="delete">
+        <i class="fa fa-folder"></i><span>删除</span>
+    </li>
+</ul>
+<script type="text/javascript">
+    prefix = prefix || '';
+    if (prefix != "" && prefix.charAt(prefix.length - 1) != '/') {
+        prefix = prefix + "/";
+    }
+    var basePrefix = prefix;
+    var queryParam = {
+        prefix: prefix,
+        onlyDirectory: directory
+    }
+    var path_stack = [];
+
+    $vfileContainer.node.delegate(".vfile", 'dblclick', function (e) {
+        var node = $(e.currentTarget);
+        var $node = Smart.of(node);
+        var data = $node.data();
+        if (data.type == 'DIRECTORY') {
+            loadDir(data.key);
+        }
+    })
+
+    $breadcrumb.node.delegate('.file-dir', 'click', function (e) {
+        var node = $(e.currentTarget);
+        if (node.attr("data-idx") == null) {
+            loadDir(basePrefix);
+            return;
+        }
+        var idx = parseInt(node.attr("data-idx"));
+        var prefix = path_stack.slice(0, idx + 1).join("/") + "/";
+        if (prefix == queryParam.prefix) {
+            return;
+        }
+        loadDir(basePrefix + prefix);
+    })
+
+    function show() {
+        var target = Smart.of(Smart.UI.contextmenu.node);
+        var data = target.parent().data()
+        S.popupOpen('/oss/object-info.html', {object: data})
+    }
+
+    function loadDir(prefix) {
+        queryParam.prefix = prefix;
+        path_stack = prefix.substring(basePrefix.length).split("/");
+        $vfilesGrid.refresh();
+        $breadcrumb.refresh();
+    }
+
+    function listFile() {
+        return S.get('/api/oss/list', queryParam).done(function (rs) {
+            queryParam.marker = rs.nextMarker
+        })
+    }
+
+    S.meta.btns = [
+        {
+            name: "选择",
+            style: "btn btn-primary",
+            click: function () {
+                var datas = $vfilesGrid.getCheckedData();
+                if (datas.length) {
+                    S.close(datas);
+                } else {
+                    S.toast("您还没有选择文件！", "warning");
+                }
+            }
+        },
+        {
+            name: "关闭",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+
+    function contextMenuFilter(menu) {
+        if(menu.attr("menuid") == 'delete' && $vfilesGrid.getCheckedData().length == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    function createDir() {
+        S.popupOpen("/oss/folder-create.html", {parent: queryParam.prefix}).done(function (rs) {
+            rs && $vfilesGrid.refresh();
+        })
+    }
+
+    function upload() {
+        S.popupOpen("/oss/upload.html", {folder: queryParam.prefix}).done(function (rs) {
+            rs && $vfilesGrid.refresh();
+        })
+    }
+
+    function del() {
+        var datas = $vfilesGrid.getCheckedData("key");
+        if (datas.length) {
+            S.confirm("确定删除文件吗？").done(function() {
+                S.put("/api/oss/del", {keys: datas} ).done(function() {
+                    $vfilesGrid.refresh();
+                })
+            })
+        }
+    }
+
+</script>

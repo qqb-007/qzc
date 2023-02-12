@@ -1,0 +1,98 @@
+<meta args="config"/>
+<form class="form-horizontal" id="form" s="form,datac,nda,valid" s-data="config">
+    <table class="table table-bordered table-condensed">
+        <tr>
+            <th>电商平台</th>
+            <td>
+                <select class="form-control ecomPlat input-sm" s="select"
+                        name="ecomPlat"
+                        s-build="S.get('/api/enum/valuesMap/core.enums.EcomPlat')">
+                    <option value="">选择电商平台</option>
+                </select>
+            </td>
+            <th>最低销量</th>
+            <td>
+                <input autocomplete="off" type="number" class="form-control input-sm" name="minSales"/>
+            </td>
+        </tr>
+        <tr>
+            <th>最低价</th>
+            <td>
+                <input autocomplete="off" type="text" class="form-control input-sm"
+                       s-valid-error="require(false),number()" name="startPrice"/>
+            </td>
+            <th>最高价</th>
+            <td>
+                <input autocomplete="off" type="text" class="form-control input-sm"
+                       s-valid-error="require(false),number()" name="endPrice"/>
+            </td>
+        </tr>
+        <tr>
+            <th>频道id</th>
+            <td>
+                <select class="form-control input-sm" s="select" s-build="S.get('/api/channel/list')" name="channelId">
+                    <option value="">不选频道</option>
+                </select>
+            </td>
+            <th>分类id</th>
+            <td>
+                <input autocomplete="off" type="text" s-dblclick="selectShopcat()" id="catId"
+                       class="form-control input-sm" name="catId"/>
+            </td>
+        </tr>
+        <tr>
+            <th>是否推荐</th>
+            <td>
+                <label class="s-checkbox">
+                    <input autocomplete="off" type="checkbox" name="recommend" value="true">
+                    <span class="s-checkbox-indicator"></span>
+                </label>
+            </td>
+            <th>包邮</th>
+            <td>
+                <label class="s-checkbox">
+                    <input autocomplete="off" type="checkbox" name="freeShipment" value="true">
+                    <span class="s-checkbox-indicator"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th>最低佣金</th>
+            <td>
+                <input autocomplete="off" type="text" class="form-control input-sm"
+                       s-valid-error="require(false),number()" name="minCommissionFee"/>
+            </td>
+            <th>优惠券</th>
+            <td>
+                <label class="s-checkbox">
+                    <input autocomplete="off" type="checkbox" name="coupon" value="true">
+                    <span class="s-checkbox-indicator"></span>
+                </label>
+            </td>
+        </tr>
+    </table>
+</form>
+<script>
+    S.getConfig = function () {
+        var deferred = $.Deferred();
+        $form.validate().done(function () {
+            deferred.resolve(Smart.serializeToObject($form.node));
+        })
+        return deferred;
+    }
+
+    function selectShopcat() {
+        S.popupOpen("/shopcat/shopcatSelector.html", {multi: false}).done(function (shopcats, path) {
+            if (shopcats && shopcats.length) {
+                var ids = $catId.node.val();
+                if (ids != '') {
+                    ids += ","
+                }
+                ids += shopcats.map(function (s) {
+                    return s.id
+                }).join(",")
+                $catId.node.val(ids)
+            }
+        })
+    }
+</script>

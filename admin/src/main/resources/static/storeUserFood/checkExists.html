@@ -1,0 +1,28 @@
+<metat title="检测商品存在" args="plat" width="500"/>
+<div class="p clearfix">
+	<div class="alert alert-warning">是否检测商品存在？选择"检测商品并发布"适用于老门店，能够最大程度保证发布成功率，但是会大幅度降低发布效率！</div>
+	<div s="window" s-window="{href: '/plat/plat-selector.html', args: {plat: plat}}" id="platSelector"></div>
+</div>
+<script>
+	S.meta.btns = [
+		{
+			name: "检测商品并发布",
+			style: "btn btn-primary",
+			click: function () {
+				$platSelector.getPlatList(function(platList) {
+					S.close(true, platList)
+				})
+
+			}
+		},
+		{
+			name: "直接发布",
+			style: "btn btn-default",
+			click: function () {
+				$platSelector.getPlatList(function(platList) {
+					S.close(false, platList)
+				})
+			}
+		}
+	]
+</script>

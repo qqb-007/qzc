@@ -1,0 +1,509 @@
+<style lang="less" src="../css/grid.less"></style>
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/panel.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+
+  .op-item {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 30rpx;
+    &-title {
+      font-size: 12px;
+      color: #495060;
+      margin-top: 5px;
+    }
+    &-icon {
+      font-size: 36px;
+    }
+  }
+
+  .top {
+    background-color: @color-primary;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    &-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+    }
+    &-val {
+      font-weight: bold;
+      color: #ffffff;
+      font-size: 30px;
+    }
+    &-txt {
+      font-weight: 300;
+      font-size: 12px;
+      color: #8f9aa6;
+    }
+  }
+
+  .menu{
+    width: 100%;
+    height: 100px;
+    background-color: #FFFFFF;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    &-button{
+      height: 80px;
+      width: 80px;
+      font-size: 25px;
+      font-weight: bold;
+      color: #FFFFFF;
+      border-radius: 40px;
+      background-color: #2D8CF0;
+      text-align: center;
+      line-height: 80px;
+    }
+  }
+
+  .time-range-bar {
+    height: 40px;
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    background-color: #fff;
+  }
+
+  .day-input {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 0 20px;
+    padding: 3px 20px;
+    height: 20px;
+    line-height: 20px;
+  }
+
+  .biz-cell {
+    padding: 10px;
+    &-title {
+      color: @color-success;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    &-val {
+      font-size: 18px;
+    }
+    &-plat {
+      @height: 20px;
+      flex: 1;
+      font-size: 12px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin: 0px 5rpx;
+      border-radius: 3px;
+      overflow: hidden;
+      &:first-child {
+        border-right: none;
+      }
+
+      line-height: @height;
+      text-align: right;
+      &-val {
+        text-align: right;
+        flex: 1;
+        font-size: 12px;
+        border: 1rpx solid #ddd;
+        background-color: #efefef;
+        padding-right: 5rpx;
+      }
+      &-m, &-e, &-c, &-j {
+        width: @height;
+        text-align: center;
+        display: inline-block;
+      }
+      &-m{
+        background-color: #06c0ab;
+        color: #fff;
+      }
+      &-c{
+        background-color: #06c01f;
+        color: #fff;
+      }
+      &-j{
+        background-color: #b4c006;
+        color: #fff;
+      }
+      &-e{
+        background-color: #1ca8e4;
+        color: #fff;
+      }
+      &-info {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        height: @height;
+        overflow: hidden;
+      }
+    }
+  }
+
+  .container {
+    background-color: #efeff4;
+  }
+
+  .tabs {
+    margin-top: 5px;
+  }
+
+  .biz-data-grid {
+    background-color: #ffffff;
+  }
+
+  .icon-detail {
+    color: #243850;
+    &-show {
+      color: #1ca8e4;
+    }
+  }
+  .balance-card {
+    margin: 10px;
+    border-radius: 10px;
+    height: 170px;
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+    background-image: linear-gradient(to top, #7C8AA0, #637083);
+    color: #ffffff;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.43);
+    &-dqye {
+      font-size: 12px;
+    }
+    &-ljsr {
+      font-size: 12px;
+      margin-top: 3px;
+      &-value {
+        font-weight: bold;
+      }
+    }
+    &-value {
+      position: relative;
+      &-y, &-r {
+        font-size: 22px;
+        /*font-weight: bold;*/
+      }
+      &-r {
+        font-weight: bold;
+      }
+      &-l {
+        font-size: 40px;
+        font-weight: bold;
+      }
+      &-detail-btn {
+        font-size: 14px;
+        margin-left: 5px;
+      }
+    }
+    &-withdraw-btn {
+      background-color: #ffffff;
+      height: 30px;
+      width: 90px;
+      text-align: center;
+      line-height: 30px;
+      border-radius: 30px;
+      font-size: 14px;
+      color: #545f71;
+      &:active {
+        background-color: #6f7f99;
+      }
+    }
+    &-sd {
+      background-color: #545f71;
+      height: 30px;
+      position: absolute;
+      bottom: 15px;
+      right: 0;
+      left: 0;
+      padding: 10px 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      font-size: 14px;
+      align-items: center;
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="top">
+      <view class="top-item">
+        <view class="top-val">{{bizData.total}}</view>
+        <view class="top-txt">今日订单收入/元</view>
+      </view>
+      <div class="top-item">
+        <view class="top-val">{{bizData.validOrderNum}}</view>
+        <view class="top-txt">今日单量/单</view>
+      </div>
+    </view>
+    <view class="menu">
+      <view class="menu-button" @tap="open('order')">订单</view>
+      <view class="menu-button" @tap="open('food-list')">加菜</view>
+      <view class="menu-button" @tap="open('store-user-food-list')">商品</view>
+    </view>
+    <view class="tabs">
+      <i-tabs current="{{dayType}}" color="{{tabColor}}" @change="dayChange">
+        <i-tab key="last1Days" title="昨日"></i-tab>
+        <i-tab key="last7Days" title="近7天"></i-tab>
+        <i-tab key="last30Days" title="近30天"></i-tab>
+        <i-tab key="customDays" title="自定义"></i-tab>
+      </i-tabs>
+    </view>
+    <view class="time-range-bar" wx:if="{{dayType === 'customDays'}}">
+      <picker @change="bindPickerChange" data-key="startDate" mode="date" value="{{startDate}}" end="{{endDate}}">
+        <view class="day-input">{{startDate}}</view>
+      </picker>
+      <view>至</view>
+      <picker @change="bindPickerChange" data-key="endDate" mode="date" value="{{endDate}}" start="{{startDate}}"
+              end="{{maxDate}}">
+        <view class="day-input">{{endDate}}</view>
+      </picker>
+    </view>
+    <view class="grid biz-data-grid" @tap="toggleDetailShow">
+      <view class="grid-row">
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title"><text>营业额</text> <text class="iconfont icon-detail {{showDetail ? 'icon-detail-show' : ''}}"></text></view>
+          <view class="biz-cell-val">¥{{dayBizData.total}}</view>
+          <view class="biz-cell-plat-info" wx:if="{{showDetail}}">
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.meituanTotal}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.eleTotal}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-c">菜</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.clbmTotal}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-j">京</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.jddjTotal}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="grid-row">
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title">单均价</view>
+          <view class="biz-cell-val">¥{{dayBizData.perFee}}</view>
+          <view class="biz-cell-plat-info" wx:if="{{showDetail}}">
+            <view class="biz-cell-plat" wx:if="{{showDetail}}">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.meituanPerFee}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.elePerFee}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-c">菜</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.clbmPerFee}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-j">京</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.jddjPerFee}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="grid-row">
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title">
+            有效订单
+          </view>
+          <view class="biz-cell-val">{{dayBizData.validOrderNum}}单</view>
+          <view class="biz-cell-plat-info" wx:if="{{showDetail}}">
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">{{dayBizData.meituanValidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">{{dayBizData.eleValidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-c">菜</text>
+              <text class="biz-cell-plat-val">{{dayBizData.clbmValidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-j">京</text>
+              <text class="biz-cell-plat-val">{{dayBizData.jddjValidOrderNum}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title">无效订单</view>
+          <view class="biz-cell-val">{{dayBizData.invalidOrderNum}}单</view>
+          <view class="biz-cell-plat-info" wx:if="{{showDetail}}">
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">{{dayBizData.meituanInvalidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">{{dayBizData.eleInvalidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-c">菜</text>
+              <text class="biz-cell-plat-val">{{dayBizData.clbmInvalidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-j">京</text>
+              <text class="biz-cell-plat-val">{{dayBizData.jddjInvalidOrderNum}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="balance-card">
+      <view class="balance-card-left">
+        <view class="balance-card-dqye">当前余额</view>
+        <view class="balance-card-value" @tap="open('wallet-flow-detail-list')">
+          <text class="balance-card-value-y"> ¥</text>
+          <text class="balance-card-value-l">{{wallet.moneyInt}}</text>
+          <text class="balance-card-value-r">.{{wallet.moneyDecimal}}</text>
+          <text class="balance-card-value-detail-btn">余额流水</text>
+        </view>
+        <view class="balance-card-ljsr">累计收入</view>
+        <view class="balance-card-ljsr-value"> ¥ {{obtainedMoney}}</view>
+      </view>
+      <view class="balance-card-withdraw-btn" @tap="withdraw">立即提现</view>
+      <view class="balance-card-sd" @tap="open('settlement-sheet-list')">
+        <view></view>
+        <view>查询历史账单&gt;&gt;</view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let api = require('../utils/api')
+  let color = require('../utils/color')
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '王小菜商家后台',
+      enablePullDownRefresh: true,
+      // backgroundColor: '#efeff4',
+      'usingComponents': {
+        'i-tabs': '../iview/tabs/index',
+        'i-tab': '../iview/tab/index'
+      }
+    }
+    components = {}
+
+    data = {
+      bizData: {},
+      dayType: 'last1Days',
+      startDate: '',
+      endDate: '',
+      maxDate: '',
+      tabColor: color.success,
+      dayBizData: {},
+      wallet: {},
+      obtainedMoney: 0,
+      showDetail: false
+    }
+
+    methods = {
+      open(url) {
+        wx.navigateTo({
+          url: url
+        })
+      },
+      withdraw() {
+        wx.navigateTo({
+          url: 'withdraw'
+        })
+      },
+      dayChange({detail}) {
+        this.dayType = detail.key
+        this.loadBizData(true)
+      },
+      bindPickerChange({detail, currentTarget}) {
+        this[currentTarget.dataset.key] = detail.value
+        this.loadBizData(true)
+      },
+      toggleDetailShow () {
+        this.showDetail = !this.showDetail
+      }
+    }
+
+    events = {}
+
+    loadData() {
+      this.loadBizData()
+      return api.page.index().done(rs => {
+        let data = rs.data
+        this.bizData = data.bizData
+        this.bizData.total = this.bizData.total.toFixed(0)
+        this.bizData.meituanTotal = this.bizData.meituanTotal.toFixed(1)
+        this.bizData.eleTotal = this.bizData.eleTotal.toFixed(1)
+        this.bizData.clbmTotal = this.bizData.clbmTotal.toFixed(1)
+        this.bizData.jddjTotal = this.bizData.jddjTotal.toFixed(1)
+        this.startDate = data.startDate
+        this.endDate = data.endDate
+        this.maxDate = data.endDate
+        this.wallet = data.wallet
+        let money = this.wallet.money.toFixed(0).split('.')
+        this.wallet.moneyInt = money[0]
+        this.wallet.moneyDecimal = money[1]
+        this.obtainedMoney = this.wallet.obtainedMoney.toFixed(1)
+        this.$apply()
+      })
+    }
+
+    onPullDownRefresh() {
+      this.loadData().done(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    loadBizData(showLoading) {
+      showLoading && wx.showLoading()
+      return api.stat.storeUserBizData({
+        dayType: this.dayType,
+        startTime: this.startDate,
+        endTime: this.endDate
+      }).done(rs => {
+        this.dayBizData = rs.data
+        this.dayBizData.perFee = this.dayBizData.perFee.toFixed(1)
+        this.dayBizData.total = this.dayBizData.total.toFixed(1)
+        this.dayBizData.meituanTotal = this.dayBizData.meituanTotal.toFixed(1)
+        this.dayBizData.eleTotal = this.dayBizData.eleTotal.toFixed(1)
+        this.dayBizData.clbmTotal = this.dayBizData.clbmTotal.toFixed(1)
+        this.dayBizData.jddjTotal = this.dayBizData.jddjTotal.toFixed(1)
+        this.dayBizData.elePerFee = this.dayBizData.elePerFee.toFixed(1)
+        this.dayBizData.clbmPerFee = this.dayBizData.clbmPerFee.toFixed(1)
+        this.dayBizData.jddjPerFee = this.dayBizData.jddjPerFee.toFixed(1)
+        this.dayBizData.meituanPerFee = this.dayBizData.meituanPerFee.toFixed(1)
+        this.$apply()
+        showLoading && wx.hideLoading()
+      })
+    }
+
+    onLoad() {
+      wx.startPullDownRefresh()
+    }
+  }
+</script>

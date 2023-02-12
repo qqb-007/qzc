@@ -1,0 +1,459 @@
+<metat title="门店管理"/>
+<div class="p">
+    <div class="panel panel-orange">
+        <div class="panel-heading">
+            <span class="h3">门店管理</span>
+        </div>
+        <div class="panel-body">
+            <div class="m-b clearfix">
+                <form class="form-inline pull-left" id="form">
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店电话"
+                           style="width:200px;" name="phone"/>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="门店名称"
+                           style="width:200px;" name="name"/>
+                    <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+                    <select class="form-control input-sm"
+                            name="opening">
+                        <option value="">开店状态</option>
+                        <option value="true">开店中</option>
+                        <option value="false">已关店</option>
+                    </select>
+                    <select class="form-control input-sm"
+                            name="lineOpen">
+                        <option value="">线上营业状态</option>
+                        <option value="true">营业中</option>
+                        <option value="false">休息</option>
+                    </select>
+                    <select class="form-control input-sm"
+                            name="showButton">
+                        <option value="">商家版按钮显示</option>
+                        <option value="true">显示</option>
+                        <option value="false">关闭</option>
+                    </select>
+                    <select class="form-control input-sm"
+                            name="deliverySelf">
+                        <option value="">自动发起配送</option>
+                        <option value="true">关闭</option>
+                        <option value="false">开启</option>
+                    </select>
+                    <input autocomplete="off" type="text" class="form-control input-sm" placeholder="关店天数"
+                           style="width:200px;" name="closeDayNum"/>
+                    <select class="form-control input-sm" s="select"
+                            name="deliveryType"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.DeliveryType?igNames=DELETED')">
+                        <option value="">配送方式</option>
+                    </select>
+                    <select class="form-control input-sm" s="select"
+                            s-build="S.get('/api/enum/valuesMap/core.enums.Plat')"
+                            name="plat">
+                        <option value="">平台</option>
+                    </select>
+                    <button type="button" class="btn btn-default btn-sm"
+                            s-click="$page.node.val(1); $storesGrid.refresh()">查询
+                    </button>
+                </form>
+                <div class="pull-right form-inline">
+                    <input type="number" class="form-control input-sm" id="meituanPoiCode" style="width: 300px;"
+                           placeholder="美团/饿百/客户端门店id，多个用逗号隔开"/>
+                    <a href="javascript:;" class="btn btn-warning btn-sm s-loading-icon btn-outline"
+                       s-click="return syncFromMeituan()">
+                        <i class="fa fa-refresh s-loading-spinner"></i> 同步美团店铺
+                    </a>
+                    <a href="javascript:;" class="btn btn-warning btn-sm s-loading-icon btn-outline"
+                       s-click="return syncFromCLBM()">
+                        <i class="fa fa-refresh s-loading-spinner"></i> 同步菜老板美团店铺
+                    </a>
+                    <a href="javascript:;" class="btn btn-info btn-sm s-loading-icon btn-outline"
+                       s-click="return syncFromEle()">
+                        <i class="fa fa-refresh s-loading-spinner"></i> 同步饿百店铺
+                    </a>
+                    <a href="javascript:;" class="btn btn-info btn-sm s-loading-icon btn-outline"
+                       s-click="return syncFromWante()">
+                        <i class="fa fa-refresh s-loading-spinner"></i> 同步客户端店铺
+                    </a>
+                    <a href="javascript:;" class="btn btn-info btn-sm s-loading-icon btn-outline"
+                       s-click="return syncFromJddj()">
+                        <i class="fa fa-refresh s-loading-spinner"></i> 同步京东到家店铺
+                    </a>
+                    <a href="javascript:;" class="btn btn-info btn-sm s-loading-icon btn-outline"
+                       s-click="return syncFromJddjz()">
+                        <i class="fa fa-refresh s-loading-spinner"></i> 同步京东子账号店铺
+                    </a>
+                    <a href="javascript:;" class="btn btn-info btn-sm s-loading-icon btn-outline"
+                       s-click="return updateMeiTuanPic()">
+                        <i class="fa fa-refresh s-loading-spinner"></i> 更换美团店铺logo
+                    </a>
+                </div>
+            </div>
+            <table
+                    id="storesGrid"
+                    s='datac,nda'
+                    s-data="S.get('/api/store/search', $form.node.serialize())"
+                    class="table table-striped table-bordered">
+                <tr>
+                    <th>平台</th>
+                    <th>平台ID</th>
+                    <th>门店</th>
+                    <th class="text-right">加价百分比</th>
+                    <th class="">电话</th>
+                    <th class="text-center">地址</th>
+                    <th class="text-center">商家</th>
+                    <th class="text-center">配送方式</th>
+                    <th class="text-center">状态</th>
+                    <th class="text-center">营业状态</th>
+                    <th class="text-right">操作</th>
+                </tr>
+                <tbody s="loop" s-data-filter="'results'">
+                <tr s-loop-role="empty">
+                    <td colspan="10" class="alert alert-warning">
+                        暂无门店
+                    </td>
+                </tr>
+                <tr s-loop-role="row" s="datac">
+                    <td name="platTitle"></td>
+                    <td name="code"></td>
+                    <td name="name"></td>
+                    <td>
+                        <input autocomplete="off" style="width: 80px;" type="number" class="form-control text-right"
+                               name="priceIncrease" s-change="priceIncreaseChange(this)"/>
+                    </td>
+                    <td name="phone"></td>
+                    <td name="address"></td>
+                    <td s="tpl" class="text-center">
+                        {%if(this.storeUser) {%}
+                        <span>{%=this.storeUser.name%} {%=this.storeUser.phone%}</span>
+                        <input type="button" class="btn btn-xs btn-outline btn-warning" s-click="bindStoreUser(this)"
+                               value="改绑"/>
+                        {%} else {%}
+                        <input type="button" class="btn btn-xs btn-outline btn-warning" s-click="bindStoreUser(this)"
+                               value="绑定"/>
+                        {%}%}
+                    </td>
+                    <td class="text-center" s="tpl">
+
+                        <div><a href="javascript:;" class="label label-orange" s-click="editDeliveryType(this)"><span>{%=this.deliveryTypeTitle%}</span></a></div>
+                        {%if (this.deliveryType === 'UU_OPEN') {%}
+                        <a href="javascript:;" class="label label-orange" s-click="editUuType(this)"><span>{%=this.uuAccountTypeTitle%}</span></a>
+
+                        <a href="javascript:;" s-click="editUuMix(this)"
+                           class="label {%=this.uuMix ? 'label-success' : 'label-default'%}">{%=this.uuMix ?
+                            '混合送' : '混合送'%}</a>
+
+                        <a href="javascript:;" s-click="editUuTime(this)"
+                           class="label {%=this.changeUuTime ? 'label-success' : 'label-default'%}">{%=this.changeUuTime ?
+                            this.changeUuTime : '未设置时间'%}</a>
+                        {%}%}
+
+                        {%if (this.deliveryType === 'MEITUAN_OPEN') {%}
+                        <a href="javascript:;" class="label label-orange" s-click="editSecendDeliveryType(this)"><span>第二配送：{%=this.secondDeliveryTypeTitle ?
+                            this.secondDeliveryTypeTitle : '未设置'%}</span></a>
+                        {%}%}
+
+                    </td>
+                    <td class="text-center" s="tpl">
+                        {%if(this.opening) {%}
+                        <label class="label label-success">开店中</label>
+                        {%} else {%}
+                        <label class="label label-default">已关店</label>
+                        {%}%}
+                        {%if(this.showButton) {%}
+                        <label class="label label-success" s-click="openShow(this, false)">商家版按钮</label>
+                        {%} else {%}
+                        <label class="label label-default" s-click="openShow(this, true)">商家版按钮</label>
+                        {%}%}
+
+                        {%if(this.deliverySelf) {%}
+                        <label class="label label-default" s-click="deliverySelf(this, false)">自动配送</label>
+                        {%} else {%}
+                        <label class="label label-success" s-click="deliverySelf(this, true)">自动配送</label>
+                        {%}%}
+                    </td>
+                    <td class="text-center" s="tpl">
+                        {%if(this.lineOpen) {%}
+                        <label class="label label-success">营业中</label>
+                        {%} else {%}
+                        <label class="label label-default">已休息</label>
+                        {%}%}
+                    </td>
+                    <td class="text-right" s="tpl">
+                        <input type="button" class="btn btn-xs btn-danger" s-click="checkFood(this, false)"
+                               value="核对商品"/>
+                        {%if(this.opening) {%}
+                        <input type="button" class="btn btn-xs btn-danger" s-click="open(this, false)" value="本地关店"/>
+                        {%} else {%}
+                        <input type="button" class="btn btn-xs btn-success" s-click="open(this, true)" value="本地开店"/>
+                        {%}%}
+                        <input type="button" class="btn btn-xs btn-success" s-click="openLine(this, true)" value="线上开店"/>
+                        <input type="button" class="btn btn-xs btn-danger" s-click="openLine(this, false)" value="线上休息"/>
+                        {%if (this.deliveryType === 'MEITUAN_OPEN') {%}
+                        <div class="p-t-xs">
+                            <a href="javascript:;" class="btn btn-info btn-outline btn-xs"
+                               s-click="updateDeliveryArea(this)">
+                                更新配送
+                            </a>
+                        </div>
+                        <div class="p-t-xs">
+                            <a href="javascript:;" class="btn btn-info btn-outline btn-xs"
+                               s-click="updateDeliveryAreaById(this)">
+                                手动更新配送
+                            </a>
+                        </div>
+                        {%}%}
+                        <!--<input type="button" class="btn btn-xs btn-outline btn-success" s-click="detectFoodList(this)" value="商品校对" />-->
+                        <!--<input type="button" class="btn btn-xs btn-outline btn-success" s-click="pullPhoneNumber(this)" value="拉取用户真实手机号" />-->
+                        <input type="button" class="btn btn-xs btn-danger" s-click="checkFoodTip(this, false)" value="更新商品类目" />
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="10" class="text-right">
+                        共有<span name="total"></span>个数据
+                        <ul s="pagination"
+                            s-pagination="{action:function(){$page.node.val(this); $storesGrid.refresh()}}"
+                            class="pagination pagination-sm">
+                        </ul>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    function doSyncMeituan() {
+        return S.post("/api/store/sync/meituan", {poiCodes: $meituanPoiCode.node.val()}).done(function (rs) {
+            if (rs) {
+                S.toast('同步成功', 'success')
+                $storesGrid.refresh()
+            } else {
+                S.toast('同步失败', 'danger')
+            }
+        })
+    }
+
+
+    function checkFoodTip($this, opening) {
+        var data = $this.parent().data()
+        S.put('/api/store/checkFoodTip/' + data.id + "/" + opening).done(function() {
+            $storesGrid.refresh()
+        })
+    }
+
+
+    function updateAllTips() {
+        S.put('/api/store/checkAllFoodTip/' + 110 + "/" + true).done(function() {
+            $storesGrid.refresh()
+        })
+    }
+
+    function doSyncCLBM() {
+        return S.post("/api/store/sync/clbm", {poiCodes: $meituanPoiCode.node.val()}).done(function (rs) {
+            if (rs) {
+                S.toast('同步成功', 'success')
+                $storesGrid.refresh()
+            } else {
+                S.toast('同步失败', 'danger')
+            }
+        })
+    }
+
+
+    function editUuMix($s) {
+        S.put("/api/store/toggle/uuMix/" + $s.parent().data().id).done(function () {
+            $storesGrid.refresh()
+        })
+    }
+
+
+    function syncFromCLBM() {
+        var codes = $meituanPoiCode.node.val()
+        var deferred = $.Deferred()
+        if (!codes) {
+            S.confirm('您还没有输入门店ID，如未输入将同步所有门店，是否继续').done(function () {
+                doSyncCLBM().always(function () {
+                    deferred.resolve()
+                })
+            }).fail(function () {
+                deferred.resolve()
+            })
+            return deferred
+        }
+        doSyncCLBM().always(function () {
+            deferred.resolve()
+        })
+        return deferred
+    }
+
+    function syncFromMeituan() {
+        var codes = $meituanPoiCode.node.val()
+        var deferred = $.Deferred()
+        if (!codes) {
+            S.confirm('您还没有输入门店ID，如未输入将同步所有门店，是否继续').done(function () {
+                doSyncMeituan().always(function () {
+                    deferred.resolve()
+                })
+            }).fail(function () {
+                deferred.resolve()
+            })
+            return deferred
+        }
+        doSyncMeituan().always(function () {
+            deferred.resolve()
+        })
+        return deferred
+    }
+
+    function syncFromEle() {
+        S.popupOpen('/store/sync-ele.html').done(function (flag) {
+            if (flag) {
+                S.toast('同步成功', 'success')
+                $storesGrid.refresh()
+            }
+        })
+    }
+
+    function deliverySelf($this, opening) {
+        var data = $this.parent().data()
+        S.put('/api/store/deliverySelf/' + data.id + "/" + opening).done(function () {
+            $storesGrid.refresh()
+        })
+    }
+
+    function syncFromWante() {
+        S.popupOpen('/store/sync-wante.html').done(function (flag) {
+            if (flag) {
+                S.toast('同步成功', 'success')
+                $storesGrid.refresh()
+            }
+        })
+    }
+
+    function syncFromJddj() {
+        S.popupOpen('/store/sync-jddj.html').done(function (flag) {
+            if (flag) {
+                S.toast('同步成功', 'success')
+                $storesGrid.refresh()
+            }
+        })
+    }
+
+    function syncFromJddjz() {
+        S.popupOpen('/store/sync-jddjz.html').done(function (flag) {
+            if (flag) {
+                S.toast('同步成功', 'success')
+                $storesGrid.refresh()
+            }
+        })
+    }
+
+    function updateMeiTuanPic() {
+        S.popupOpen('/store/update-meituan-pic.html').done(function (flag) {
+            if (flag) {
+                S.toast('更换成功', 'success')
+                $storesGrid.refresh()
+            }
+        })
+    }
+
+
+    function updateDeliveryArea($s) {
+        S.confirm('确认更新店铺配送范围吗').done(function () {
+            S.put("/api/store/" + $s.parent().data().id + "/delivery-area/").done(function () {
+                $storesGrid.refresh();
+                S.toast('配送范围更新成功', 'success')
+            })
+        })
+    }
+
+    function updateDeliveryAreaById($s) {
+        var data = $s.parent().data()
+        S.popupOpen('/store/updateDelivery.html', {data: data})
+    }
+
+
+    function editUuTime($s) {
+        var data = $s.parent().data()
+        S.popupOpen('/store/editUuTime.html', {data: data}).done(function () {
+            $storesGrid.refresh()
+        })
+    }
+
+
+    function open($this, opening) {
+        var data = $this.parent().data()
+        S.put('/api/store/open/' + data.id + "/" + opening).done(function () {
+            $storesGrid.refresh()
+        })
+    }
+
+    function openLine($this, opening) {
+        var data = $this.parent().data()
+        S.put('/api/store/openLine/' + data.id + "/" + opening).done(function () {
+            $storesGrid.refresh()
+        })
+    }
+
+    function openShow($this, opening) {
+        var data = $this.parent().data()
+        S.put('/api/store/openShow/' + data.id + "/" + opening).done(function () {
+            $storesGrid.refresh()
+        })
+    }
+
+    function checkFood($this, opening) {
+        var data = $this.parent().data()
+        S.put('/api/store/checkFood/' + data.id + "/" + opening).done(function () {
+            $storesGrid.refresh()
+        })
+    }
+
+    function priceIncreaseChange($this) {
+        S.put('/api/store/price-increase/' + $this.parent().data().id, {priceIncrease: $this.node.val()}).done(function () {
+            S.toast('修改成功', 'success')
+        })
+    }
+
+    function bindStoreUser($this) {
+        S.popupOpen('/storeUser/storeUserSelector.html', {multi: false}).done(function (storeUserList) {
+            if (storeUserList) {
+                S.put('/api/store/store-user/' + $this.parent().data().id, {storeUserId: storeUserList[0].id}).done(function () {
+                    $storesGrid.refresh()
+                    S.toast('绑定成功', 'success')
+                })
+            }
+        })
+    }
+
+
+    function editDeliveryType($s) {
+        S.popupOpen('/store/store-delivery-type.html', {store: $s.parent().data()}).done(function (rs) {
+            rs && $storesGrid.refresh();
+        })
+    }
+
+    function editSecendDeliveryType($s) {
+        S.popupOpen('/store/store-secend-delivery-type.html', {store: $s.parent().data()}).done(function (rs) {
+            rs && $storesGrid.refresh();
+        })
+    }
+
+    function editUuType($s) {
+        S.popupOpen('/store/store-uu-type.html', {store: $s.parent().data()}).done(function (rs) {
+            rs && $storesGrid.refresh();
+        })
+    }
+
+
+    function pullPhoneNumber($this) {
+        S.get('/api/order/batch-pull-phone-number/' + $this.parent().data().id).done(function (rs) {
+            S.alert(rs)
+        })
+    }
+
+    function detectFoodList($this) {
+        S.popupOpen('/food/platStoreFoodProofread.html', {storeId: $this.parent().data().id})
+    }
+
+
+</script>

@@ -1,0 +1,1 @@
+ALTER TABLE `store_user` ADD COLUMN `biz_manager2_id` INT (11) AFTER `biz_manager_id`;

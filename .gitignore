@@ -1,0 +1,15 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+**/target
+**/.idea
+
+**/node_modules
+**/unpackage
+**/package-lock.json
+
+.DS_Store
+**/.DS_Store

@@ -1,0 +1,254 @@
+[
+  {
+    "id": "DASHBOARD",
+    "title": "仪表盘",
+    "url": "/dashboard.html"
+  },
+  {
+    "id": "OPERATION_CENTER",
+    "title": "运营中心",
+    "children": [
+      {
+        "id": "STORE_USER_FOOD",
+        "title": "门店商品",
+        "url": "/storeUserFood/storeUserFoodList.html"
+      },
+      {
+        "id": "STORE_FOOD_APPLICATION_MANAGE",
+        "title": "商品申请",
+        "url": "/storeFoodApplication/storeFoodApplicationList.html"
+      },
+      {
+        "id": "STORE_FOOD_CHECK",
+        "title": "商品校对",
+        "url": "/food/platStoreFoodProofread.html"
+      },
+      {
+        "id": "ORDER_CENTER",
+        "title": "订单管理",
+        "children": [
+          {
+            "id": "WAIT_CHECK_ORDER_LIST",
+            "permissionId": "ORDER_MANAGE",
+            "title": "待核对",
+            "url": "/order/orderList.html?bizStatus=WAIT_CHECK"
+          },
+          {
+            "id": "WAIT_SETTLE_ORDER_LIST",
+            "permissionId": "ORDER_MANAGE",
+            "title": "待结算",
+            "url": "/order/orderList.html?bizStatus=WAIT_SETTLE"
+          },
+          {
+            "id": "SETTLED_ORDER_LIST",
+            "permissionId": "ORDER_MANAGE",
+            "title": "已结算",
+            "url": "/order/orderList.html?bizStatus=SETTLED"
+          },
+          {
+            "id": "ALL_ORDER_LIST",
+            "permissionId": "ORDER_MANAGE",
+            "title": "所有订单",
+            "url": "/order/orderList.html"
+          },
+          {
+            "id": "ABNORAML_ORDER_LIST",
+            "permissionId": "ORDER_MANAGE",
+            "title": "配送异常",
+            "url": "/order/abnormalOrderList.html"
+          },
+          {
+            "id": "ORDER_SYNC_LIST",
+            "title": "订单通知与同步",
+            "url": "/order/orderNotification.html"
+          },
+          {
+            "id": "ORDER_EXPORT",
+            "title": "订单导出",
+            "url": "/order/orderExport.html"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "BASE_MANAGE",
+    "title": "基础管理",
+    "children": [
+      {
+        "id": "FOOD_MANAGE",
+        "title": "商品管理",
+        "children": [
+          {
+            "id": "FOOD_LIST",
+            "title": "商品列表",
+            "url": "/food/foodList.html"
+          },
+          {
+            "id": "FOOD_CATEGORY_MANAGE",
+            "title": "分类管理",
+            "url": "/foodCategory/foodCategoryList.html"
+          }
+        ]
+      },
+      {
+        "id": "warsehouse",
+        "title": "库位管理",
+        "url": "/warehouse/warehouseList.html"
+      },
+      {
+        "id": "STORE_MANAGE",
+        "title": "门店管理",
+        "children": [
+          {
+            "id": "STORE_LIST",
+            "title": "门店列表",
+            "url": "/store/storeList.html"
+          },
+          {
+            "id": "STORE_USER_MANAGE",
+            "title": "商家",
+            "url": "/storeUser/storeUserList.html"
+          },
+          {
+            "id": "FOOD_SUPPLIER_MANAGE",
+            "title": "供应商管理",
+            "url": "/food-supplier/foodSupplierList.html"
+          }
+        ]
+      },
+      {
+        "id": "ORG_MANAGE",
+        "title": "组织架构",
+        "children": [
+          {
+            "id": "EMPLOYEE_MANAGE",
+            "title": "员工管理",
+            "url": "/employee/employeeList.html"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "REPORT_CENTER",
+    "title": "报表中心",
+    "children": [
+      {
+        "id": "FOOD_QUOTE_REPORT",
+        "title": "商品报价报表",
+        "url": "/report/food-quote-report.html"
+      }
+    ]
+  },
+  {
+    "id": "FINANCE_CENTER",
+    "title": "财务中心",
+    "children": [
+      {
+        "id": "WITHDRAW",
+        "title": "门店提现",
+        "url": "/withdraw/withdrawList.html"
+      },
+      {
+        "id": "BAG",
+        "title": "袋子申请",
+        "url": "/bag/bagList.html"
+      },
+      {
+        "id": "SETTLEMENT_MANAGE",
+        "title": "结算单",
+        "children": [
+          {
+            "id": "SETTLEMENT_SHEET_DETAIL_LIST",
+            "title": "日结算单",
+            "url": "/settlement/settlementSheetDetailList.html"
+          },
+          {
+            "id": "SETTLEMENT_SHEET_LIST",
+            "title": "周结算单",
+            "url": "/settlement/settlementSheetList.html"
+          }
+        ]
+      },
+      {
+        "id": "SETTLEMENT_CENTER",
+        "title": "结算中心",
+        "url": "/settlement/settlementCenter.html"
+      },
+      {
+        "id": "WALLET",
+        "title": "钱包列表",
+        "url": "wallet/walletList.html"
+      }
+    ]
+  },
+  {
+    "id": "SYSTEM_MANAGE",
+    "title": "系统管理",
+    "children": [
+      {
+        "id": "MANAGER_CENTER",
+        "title": "账号管理",
+        "children": [
+          {
+            "id": "MANAGER_MANAGE",
+            "title": "管理员管理",
+            "url": "manager/managers.html"
+          },
+          {
+            "id": "MANAGER_ROLE_MANAGE",
+            "title": "角色管理",
+            "url": "manager-permission/role/roles.html"
+          }
+        ]
+      },
+      {
+        "id": "CONFIG_MANAGE",
+        "title": "配置中心",
+        "children": [
+          {
+            "id": "MEITUAN_WAIMAI_APP_SETTING",
+            "title": "美团外卖APP配置",
+            "url": "/settings/setting.html?type=MeituanWaimaiAppSetting&html=/settings/MeituanWaimaiAppSetting.html"
+          },
+          {
+            "id": "FOOD_SETTING",
+            "title": "商品配置",
+            "url": "/settings/setting.html?type=FoodSetting&html=/settings/FoodSetting.html"
+          },
+          {
+            "id": "SETTLEMENT_SETTING",
+            "title": "结算配置",
+            "url": "/settings/setting.html?type=SettlementSetting&html=/settings/SettlementSetting.html"
+          },
+          {
+            "id": "WITHDRAW_SETTING",
+            "title": "提现配置",
+            "url": "/settings/setting.html?type=WithdrawSetting&html=/settings/WithdrawSetting.html"
+          },
+          {
+            "id": "ALIPAY_SETTING",
+            "title": "支付宝配置",
+            "url": "/settings/setting.html?type=AlipaySetting&html=/settings/AlipaySetting.html"
+          },
+          {
+            "id": "FEIEYUN_SETTING",
+            "title": "飞蛾云配置",
+            "url": "/settings/setting.html?type=FeieyunSetting&html=/settings/FeieyunSetting.html"
+          },
+          {
+            "id": "SMS_SETTING",
+            "title": "短信配置",
+            "url": "/settings/setting.html?type=SmsSetting&html=/settings/SmsSetting.html"
+          },
+          {
+            "id": "SUPER_PASSWORD_SETTING",
+            "title": "超级密码",
+            "url": "/settings/setting.html?type=SuperPasswordSetting&html=/settings/SuperPasswordSetting.html"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,83 @@
+<meta title="按分类下架" width="500"/>
+<style>
+	.store-info {
+		border-radius: 5px;
+		border: 1px solid #ddd;
+		padding: 5px 10px;
+		margin: 3px;
+	}
+</style>
+<div class="p">
+	<form id="form" s="valid,form" method="post" action="/api/store-user-food/copy">
+		<table class="table table-bordered table-stripped">
+			<tr>
+				<th style="width: 100px;">门店</th>
+				<td>
+					<div s="tpl" id="storeUserList">
+						{%$.each(this, function(i) {%}
+						<div style="display: inline-block" class="store-info">
+							<a href="javascript:;">{%=this.name%} <a href="javascript:;"
+																											 s-click="this.node.parent().remove()"
+																											 class="fa fa-times"></a></a>
+							<input type="hidden" name="storeUserIdList" data-name="{%=this.name%}"
+										 class="target-store-user-id"
+										 value="{%=this.id%}"/>
+						</div>
+						{%})%}
+					</div>
+
+					<div>
+						<a href="javascript:;" class="h3" s-click="selectStoreUser()">选择门店 <i class="fa fa-plus"></i></a>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">分类</th>
+				<td>
+					<select id = "categorySelect" class="form-control" s="select" name="foodCategoryName" s-select="{value: 'name'}"
+									s-build="S.get('/api/food-category/list')">
+						<option value="">选择分类</option>
+					</select>
+				</td>
+			</tr>
+
+		</table>
+	</form>
+</div>
+<script type="text/javascript">
+
+	var sale = false;
+	S.meta.btns = [
+		{
+			name: "批量下架",
+			style: "btn btn-primary",
+			click: function () {
+				$form.validate().done(function() {
+					S.confirm('确认下架吗？').done(function() {
+						var loading = S.loading()
+						S.put('/api/store-user-food/soldCategory', $form.node.serialize()).done(function() {
+							S.toast('下架成功', 'success');
+						}).always(function() {
+							loading.resolve()
+						})
+					})
+				})
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function selectStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: true}).done(function (storeUserList) {
+			if (storeUserList) {
+				$storeUserList.prependData(storeUserList)
+			}
+		})
+	}
+</script>

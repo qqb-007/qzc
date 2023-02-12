@@ -1,0 +1,133 @@
+<meta title="管理员管理" icon="fa fa-users"/>
+<div class="container-fluid space-v">
+    <div class="p">
+        <div class="m-b-xs clearfix">
+            <form class="form-inline pull-left" id="managersSearchForm" s="form"
+                  s-form="{action:function(){$page.node.val(1); $managersGrid.refresh()}}"
+            >
+                <input autocomplete="off" type="text" class="form-control input-sm" placeholder="账号" style="width:150px;" name="username" />
+                <input autocomplete="off" type="text" class="form-control input-sm" placeholder="姓名" style="width:150px;" name="name" />
+                <select class="form-control input-sm" name="locked">
+                    <option value="">所有状态</option>
+                    <option value="false">正常</option>
+                    <option value="true">锁定</option>
+                </select>
+                <input autocomplete="off" type="hidden" name="page" id="page" />
+                <input autocomplete="off" type="submit" class="btn btn-primary btn-sm" value="查找" />
+            </form>
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a href="javascript:;" class="btn btn-default btn-sm"
+                       s-click="S.popupOpen('/manager/manager-add.html').done(function(flag){flag && $managersGrid.refresh()})">
+                        <i class="fa fa-plus"></i> 新建
+                    </a>
+                    <a href="javascript:;" class="btn btn-default btn-sm" s-click="lock(false)">
+                        <i class="fa fa-unlock-alt"></i> 激活
+                    </a>
+                    <a href="javascript:;" class="btn btn-default btn-sm" s-click="lock(true)">
+                        <i class="fa fa-lock"></i> 锁定
+                    </a>
+                    <a href="javascript:;" class="btn btn-default btn-sm" s-click="setStatus('DELETED')">
+                        <i class="fa fa-remove"></i> 删除
+                    </a>
+                </div>
+                <div id="pager" s="pager" s-pager="{action: function(){$page.node.val(this); $productBrandsGrid.refresh()}}" class="btn-group ">
+                    <button class="btn btn-default btn-sm s-pager-prev"><i class="fa fa-arrow-left"></i></button>
+                    <button class="btn btn-default btn-sm s-pager-next"><i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="managersGrid" s='check,datac,nda'
+             s-datac="{targets: [$pager]}"
+             s-data="S.get('/api/manager/search', $managersSearchForm.node.serialize())">
+            <table class="table table-striped table-hover table-condensed table-bordered" style="width: 100%;">
+                <tr>
+                    <th style="width: 1px;">
+                        <label class="s-checkbox">
+                            <input autocomplete="off" type="checkbox" s-check-role="checkall-h" />
+                            <span class="s-checkbox-indicator"></span>
+                        </label>
+                    </th>
+                    <th>账号</th>
+                    <th>姓名</th>
+                    <th>创建时间</th>
+                    <th>登录时间</th>
+                    <th>更新时间</th>
+                    <th>登陆次数</th>
+                    <th class="text-center">状态</th>
+                    <th class="text-right">操作</th>
+                </tr>
+                <tbody s="loop" s-data-filter="'results'">
+                <tr s-loop-role="empty">
+                    <td colspan="9">
+                        <div class="s-ui-none-data-info text-center"><i class="fa fa-info-circle text-info"></i> 未查询到管理员信息</div>
+                    </td>
+                </tr>
+                <tr s-loop-role="row" s="datac,row" s-check-role="i">
+                    <td>
+                        <label class="s-checkbox">
+                            <input autocomplete="off" type="checkbox" s-check-role="h" />
+                            <span class="s-checkbox-indicator"></span>
+                        </label>
+                    </td>
+                    <td name="username"></td>
+                    <td name="name"></td>
+                    <td name="createTime"></td>
+                    <td name="updateTime"></td>
+                    <td name="lastLoginTime"></td>
+                    <td name="loginTimes"></td>
+                    <td class="text-center" s="tpl">
+                        <span class="label {%=this.locked ? 'label-danger' : 'label-success'%}">{%=!this.locked ? '正常' : '锁定'%}</span>
+                    </td>
+                    <td class="text-right">
+                        <input autocomplete="off" type="button" value="角色" class="btn btn-success btn-outline btn-xs"  s-click="var that = this; S.popupOpen('/manager/manager-role.html', {manager: this.parent().data()})" />
+                        <div style="display: inline-block" s="tpl">
+                            {%if(this.locked) {%}
+                            <a href="javascript:;" class="btn btn-warning btn-outline btn-xs" s-click="lock(this, false)">
+                                <i class="fa fa-unlock-alt"></i> 激活
+                            </a>
+                            {%} else {%}
+                            <a href="javascript:;" class="btn btn-danger btn-outline btn-xs" s-click="lock(this, true)">
+                                <i class="fa fa-lock"></i> 锁定
+                            </a>
+                            {%}%}
+                            <a href="javascript:;" class="btn btn-danger btn-outline btn-xs" s-click="remove(this)">
+                                <i class="fa fa-remove"></i> 删除
+                            </a>
+                        </div>
+                        <input autocomplete="off" type="button" value="编辑" class="btn btn-primary btn-xs"  s-click="var that = this; S.popupOpen('/manager/manager-edit.html', {manager: this.parent().data()}).done(function(rs){rs && $managersGrid.refresh();})" />
+                        <input autocomplete="off" type="button" value="修改密码" class="btn btn-default btn-xs"  s-click="S.popupOpen('/manager/modify-manager-pwd.html', {manager: this.parent().data()})" />
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="9" class="text-right" style="vertical-align: middle">
+                        <ul s="pagination" id="managerPagination" s-pagination="{action:function(){$page.node.val(this); $managersGrid.refresh()}}"
+                            class="pagination pagination-sm " >
+                        </ul>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function lock($s, flag){
+        S.confirm("确定操作吗？").done(function(){
+            S.put("/api/manager/lock/" + flag, {ids: $s.parent().data().id}).done(function(){
+                $managersGrid.refresh();
+            })
+        });
+    }
+
+    function remove($s) {
+        S.confirm("确定要删除吗？该操作不可恢复").done(function(){
+            S.remove("/api/manager/" + $s.parent().data().id).done(function(){
+                $managersGrid.refresh();
+            })
+        });
+    }
+</script>

@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: wxc
+  profiles:
+    active: dev
+  cloud:
+    config:
+     uri: http://localhost:8888
+     fail-fast: true
+  mvc:
+    async:
+      request-timeout: 36000
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+server:
+  connection-timeout: 36000

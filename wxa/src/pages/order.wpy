@@ -1,0 +1,1012 @@
+<style lang='css' src='../css/icon.css'></style>
+<style lang='less' src='../css/color.less'></style>
+<style lang='less' src='../css/text.less'></style>
+<style lang='less' src='../css/utils.less'></style>
+<style lang='less' src='../css/bg.less'></style>
+<style lang='less' src='../css/style.less'></style>
+<style lang="less">
+  @import "../css/var";
+
+  .container {
+    padding: 20rpx;
+    background-color: #efeff4;
+    font-size: 32rpx;
+    padding-top: 100rpx;
+  }
+
+  .order {
+    border: 1rpx solid #ddd;
+    margin-bottom: 20rpx;
+    margin-top: 10rpx;
+    overflow: hidden;
+    background-color: #ffffff;
+    &-head {
+      font-size: 28rpx;
+      background-color: #f9f9f9;
+      padding: 16rpx 0;
+      color: #fff;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    &-status {
+      font-size: 28rpx;
+      color: @color-title;
+      margin-right: 20rpx;
+    }
+    &-ptime{
+      height: 48rpx;
+      padding: 0 20rpx 0 12rpx;
+      line-height: 48rpx;
+      font-size: 32rpx;
+      border-top-right-radius: 48rpx;
+      border-bottom-right-radius: 48rpx;
+      background-color: @color-success;
+    }
+    &-bptime{
+      height: 48rpx;
+      width: 160rpx;
+    }
+    &-id {
+      height: 48rpx;
+      padding: 0 20rpx 0 12rpx;
+      line-height: 48rpx;
+      font-size: 36rpx;
+      border-radius: 48rpx;
+      background-color: @color-success;
+    }
+    &-create {
+      font-size: 24rpx;
+    }
+    &-body {
+      padding: 20rpx 30rpx;
+    }
+    &-detail {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      font-size: 32rpx;
+      padding: 4rpx 8rpx;
+      &-list {
+        background-color: #fefcec;
+      }
+    }
+    &-divide {
+      border-top: 1rpx dashed #ddd;
+      margin: 20rpx 0;
+    }
+    &-footer {
+      font-size: 24rpx;
+      color: @color-muted;
+      position: relative;
+    }
+    &-info {
+      font-size: 36rpx;
+      color: #ED3F14;
+      font-weight: bold;
+      &-text {
+        color: @color-title;
+        font-size: 32rpx;
+        margin-left: 20rpx;
+      }
+    }
+    &-total {
+      font-size: 36rpx;
+      font-weight: bold;
+      color: @color-primary;
+    }
+
+    &-refund {
+      font-size: 36rpx;
+      font-weight: bold;
+      color: @color-danger;
+    }
+
+    &-income {
+      font-size: 36rpx;
+      font-weight: bold;
+      color: @color-success;
+    }
+
+    &-fee {
+      text-align: right;
+    }
+    &-toggle {
+      color: red;
+      font-size: 30rpx;
+      font-weight: bold;
+    }
+
+    &-food {
+      &-pic {
+        border-radius: 6rpx;
+        width: 100rpx;
+        height: 100rpx;
+        margin-right: 4rpx;
+      }
+      &-name {
+        font-size: 28rpx;
+        /*font-weight: bold;*/
+        flex: 2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      &-quantity {
+        font-size: 28rpx;
+        flex: 2;
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+        &-label {
+          font-size: 28rpx;
+          font-weight: normal;
+        }
+      }
+      &-total {
+        font-size: 28rpx;
+        /*font-weight: bold;*/
+        flex: 1;
+        text-align: right;
+      }
+    }
+  }
+
+  .order-panel {
+    &-head {
+      flex-direction: row;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    &-title {
+      font-weight: bold;
+      color: @color-title;
+      font-size: 40rpx;
+      &-tip {
+        font-size: 24rpx;
+        color: @color-muted;
+        font-weight: normal;
+        margin-left: 40rpx;
+      }
+    }
+  }
+
+  .copy-btn {
+    color: @color-title;
+  }
+
+  .search-bar {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background-color: @color-primary;
+    padding: 10rpx 20rpx;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .date-show {
+    color: #ffffff;
+    font-size: 28rpx;
+    &-icon {
+      font-size: 24rpx;
+    }
+  }
+
+  .search-input {
+    border-radius: 4rpx;
+    height: 60rpx;
+    line-height: 60rpx;
+    border: 1rpx solid #ddd;
+    padding: 0 20rpx;
+    font-size: 28rpx;
+    background-color: #fff;
+    flex: 1;
+    /*margin: 0 10px;*/
+    color: @color-primary;
+    margin-bottom: 20rpx;
+  }
+
+  .tabs{
+    margin-bottom: 10rpx;
+    position: sticky;
+    top: 60rpx;
+    z-index: 99;
+  }
+
+  .status-select {
+    color: #ffffff;
+    font-size: 28rpx;
+    &-icon {
+      font-size: 24rpx;
+    }
+  }
+
+  .order-btn {
+    &-bar {
+      position: absolute;
+      right: 0rpx;
+      top: 0rpx;
+      display: flex;
+      flex-direction: row;
+    }
+    margin-left: 40rpx;
+    text-align: center;
+    &-icon {
+      font-size: 48rpx;
+    }
+    &-txt {
+      font-size: 24rpx;
+    }
+  }
+
+  .return {
+    box-shadow: 0px 0px 10px rgba(102, 102, 102, 0.39);
+    width: 26%;
+    height: 80rpx;
+    padding: 0 10rpx;
+    text-align: center;
+    line-height: 80rpx;
+    font-size: 40rpx;
+    background-color: #495060;
+    position: fixed;
+    right: 37%;
+    left: 37%;
+    bottom: 0px;
+    border-radius: 20rpx;
+    color: #ffffff;
+    z-index: 10;
+  }
+
+  .sale-btn{
+    font-size: 24rpx;
+    padding: 6rpx 16rpx;
+    border-radius: 4rpx;
+    background-color: @color-danger;
+    color: #ffffff;
+  }
+  .change-btn{
+    font-size: 26rpx;
+    padding: 6rpx 16rpx;
+    border-radius: 4rpx;
+    background-color: @color-danger;
+    color: #ffffff;
+  }
+
+  .modal-mask {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000;
+    opacity: 0.5;
+    overflow: hidden;
+    z-index: 9000;
+    color: #fff;
+  }
+  .modal-dialog {
+    width: 80%;
+    overflow: hidden;
+    position: fixed;
+    top: 10%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #f9f9f9;
+    margin: auto;
+    border-radius:36rpx;
+  }
+  .modal-title {
+    padding-top: 50rpx;
+    font-size: 40rpx;
+    color: #030303;
+    text-align: center;
+  }
+  .modal-content {
+    padding: 50rpx 32rpx;
+  }
+  .modal-input {
+    display: flex;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4rpx;
+    font-size: 36rpx;
+  }
+  .input {
+    width: 100%;
+    height: 100rpx;
+    font-size: 36rpx;
+    line-height: 36rpx;
+    padding: 0 20rpx;
+    box-sizing: border-box;
+    color: #333;
+  }
+  .modal-footer {
+    display: flex;
+    flex-direction: row;
+    height: 86rpx;
+    border-top: 2rpx solid #dedede;
+    font-size: 34rpx;
+    line-height: 86rpx;
+  }
+  .btn-cancel {
+    width: 50%;
+    color: #666;
+    text-align: center;
+    border-right: 2rpx solid #dedede;
+  }
+  .btn-confirm {
+    width: 50%;
+    color: #ec5300;
+    text-align: center;
+  }
+  .warning{
+    color: #ED3F14;
+    font-size: 50rpx;
+  }
+  .fushu{
+    color: #ED3F14;
+    font-weight: bold;
+  }
+
+  .fqps{
+    width: 100rpx;
+    height: 80rpx;
+    border-radius: 40rpx;
+    line-height: 80rpx;
+    background-color: #06C0AB;
+    color: #141F2D;
+    font-weight: bold;
+  }
+
+</style>
+<template>
+  <view class="container">
+    <view wx:if="{{empty}}" class="page-notice">
+      <view class="page-notice-info">暂无订单</view>
+    </view>
+    <view class="search-bar">
+      <picker @change="dateChange" mode="date" value="{{search.date}}">
+        <view class="date-show">{{dateShow}}
+          <text class="iconfont date-show-icon icon-unfold"></text>
+        </view>
+      </picker>
+      <picker @change="platChange" mode="selector" value="{{platListIndex}}" range="{{platList}}">
+        <view class="status-select">{{platShow}}
+          <text class="iconfont status-select-icon icon-unfold"></text>
+        </view>
+      </picker>
+      <picker @change="statusChange" mode="selector" value="{{statusListIndex}}" range="{{statusList}}">
+        <view class="status-select">{{statusShow}}
+          <text class="iconfont status-select-icon icon-unfold"></text>
+        </view>
+      </picker>
+    </view>
+    <view class="tabs">
+      <!--<input placeholder="输入平台流水号进行筛选" class="search-input" @input="searchInputChange"/>-->
+      <i-tabs current="{{orderStatusIndex}}" color="{{tabColor}}" @change="StatusTypeChange">
+        <i-tab key="0" title="新订单"></i-tab>
+        <i-tab key="1" title="已完成"></i-tab>
+        <i-tab key="2" title="预订单"></i-tab>
+      </i-tabs>
+    </view>
+    <block wx:for="{{orderList}}" wx:key="{{item.id}}">
+      <view class="order">
+        <view class="order-head flex-row space-between">
+          <block wx:if="{{item.status === 'MERCHANT_CONFIRMED'}}">
+            <view class="order-ptime">{{item.ptime}}</view>
+          </block>
+          <block wx:if="{{item.status !== 'MERCHANT_CONFIRMED'}}">
+            <view class="order-bptime"></view>
+          </block>
+          <view class="order-id">#{{item.daySeq}}<text>{{item.platTitle}}</text></view>
+          <view class="order-status">{{item.statusTitle}}</view>
+        </view>
+        <view class="order-body">
+          <view class="order-panel">
+            <view class="order-panel-head">
+              <view class="order-panel-title">{{item.recipientName}} 送达：{{item.deliveryTime}}</view>
+            </view>
+            <view class="order-info" @tap="tellPhone({{item.recipientPhone}})">顾客号码
+              <text class="order-info-text">{{item.recipientPhone}}</text>
+              <text class="iconfont icon-phone order-toggle">点击拨打</text>
+            </view>
+            <block wx:if="{{item.caution !== '0' && item.caution !== ' ' && item.caution !== ''}}">
+              <view class="order-info">备注
+                <text class="order-info-text">{{item.caution}}</text>
+              </view>
+            </block>
+          </view>
+          <view class="order-divide"></view>
+          <view class="order-panel">
+            <view class="order-panel-head" @tap="showDetail({{index}})">
+              <view class="order-panel-title">商品</view>
+              <view class="order-toggle">展开
+                <text class="iconfont {{item.detailShown ? 'icon-fold' : 'icon-unfold'}}"></text>
+              </view>
+            </view>
+            <view class="order-detail-list" wx-if="{{item.detailShown}}">
+              <view class="order-detail" wx:for="{{item.detailList}}" @tap="preview({{detail.foodPicture}})"
+                wx:for-item="detail" wx:key="{{detai.id}}">
+                <image src="{{detail.foodPicture}}" class="order-food-pic" mode="aspectFill"></image>
+                <view class="order-food-name">{{detail.foodName}}({{detail.spec}})</view>
+                <view class="order-food-quantity"><text class="{{detail.quantity>1 ? 'fushu' : ''}}">×{{detail.quantity}}</text>
+                  <view class="sale-btn" catchtap="soldOut({{detail.foodCode}})">下架</view>
+                  <view class="change-btn" catchtap="modalinput({{detail}})">改价</view>
+                </view>
+                <!--<view class="order-food-quantity">
+                  <block wx:if="{{detail.refundQuantity}}">
+                    <text class="order-food-quantity-label">退</text>
+                    <text>×{{detail.refundQuantity}}</text>
+                  </block>
+                </view>-->
+                <view class="order-food-total">¥{{detail._total}}</view>
+              </view>
+            </view>
+          </view>
+          <block wx:if="{{item.deliveryType === 'MEITUAN_OPEN'}}">
+            <view class="order-divide"></view>
+            <view class="order-panel">
+              <view class="order-panel-head">
+                <view class="order-panel-title">配送信息</view>
+                <view class="order-status">
+                  <text>{{item.deliveryStatusTitle}}</text>
+                </view>
+              </view>
+              <view class="order-info" @tap="tellPhone({{item.psCourierPhone}})">骑手信息
+                <block wx:if="{{item.psCourierPhone}}">
+                  <text class="order-info-text">{{item.psCourierName}} {{item.psCourierPhone}}</text>
+                  <text class="iconfont icon-phone order-toggle">点击拨打</text>
+                </block>
+                <block wx:else>
+                  <text>暂无骑手信息</text>
+                </block>
+              </view>
+            </view>
+          </block>
+          <view class="order-divide"></view>
+          <view class="order-panel">
+            <view class="order-panel-head">
+              <view class="order-panel-title">总计</view>
+              <view class="order-fee">
+                <view class="order-income">¥{{item._total}}</view>
+              </view>
+            </view>
+          </view>
+          <view class="order-divide"></view>
+          <view class="order-footer">
+            <view>下单：{{item.createTime}}</view>
+            <view>单号：{{item.platOrderId}}
+              <text class="copy-btn" @tap="copyClipboard({{item.platOrderId}})">复制</text>
+            </view>
+            <view class="order-btn-bar">
+              <view class="order-btn" @tap="print({{item.id}})">
+                <view class="iconfont icon-print order-btn-icon"></view>
+                <view class="order-btn-txt">打印</view>
+              </view>
+              <block wx:if="{{item.status === 'WAIT_MERCHANT_CONFIRM'}}">
+                <view class="order-btn" @tap="receiptOrder({{item.id}})">
+                  <view class="iconfont icon-arrow-right order-btn-icon"></view>
+                  <view class="order-btn-txt">接单</view>
+                </view>
+              </block>
+              <view class="order-btn" @tap="open('/pages/order-suppliers?id={{item.id}}')">
+                <view class="iconfont icon-pickup order-btn-icon"></view>
+                <view class="order-btn-txt">捡货</view>
+              </view>
+              <block wx:if="{{item.deliveryStatus === 'CANCELED'}}">
+                <view class="order-btn" @tap="sendDelivery({{item.id}})">
+
+                  <view class="fqps">发起配送</view>
+                </view>
+              </block>
+              <block wx:if="{{item.deliveryStatus === 'WAIT_SCHEDULE' || item.deliveryStatus === 'ACCEPT'}}">
+                <view class="order-btn" @tap="cancelDelivery({{item.id}})">
+                  <!-- <view class="iconfont icon-unfold order-btn-icon"></view> -->
+                  <view class="fqps">取消配送</view>
+                </view>
+              </block>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <i-divider content="我是有底线的" wx:if="{{!hasNext && !empty}}"></i-divider>
+    <view class="return" @tap="back">返回首页</view>
+
+    <view class="modal-dialog" hidden="{{hideModel}}">
+      <view class="modal-title">请注意报价单位为 <text class="warning">{{detail.foodUnit}}</text></view>
+      <view class="modal-content">
+        <input class="search-input" type="digit" placeholder="请输入报价 单位 元" value="{{detail.price}}" @input="getChange"
+          focus="{{!hideModel}}" />
+      </view>
+      <view class="modal-footer">
+        <view class="btn-cancel" bindtap="cancel()">取消</view>
+        <view class="btn-confirm" bindtap="confirmb">确定</view>
+      </view>
+    </view>
+    <view class="modal-mask" bindtap="cancel()" hidden="{{hideModel}}"></view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  let Deferred = require('../utils/deferred')
+  let api = require('../utils/api')
+  let color = require('../utils/color')
+  let time = require('../utils/time')
+  let caution = require('../utils/caution')
+  const DEFAULT_SEARCH_PARAM = {
+    page: 1,
+    daySeq: '',
+    statusType: '',
+    date: ''
+  }
+
+  const FOOD_DEFAULT_SEARCH_PARAM = {
+    page: 1
+  }
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '订单',
+      enablePullDownRefresh: true,
+      backgroundTextStyle: 'dark',
+      // backgroundColor: '#efeff4',
+      'usingComponents': {
+        'i-tabs': '../iview/menus/index',
+        'i-tab': '../iview/menu/index',
+        'i-tag': '../iview/tag/index',
+        'i-divider': '../iview/divider/index',
+        'i-input': '../iview/input/index'
+      }
+    }
+    components = {}
+
+    data = {
+      searchParam: Object.assign({}, DEFAULT_SEARCH_PARAM),
+      foodSearchParam: Object.assign({}, FOOD_DEFAULT_SEARCH_PARAM),
+      loading: false,
+      hasNext: true,
+      empty: false,
+      orderList: [],
+      platOrderId: '',
+      dateShow: '--',
+      statusList: ['全部订单', '已完成', '预订单'],
+      statusType: ['ALL', 'FINISHED', 'RESERVE'],
+      statusListIndex: 0,
+      statusShow: '全部订单',
+      platList: ['全部平台', '王小菜美团', '菜老板美团', '饿了么', '京东'],
+      platType: ['', 'MEITUAN', 'CLBM', 'ELE', 'JDDJ'],
+      platListIndex: 0,
+      orderStatusIndex: 0,
+      platShow: '所有平台',
+      hideModel: true,
+      detail: {
+        foodId: '',
+        price: '',
+        foodUnit: ''
+      }
+    }
+
+    methods = {
+      open(url) {
+        wx.navigateTo({
+          url
+        })
+      },
+      tellPhone(value) {
+        wx.makePhoneCall({
+          phoneNumber: value.replace('_', ',') + '' // 仅为示例，并非真实的电话号码
+        })
+      },
+      showDetail(idx) {
+        let order = this.orderList[idx]
+        order.detailShown = !order.detailShown
+        if (!order.detailList) {
+          this.loadDetailList(order)
+        }
+        this.$apply()
+      },
+      soldOut(id) {
+        let self = this
+        wx.showModal({
+          title: '提示',
+          content: '确认下架该商品吗？',
+          success(res) {
+            if (res.confirm) {
+              api.storeUserFood.soldOut({
+                foodId: id
+              }).done(rs => {
+                let data = rs.data
+                if (data) {
+                  wx.showToast({
+                    title: '下架成功',
+                    icon: 'success',
+                    duration: 500
+                  })
+                  self.$apply()
+                }
+              })
+            } else if (res.cancel) {}
+          }
+        })
+      },
+      StatusTypeChange({
+        detail
+      }) {
+        this.orderStatusIndex = detail.key
+        this.statusListIndex = detail.key
+        this.statusShow = this.statusList[this.statusListIndex]
+        this.searchParam.statusType = this.statusType[this.statusListIndex]
+        this.loadingSearch()
+      },
+      back() {
+        wx.navigateBack({
+          delta: 1
+        })
+      },
+      copyClipboard(str) {
+        wx.setClipboardData({
+          data: str + '',
+          success() {
+            wx.showToast({
+              title: '复制成功',
+              icon: 'success',
+              duration: 500
+            })
+          }
+        })
+      },
+      preview(url) {
+        wx.previewImage({
+          current: '', // 当前显示图片的http链接
+          urls: [url] // 需要预览的图片http链接列表
+        })
+      },
+      modalinput(food) {
+        let fd = food
+        this.detail.foodId = fd.foodCode
+        this.detail.foodUnit = fd.unit
+        FOOD_DEFAULT_SEARCH_PARAM.foodId = fd.foodCode
+        this.resetFoodSearchParam()
+        api.storeUserFood.search(this.foodSearchParam).done((rs) => {
+          let suf = rs.data.results[0]
+          this.detail.price = suf.alterQuotePrice
+          this.$apply()
+        })
+        this.hideModel = false
+      },
+      getChange(e) {
+        this.detail.price = e.detail.value
+      },
+      confirmb() {
+        if (this.detail.price === '' || this.detail.price === '.') {
+          wx.showToast({
+            title: '输入错误,请重新输入！',
+            icon: 'none',
+            duration: 1500
+          })
+          return
+        }
+        let price = this.detail.price
+        let foodId = this.detail.foodId
+        wx.showModal({
+          title: '提示',
+          content: '当前报价为 ' + this.detail.price + '元/' + this.detail.foodUnit + '的价格，确定改价吗',
+          success(res) {
+            if (res.confirm) {
+              api.storeUserFood.changeAlterQuotePrice({
+                id: foodId,
+                alterQuotePrice: price
+              }).always(() => {
+                wx.showToast({
+                  title: '改价完成 审核后生效！',
+                  icon: 'none',
+                  duration: 1500
+                })
+              })
+              console.log(price + '  ' + foodId)
+            } else if (res.cancel) {
+              console.log('用户点击了取消')
+            }
+          }
+        })
+        this.hideModel = true
+        this.detail.price = ''
+        this.$apply()
+      },
+      cancel() {
+        this.hideModel = true
+        this.detail.price = ''
+        this.$apply()
+      },
+      statusChange({
+        detail
+      }) {
+        this.statusListIndex = detail.value
+        this.orderStatusIndex = detail.value
+        this.statusShow = this.statusList[this.statusListIndex]
+        this.searchParam.statusType = this.statusType[this.statusListIndex]
+        this.loadingSearch()
+      },
+      platChange({
+        detail
+      }) {
+        this.platListIndex = detail.value
+        this.platShow = this.platList[this.platListIndex]
+        this.searchParam.plat = this.platType[this.platListIndex]
+        this.loadingSearch()
+      },
+      dateChange({
+        detail
+      }) {
+        this.searchParam.date = detail.value
+        let date = new Date(Date.parse(this.searchParam.date))
+        this.dateShow = (date.getMonth() + 1) + '.' + date.getDate()
+        this.loadingSearch()
+      },
+      searchInputChange({
+        detail
+      }) {
+        this.searchParam.daySeq = detail.value
+        this.loadingSearch()
+      },
+      print(id) {
+        wx.showLoading()
+        api.order.print({
+          id: id
+        }).done(rs => {
+          if (rs.data) {
+            wx.showToast({
+              title: '打印成功',
+              icon: 'success',
+              duration: 500
+            })
+          } else {
+            wx.showToast({
+              title: '打印失败',
+              duration: 500
+            })
+          }
+        }).always(() => {
+          wx.hideLoading()
+        })
+      },
+      receiptOrder(id) {
+        wx.showLoading()
+        api.order.receipt({
+          id: id
+        }).done(rs => {
+          if (rs.data) {
+            wx.showToast({
+              title: '接单成功',
+              icon: 'success',
+              duration: 500
+            })
+          } else {
+            wx.showToast({
+              title: '接单失败',
+              duration: 500
+            })
+          }
+        }).always(() => {
+          wx.hideLoading()
+          this.search()
+        })
+      },
+      sendDelivery(id) {
+        const that = this
+        wx.showModal({
+          title: '提示',
+          content: '确认发起配送吗',
+          success: function(res) {
+            if (res.confirm) {
+              wx.showLoading()
+              api.order.sendDelivery({
+                id: id
+              }).done(rs => {
+                if (rs.data) {
+                  wx.showToast({
+                    title: '发起配送成功',
+                    icon: 'success',
+                    duration: 500
+                  })
+                } else {
+                  wx.showToast({
+                    title: '发起配送失败',
+                    duration: 500
+                  })
+                }
+              }).always(() => {
+                wx.hideLoading()
+                that.search()
+              })
+            } else {
+              console.log('用户点击取消')
+            }
+          }
+        })
+      },
+      cancelDelivery(id) {
+        const that = this
+        wx.showModal({
+          title: '提示',
+          content: '确认取消配送吗？',
+          success: function(res) {
+            if (res.confirm) {
+              wx.showLoading()
+              api.order.cancelDelivery({
+                id: id
+              }).done(rs => {
+                if (rs.data) {
+                  wx.showToast({
+                    title: '取消配送成功',
+                    icon: 'success',
+                    duration: 500
+                  })
+                } else {
+                  wx.showToast({
+                    title: '取消配送失败',
+                    duration: 500
+                  })
+                }
+              }).always(() => {
+                wx.hideLoading()
+                that.search()
+              })
+            } else {
+              console.log('用户点击取消')
+            }
+          }
+        })
+      }
+    }
+
+    computed() {
+
+    }
+
+    events = {}
+
+    resetSearchParam() {
+      Object.assign(this.searchParam, DEFAULT_SEARCH_PARAM)
+      this.hasNext = true
+    }
+    resetFoodSearchParam() {
+      Object.assign(this.foodSearchParam, FOOD_DEFAULT_SEARCH_PARAM)
+    }
+
+    loadingSearch() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+      this.searchTimeout = setTimeout(() => {
+        wx.showLoading()
+        this.page = 1
+        this.search().always(() => {
+          wx.hideLoading()
+        })
+      }, 500)
+    }
+
+    onPullDownRefresh() {
+      // this.resetSearchParam()
+      this.search().always(() => {
+        wx.stopPullDownRefresh()
+      })
+    }
+
+    loadDetailList(order) {
+      wx.showLoading()
+      return api.order.detailList({
+        id: order.id
+      }).done(rs => {
+        rs.data.forEach(detail => {
+          detail._total = (detail.costTotal - detail.costRefund).toFixed(2)
+        })
+        order.detailList = rs.data
+        this.$apply()
+      }).always(() => {
+        wx.hideLoading()
+      })
+    }
+
+    onReachBottom() {
+      if (this.hasNext) {
+        this.searchParam.page++
+        this.search(true)
+      }
+    }
+
+    search(append, callback) {
+      wx.showLoading({
+        title: '加载中'
+      })
+      return api.order.search(this.searchParam).done((rs) => {
+        this.handleOrderList(rs.data.results)
+        if (append) {
+          this.orderList = this.orderList.concat(rs.data.results)
+        } else {
+          this.orderList = rs.data.results
+        }
+        let paging = rs.data
+        this.hasNext = paging.hasNext
+        this.empty = this.searchParam.page === 1 && this.orderList.length === 0
+        this.$apply()
+      }).always(() => {
+        wx.hideLoading()
+        callback && callback()
+      })
+    }
+
+    handleOrderList(orderList) {
+      orderList.forEach(order => {
+        if (order.status === 'WAIT_MERCHANT_CONFIRM') {
+          console.log('进行自动接单 ' + order.id)
+          api.order.receipt({
+            id: order.id
+          }).done(rs => {
+            if (rs.data) {
+              console.log('接单成功')
+              order.status = 'MERCHANT_CONFIRMED'
+              order.statusTitle = '已接单'
+            } else {
+              console.log('接单失败')
+            }
+          })
+        }
+        order.statusColor = this.getStatusStyle(order.status)
+        order.detailShown = true
+        this.loadDetailList(order)
+        order.ptime = time.judgeTime(order.expectedDeliveryTime)
+        order.deliveryTime = time.formatTime(order.expectedDeliveryTime, 'M/D h:m')
+        order.publishStatusColor = this.getPublishStatusStyle(order.publishStatus)
+        order._total = (order.costTotal - order.costRefund).toFixed(2)
+        order.caution = caution.filter(order.caution)
+      })
+    }
+
+    getStatusStyle(status) {
+      switch (status) {
+        case 'PAID':
+          return color.warning
+        case 'VERIFY_SUCCESS':
+          return color.success
+        case 'VERIFY_FAIL':
+          return color.danger
+      }
+    }
+
+    getPublishStatusStyle(status) {
+      switch (status) {
+        case 'WAIT':
+          return 'yellow'
+        case 'WAIT_MERCHANT_CONFIRM':
+          return 'green'
+        case 'MERCHANT_CONFIRMED':
+          return 'red'
+        case 'CANCELED':
+          return 'red'
+        case 'SHIPPING':
+          return 'red'
+      }
+    }
+
+    onLoad() {
+      let date = new Date()
+      this.dateShow = (date.getMonth() + 1) + '.' + date.getDate()
+      Deferred.when(this.search()).always(() => {
+        this.loaded = true
+      })
+    }
+  }
+</script>

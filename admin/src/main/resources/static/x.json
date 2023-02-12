@@ -1,0 +1,14 @@
+{
+  "body": {
+    "errno": 0,
+    "error": "success",
+    "data": []
+  },
+  "cmd": "resp.sku.shop.category.get",
+  "encrypt": "",
+  "sign": "BCC3DAE8767D703B9462D462B5915563",
+  "source": "36981",
+  "ticket": "7FF00B91-43A8-0D30-8EF0-843E5B400646",
+  "timestamp": 1565416429,
+  "version": "3"
+}

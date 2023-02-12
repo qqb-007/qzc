@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.batcloud.wxc.core.mapper.FoodQuoteMapper">
+
+    <select id="findStoreUserNewestFoodQuotePrice"
+            resultType="info.batcloud.wxc.core.mapper.domain.FoodPrice">
+        select
+        d.price as price,
+        d.food_id as food_id
+        from food_quote_sheet_detail d where d.id in (
+        select
+        max(d.id) as detail_id
+        from
+        food_quote_sheet s left join food_quote_sheet_detail d on d.food_quote_sheet_id = s.id
+        <where>
+            <if test="storeUserId != null">
+                and s.store_user_id=#{storeUserId}
+            </if>
+            <if test="status != null">
+                and s.status=#{status}
+            </if>
+            <if test="foodQuoteSheetId != null">
+                and s.id=#{foodQuoteSheetId}
+            </if>
+            <if test="endTime != null">
+                <![CDATA[and s.create_time<=#{endTime}]]>
+            </if>
+        </where>
+        group by d.food_id
+        )
+    </select>
+</mapper>

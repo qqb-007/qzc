@@ -1,0 +1,1 @@
+"use strict";module.exports={hold:function(n){wx.setStorageSync("loginInfo",n)},get:function(){return wx.getStorageSync("loginInfo")||{}}};

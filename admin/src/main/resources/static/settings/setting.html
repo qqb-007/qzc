@@ -1,0 +1,128 @@
+<meta args="type,html"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading form-inline">
+			版本号：
+			<select class="form-control input-sm" s="select"
+					id="versionSelect"
+					s-select="{title: titleFn, value: 'version'}"
+					s-data="versionData"
+					s-build="buildData()">
+				<option value="-1">新增版本</option>
+			</select>
+			<div class="pull-right">
+				<a href="javascript:;" class="btn btn-default btn-sm"
+				   s-click="copy()">
+					<i class="fa fa-plus"></i> 复制新增
+				</a>
+				<a href="javascript:;" class="btn btn-danger btn-sm"
+				   s-click="del()">
+					<i class="fa fa-remove"></i> 删除
+				</a>
+				<a href="javascript:;" class="btn btn-warning btn-sm"
+				   s-click="active()">
+					<i class="fa fa-check"></i> 激活
+				</a>
+
+				<a href="javascript:;" class="btn btn-primary btn-sm"
+				   s-click="save()">
+					<i class="fa fa-save"></i> 保存
+				</a>
+			</div>
+		</div>
+		<div class="panel-body" id="panel" s="window" style="background-color: #fff">
+		</div>
+	</div>
+	<script>
+
+		var currentSettingData;
+
+		function titleFn(data) {
+			return data.version + " : " + data.statusTitle + "";
+		}
+
+		var versionList;
+
+		var currentVersion;
+
+		function versionData() {
+			if (currentVersion) {
+				return currentVersion;
+			}
+			for (var i in versionList) {
+				var version = versionList[i];
+				if (version.status == 'ACTIVE') {
+					return version.version
+				}
+			}
+			if (versionList.length) {
+				return versionList[0].version;
+			}
+		}
+
+		function refresh() {
+			$versionSelect.refresh().done(function () {
+				$versionSelect.node.change();
+			})
+		}
+
+		function buildData() {
+			return S.get('/api/setting/version/' + type).done(function (rs) {
+				versionList = rs
+			})
+		}
+
+		$versionSelect.node.change(function () {
+			var val = $(this).val();
+			S.get('/api/setting/' + type + '/' + val).done(function (rs) {
+				currentSettingData = rs;
+				$panel.load(html || "/settings/" + type + ".html", {data: rs})
+			})
+
+		})
+		S.on("s-ready", function () {
+			$versionSelect.node.change();
+		})
+
+		function save() {
+			Smart.deferDelegate($panel.getContent()).done(function (content) {
+				S.post("/api/setting", {
+					key: type,
+					version: $versionSelect.node.val(),
+					content: JSON.stringify(content)
+				}).done(function (rs) {
+					S.toast("保存成功", 'success');
+					currentVersion = rs;
+					if ($versionSelect.node.val() == -1) {
+						refresh();
+					}
+					$versionSelect.refresh()
+				})
+			})
+
+		}
+
+		function active() {
+			currentVersion = null;
+			S.confirm("确认激活当前设置吗?").done(function () {
+				S.put("/api/setting/active/" + $versionSelect.node.val(), {key: type}).done(function () {
+					refresh()
+				})
+			})
+		}
+
+		function del() {
+			currentVersion = null;
+			S.confirm("请输入<span class='text-danger'>DELETE</span>进行确认删除!", {
+				confirmInput: 'DELETE'
+			}).done(function () {
+				S.remove("/api/setting/" + $versionSelect.node.val() + '?key=' + type).done(function () {
+					refresh()
+				})
+			})
+		}
+
+		function copy() {
+			$versionSelect.node.val(-1);
+		}
+	</script>

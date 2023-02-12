@@ -1,0 +1,49 @@
+<meta title="提现审核" args="userWithdraw" width="600px" />
+<form class="p" id="form" s="form,nda,datac" s-data="userWithdraw" method="put" action="/api/withdraw/verify">
+    <input autocomplete="off" type="hidden" name="id" />
+    <table class="table table-bordered table-stripped">
+        <tr>
+            <th>审核备注：</th>
+            <td>
+                <input autocomplete="off" type="hidden" id="success" name="success" />
+                <textarea id="verifyRemark" class="form-control" rows="5" name="remark"></textarea>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<script>
+    S.meta.btns = [
+        {
+            name: "通过",
+            style: "btn btn-success",
+            click: function() {
+                $success.node.val("true")
+                return $form.submit().done(function(rs) {
+                    S.close(rs);
+                })
+            }
+        },
+        {
+            name: "拒绝",
+            style: "btn btn-danger btn-outline",
+            click: function() {
+                if($verifyRemark.node.val() == "") {
+                    S.toast("请输入审核备注", 'warning');
+                    return;
+                }
+                $success.node.val("false")
+                return $form.submit().done(function(rs) {
+                    S.close(rs);
+                })
+            }
+        },
+        {
+            name: "取消",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+</script>

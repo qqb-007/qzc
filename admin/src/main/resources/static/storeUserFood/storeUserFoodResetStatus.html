@@ -1,0 +1,82 @@
+<meta title="重置状态" width="1000"/>
+<style>
+	.store-info {
+		border-radius: 5px;
+		border: 1px solid #ddd;
+		padding: 5px 10px;
+		margin: 3px;
+	}
+</style>
+<div class="p">
+	<form id="form" s="valid,form" method="put" action="/api/store-user-food/reset-status">
+		<table class="table table-bordered table-stripped">
+			<tr>
+				<th style="width: 100px;">选择门店</th>
+				<td>
+					<div s="tpl" id="storeUserList">
+						{%$.each(this, function(i) {%}
+						<div style="display: inline-block" class="store-info">
+							<a href="javascript:;">{%=this.name%} <a href="javascript:;"
+																	 s-click="this.node.parent().remove()"
+																	 class="fa fa-times"></a></a>
+							<input type="hidden" name="storeUserIdList" class="store-user-id" value="{%=this.id%}"/>
+						</div>
+						{%})%}
+					</div>
+
+					<div class="help-block">
+						<input type="button" class="btn btn-xs btn-outline btn-success" value="选择门店"
+							   s-click="selectStoreUser()"/>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th style="width: 100px;">选择平台</th>
+				<td>
+					<div s="window" s-window="{href: '/plat/plat-selector.html'}" id="platSelector"></div>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<script type="text/javascript">
+
+	S.meta.btns = [
+		{
+			name: "重置",
+			style: "btn btn-primary",
+			click: function () {
+				var nodes = S.node.find('.store-user-id')
+				if (nodes.size() == 0) {
+					return;
+				}
+				$platSelector.getPlatList(function(platList) {
+					var loadingDeferred = S.loading()
+					$form.submit().done(function () {
+
+						S.toast('重置完成')
+						S.close(true)
+					}).always(function () {
+						loadingDeferred.resolve()
+					})
+				})
+
+			}
+		},
+		{
+			name: "关闭",
+			style: "btn btn-default",
+			click: function () {
+				S.close();
+			}
+		}
+	]
+
+	function selectStoreUser() {
+		S.popupOpen('/storeUser/storeUserSelector.html', {multi: false}).done(function (storeUserList) {
+			if (storeUserList && storeUserList.length) {
+				$storeUserList.prependData(storeUserList)
+			}
+		})
+	}
+</script>

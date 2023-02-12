@@ -1,0 +1,99 @@
+<meta title="会员钱包"/>
+<div class="p">
+	<div class="panel panel-default">
+		<div class="panel-heading clearfix">
+			<form class="form-inline" id="form">
+				<input type="text" name="storeUserName" class="form-control" placeholder="门店名"/>
+				<input type="number" name="storeUserId" class="form-control" placeholder="门店ID"/>
+				<input type="number" name="storeUserPhone" class="form-control" placeholder="门店手机号"/>
+				<input type="hidden" name="page" id="page" value="1"/>
+				<select class="form-control" s="select"
+						name="sort"
+						s-build="S.get('/api/enum/valuesMap/core.enums.WalletSort')">
+					<option value="">排序</option>
+				</select>
+				<input type="button" class="btn btn-default" value="查询"
+					   s-click="$page.node.val(1); $walletsGrid.refresh()"/>
+			</form>
+
+			<form class="form-inline" role="form" s="valid,form" id="dform" action="/api/wallet-flow-detail/export"
+				  method="get">
+				<input type="text" placeholder="日期" class="form-control" autocomplete="off" name="date" s-valid-error="require()"
+						   s="datetimepicker"/>
+				<input type="button" s-click="exportFile()" class="btn btn-default" value="导出"/>
+				<input type="button" class="btn btn-primary" s-click="download()" value="下载"/>
+			</form>
+		</div>
+		<div id="walletsGrid"
+			 class="panel-body"
+			 s='check,datac,nda'
+			 s-data="S.get('/api/wallet/search', $form.node.serialize())">
+			<table class="table table-striped table-bordered table-hover">
+				<tr>
+					<th>门店</th>
+					<th class="text-right">金额</th>
+					<th class="text-right">获得金额</th>
+					<th class="text-right">提现金额</th>
+					<th class="text-right">操作</th>
+				</tr>
+				<tbody s="loop" s-data-filter="'results'">
+				<tr s-loop-role="empty">
+					<td colspan="5">暂无数据</td>
+				</tr>
+				<tr s-loop-role="row" s-check-role="i" s="datac" class="wallet">
+					<td>
+						<span name="storeUser.name"></span>
+						<div>ID: <span name="storeUser.id"></span></div>
+					</td>
+					<td class="text-right" name="money"></td>
+					<td class="text-right" name="obtainedMoney"></td>
+					<td class="text-right" name="withdrawMoney"></td>
+					<td class="text-right" s="tpl">
+						<a href="javascript:;"
+						   s-click="S.popupOpen('/walletFlowDetail/walletFlowDetailList.html', {storeUserId: this.parent().data().storeUser.id, valueType: 'MONEY'})">明细</a>
+						{%if(this.storeUser.bankName) {%}
+						<a href="javascript:;"
+						   s-click="withdrawal(this.parent().data().storeUser.id)">提现</a>
+						{%}%}
+
+					</td>
+				</tr>
+				</tbody>
+				<tfoot>
+				<tr>
+					<td colspan="5" class="text-right">
+						共有<span name="total"></span>个数据
+						<ul s="pagination"
+							s-pagination="{action:function(){$page.node.val(this); $walletsGrid.refresh()}}"
+							class="pagination pagination-sm">
+						</ul>
+					</td>
+				</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+
+    function exportFile() {
+		$dform.submit();
+    }
+    function download(){
+        S.get('/api/order/download').done(function (rs) {
+            if(rs.file) {
+                window.open(rs.file)
+            } else {
+                S.toast('正在努力导出了,稍等一下', 'success')
+            }
+        })
+
+    }
+
+    function withdrawal(stouserId){
+        S.get('/api/withdraw/withdraw?storeUserId=' + stouserId).done(function (rs) {
+
+        })
+    }
+
+</script>

@@ -1,0 +1,40 @@
+<meta title=""/>
+<div style="width: 250px;">
+	<ul id="navbarRight" class="nav navbar-nav pull-right collapse navbar-collapse">
+		<li class="dropdown">
+			<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" s="tpl"
+			   s-data="">
+				<span>{%=APP_CONTEXT.username%}<span class="caret"></span></span>
+			</a>
+			<ul class="dropdown-menu dropdown-menu-right animated flipInX m-t-xs">
+				<li><a href="popup:/manager/modify-pwd.html">修改密码</a></li>
+				<li><a href="/logout" external>退出</a></li>
+			</ul>
+		</li>
+	</ul>
+</div>
+<audio id="baojiaAudio" style="display: none;" preload="auto" src="/images/baojiatixing.mp3"></audio>
+<script>
+  var lastWaitNum = 0;
+  function waitVerifyLoad() {
+
+    S.get("/api/food-quote-sheet/wait-verify-num").done(function (num) {
+      if (num) {
+        if (lastWaitNum !== num) {
+          var i = 0;
+          var interval = setInterval(function () {
+            i++
+            $baojiaAudio.node[0].play()
+            if (i == 3) {
+              clearInterval(interval)
+            }
+          }, 5000)
+        }
+        lastWaitNum = num;
+      }
+      setTimeout(waitVerifyLoad, 10000)
+    })
+  }
+
+  // waitVerifyLoad();
+</script>

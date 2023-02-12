@@ -1,0 +1,169 @@
+{
+  "description": "王小菜商家版",
+  "setting": {
+    "urlCheck": false,
+    "es6": false,
+    "enhance": false,
+    "postcss": false,
+    "preloadBackgroundData": false,
+    "minified": false,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "uglifyFileName": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "compileHotReLoad": false,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    },
+    "enableEngineNative": false,
+    "bundle": false,
+    "useIsolateContext": true,
+    "useCompilerModule": true,
+    "userConfirmedUseCompilerModuleSwitch": false,
+    "userConfirmedBundleSwitch": false,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "useApiHostProcess": false
+  },
+  "compileType": "miniprogram",
+  "appid": "wxfe28b7f6d2a578a2",
+  "projectname": "%E7%8E%8B%E5%B0%8F%E8%8F%9C%E5%95%86%E5%AE%B6%E7%89%88",
+  "miniprogramRoot": "dist/",
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {},
+  "condition": {
+    "search": {
+      "list": []
+    },
+    "conversation": {
+      "list": []
+    },
+    "plugin": {
+      "list": []
+    },
+    "game": {
+      "list": []
+    },
+    "gamePlugin": {
+      "list": []
+    },
+    "miniprogram": {
+      "list": [
+        {
+          "id": -1,
+          "name": "报价单",
+          "pathName": "pages/food-quote-sheet",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "报价",
+          "pathName": "pages/quote",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "订单",
+          "pathName": "pages/order",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "报价",
+          "pathName": "pages/quote",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "tixian",
+          "pathName": "pages/withdraw",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "liusu",
+          "pathName": "pages/wallet-flow-detail-list",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "111",
+          "pathName": "pages/settlement-sheet-list",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "申请商品",
+          "pathName": "pages/food-apply",
+          "query": ""
+        },
+        {
+          "id": -1,
+          "name": "login",
+          "pathName": "pages/login",
+          "query": "",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/store-user-food-sku",
+          "pathName": "pages/store-user-food-sku",
+          "query": "foodId=2047322",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "skuList",
+          "pathName": "pages/store-user-food-sku",
+          "query": "foodId= 5409",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/store-user-food-sku",
+          "pathName": "pages/store-user-food-sku",
+          "query": "id=2047322",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/food-suppliers",
+          "pathName": "pages/food-suppliers",
+          "query": "",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/order-suppliers",
+          "pathName": "pages/order-suppliers",
+          "query": "id=410921",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/order",
+          "pathName": "pages/order",
+          "query": "id=410921",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/store-user-food-list",
+          "pathName": "pages/store-user-food-list",
+          "scene": null
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,205 @@
+<meta title="新增商品" args="food" width="700"/>
+<style>
+</style>
+<div class="p">
+    <form s="valid,form,nda,datac"
+          method="post"
+          action="/api/food"
+          s-data="food"
+          id="form" class="form-horizontal">
+        <table class="table table-striped table-bordered">
+            <tr s-valid-role="item">
+                <td style="width: 100px;">图片</td>
+                <td >
+                   <div s="tpl" id="icon" s-click="selectIcon()" s-valid-role="item">
+                       <img src="{%=this.picture || 'images/upload-bg.jpg'%}" class="adv-img" style="max-width: 150px; max-height: 150px;" />
+                       <input autocomplete="off" type="hidden" name="picture" s-valid-error="require()" value="{%=this.picture%}" />
+                   </div>
+                </td>
+            </tr>
+            <tr s-valid-role="item">
+                <td style="width: 100px;">视频</td>
+                <td >
+                    <div s="tpl" id="video" s-click="selectVideo()" s-valid-role="item">
+                        <video src="{%=this.video%}" autoplay  style="max-width: 150px; max-height: 150px;">
+                            您的浏览器不支持播放视频。
+                        </video>
+                        <input autocomplete="off" type="hidden" name="video" value="{%=this.video%}" />
+                    </div>
+                </td>
+            </tr>
+            <tr >
+                <td>名称</td>
+                <td>
+                    <input autocomplete="off" placeholder="输入商品名称" type="text"
+                           class="form-control" name="name" s-valid-error="require()" />
+                </td>
+            </tr>
+            <tr >
+                <td>饿了么品牌</td>
+                <td>
+                    <input autocomplete="off" placeholder="饿了么品牌" type="text" readonly
+                           s-click="selectEleBrand(this)"
+                           class="form-control" name="eleBrandName" />
+                </td>
+            </tr>
+            <!--<tr >-->
+                <!--<td>编码</td>-->
+                <!--<td>-->
+                    <!--<input autocomplete="off" placeholder="输入商品编码" type="text"-->
+                           <!--class="form-control" name="code"  />-->
+                <!--</td>-->
+            <!--</tr>-->
+            <tr >
+                <td>店铺类目</td>
+                <td>
+                    <div class="btn-group" style="width: 100%">
+                        <select
+                                s="select"
+                                id="parentCategoryName"
+                                name="parentCategoryName"
+                                s-build="S.get('/api/food-category/firstcategorylist')"
+                                s-select="{title: 'name', value: 'name'}"
+                                s-valid-error="require()"
+                                class="form-control">
+                            <option value="">选择一级分类</option>
+                        </select>
+                        <select
+                                s="select"
+                                id="categoryName"
+                                name="categoryName"
+                                s-build-switch="'off-on'"
+                                s-select="{title: 'name', value: 'name'}"
+                                s-build="S.get('/api/food-category/childcategorylist?name={$parentCategoryName.node.val()}')"
+                                class="form-control">
+                            <option value="">选择二级分类</option>
+                        </select>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>美团类目</td>
+                <td>
+                    <input type="hidden" class="form-control dropdown-toggle" placeholder="美团类目" id="meituanTagId"
+                           s-valid-error="require()"
+                           name="meituanTagId" data-toggle="dropdown"/>
+                    <input type="text" readonly s-click="selectMeituanTag()" class="form-control dropdown-toggle"
+                           placeholder="美团类目" id="meituanTagName" s-valid-error="require()"
+                           name="meituanTagName" data-toggle="dropdown"/>
+                </td>
+            </tr>
+            <tr >
+                <td>起购量</td>
+                <td>
+                    <input autocomplete="off" placeholder="起购量" type="number"
+                           class="form-control" name="minOrderCount" s-valid-error="require()" />
+                </td>
+            </tr>
+            <tr >
+                <td>单位</td>
+                <td>
+                    <input autocomplete="off" placeholder="单位" type="text"
+                           class="form-control" name="unit" s-valid-error="require()" />
+                </td>
+            </tr>
+            <tr >
+                <td>加价百分比</td>
+                <td>
+                    <input autocomplete="off" placeholder="加价百分比" type="number"
+                           class="form-control" name="perIncrease" s-valid-error="require()" />
+                </td>
+            </tr>
+            <tr >
+                <td>包装盒数量</td>
+                <td>
+                    <input autocomplete="off" placeholder="包装盒数量" type="number"
+                           class="form-control" name="boxNum" s-valid-error="require()" />
+                </td>
+            </tr>
+            <tr >
+                <td>包装盒单价</td>
+                <td>
+                    <input autocomplete="off" placeholder="包装盒单价" type="number"
+                           class="form-control" name="boxPrice" s-valid-error="require()" />
+                </td>
+            </tr>
+            <tr >
+                <td>商品描述</td>
+                <td>
+                    <input autocomplete="off" placeholder="商品描述" type="text"
+                           class="form-control" name="description" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<script type="text/javascript">
+    S.meta.btns = [
+        {
+            name: "确定",
+            style: "btn btn-primary",
+            click: function() {
+                return $form.submit().done(function(rs) {
+                    S.close(rs)
+                })
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function() {
+                S.close();
+            }
+        }
+    ]
+
+    S.on("s-ready", function(){
+        S.cascade($parentCategoryName, $categoryName);
+    })
+
+    function selectEleBrand($this) {
+			S.popupOpen("/ele/brand-selector.html").done(function(brandList) {
+				if(brandList) {
+					$this.node.val(brandList[0].brandName)
+				}
+			})
+    }
+
+    function selectIcon() {
+      S.popupOpen("/oss/objects-selector.html", {prefix: 'adv'}).done(function(datas) {
+        if(datas) {
+          var icon = datas[0];
+          $icon.data({
+            picture: icon.url,
+          })
+        }
+      })
+    }
+
+    function selectVideo() {
+        S.popupOpen("/oss/objects-selector.html", {prefix: 'adv'}).done(function(datas) {
+            if(datas) {
+                var icon = datas[0];
+                var target = 'mp4';
+                var start = icon.url.length-target.length;
+                var arr = icon.url.substr(start,target.length);
+                if(arr != target){
+                    return;
+                }
+                $video.data({
+                    video: icon.url,
+                })
+            }
+        })
+    }
+
+	function selectMeituanTag() {
+		S.popupOpen("/meituan-waimai/tag-selector.html", {prefix: 'adv'}).done(function (tag) {
+			if (tag) {
+				$meituanTagName.node.val(tag.namePath)
+				$meituanTagId.node.val(tag.id)
+			}
+		})
+	}
+
+</script>

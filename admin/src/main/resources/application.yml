@@ -1,0 +1,19 @@
+server:
+  port: 8084
+
+manager:
+  username: tg
+  password: 123456
+
+jsse:
+  enableSNIExtension: false
+spring:
+  session:
+    store-type: hash_map
+  http:
+    multipart:
+      max-file-size: 300MB
+      max-request-size: 300MB
+  kafka:
+    consumer:
+      group-id: admin

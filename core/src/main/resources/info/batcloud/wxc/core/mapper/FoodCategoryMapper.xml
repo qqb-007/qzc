@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="info.batcloud.wxc.core.mapper.FoodCategoryMapper">
+
+  <select id="findCategoryWithFoodNum"
+          resultType="info.batcloud.wxc.core.mapper.domain.FoodCategoryWithFoodNum">
+    select category_name as `name`,
+           count(1)      as food_num,
+           fc.id         as id
+    from food_category fc
+           left join food f on fc.name = f.category_name
+    where f.deleted = 0
+    group by category_name, fc.id
+    order by fc.idx asc
+  </select>
+
+  <resultMap type="info.batcloud.wxc.core.mapper.domain.FirstFoodCategory" id="firstCategoryMap">
+    <id property="id" column="aid"/>
+    <result property="idx" column="aidx"/>
+      <result property="meituanTagId" column="ameituantagid"/>
+      <result property="meituanTagName" column="ameituantagname"/>
+      <result property="jingdongTagId" column="ajingdongtagid"/>
+      <result property="jingdongTagName" column="ajingdongtagname"/>
+    <result property="name" column="aname"/>
+    <result property="level" column="alevel"/>
+    <result property="parentId" column="aparentid"/>
+    <collection property="foodCategories" ofType="info.batcloud.wxc.core.entity.FoodCategory">
+      <id property="id" column="bid"/>
+      <result property="name" column="bname"/>
+      <result property="idx" column="bidx"/>
+        <result property="meituanTagId" column="bmeituantagid"/>
+        <result property="meituanTagName" column="bmeituantagname"/>
+        <result property="jingdongTagId" column="bjingdongtagid"/>
+        <result property="jingdongTagName" column="bjingdongtagname"/>
+      <result property="parentId" column="bparentid"/>
+      <result property="level" column="blevel"/>
+    </collection>
+  </resultMap>
+
+  <select id="findAllFirstCategory" resultMap="firstCategoryMap">
+    select a.id        aid,
+           a.name      aname,
+           a.parent_id aparentid,
+           a.level     alevel,
+           a.idx       aidx,
+           a.meituan_tag_id ameituantagid,
+           a.meituan_tag_name ameituantagname,
+           a.jingdong_tag_id ajingdongtagid,
+           a.jingdong_tag_name ajingdongtagname,
+           b.id        bid,
+           b.name      bname,
+           b.parent_id bparentid,
+           b.level     blevel,
+           b.meituan_tag_id bmeituantagid,
+           b.meituan_tag_name bmeituantagname,
+           b.jingdong_tag_id bjingdongtagid,
+           b.jingdong_tag_name bjingdongtagname,
+           b.idx       bidx
+    from food_category a
+           left join
+         food_category b on a.id = b.parent_id
+    where a.level = 0
+    order by a.idx asc
+  </select>
+
+  <select id="findFirstCategoryById" resultMap="firstCategoryMap">
+    select a.id        aid,
+           a.name      aname,
+           a.parent_id aparentid,
+           a.level     alevel,
+           a.idx       aidx,
+           b.id        bid,
+           b.name      bname,
+           b.parent_id bparentid,
+           b.level     blevel,
+           b.idx       bidx
+    from food_category a
+           left join
+         food_category b on a.id = b.parent_id
+    where a.id = #{id}
+  </select>
+</mapper>

@@ -1,0 +1,27 @@
+<meta title="新建文件夹" args="parent" width="400px"/>
+<form class="form-inline p" s="form,valid"
+      method="post"
+      action="/api/oss/folder"
+      id="form">
+    <input autocomplete="off" type="hidden" name="parent" s s-data="parent" />
+    <span s s-data="parent"></span> <input autocomplete="off" type="text" s-valid-error="require()" class="form-control" name="name" />
+</form>
+<script>
+    S.meta.btns = [
+        {
+            name: "新建",
+            style: "btn btn-primary",
+            click: function () {
+                return $form.submit().done(function(rs){
+                    S.close(rs);
+                })
+            }
+        },
+        {
+            name: "关闭",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+</script>

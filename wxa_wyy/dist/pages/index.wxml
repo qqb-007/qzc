@@ -1,0 +1,117 @@
+
+  <view class="container">
+    <view class="top">
+      <view class="top-item">
+        <view class="top-val">{{bizData.total}}</view>
+        <view class="top-txt">今日订单收入/元</view>
+      </view>
+      <div class="top-item">
+        <view class="top-val">{{bizData.validOrderNum}}</view>
+        <view class="top-txt">今日单量/单</view>
+      </div>
+    </view>
+    <view class="menu">
+      <view class="menu-button" bindtap="open" data-wpyopen-a="order">订单</view>
+      <view class="menu-button" bindtap="open" data-wpyopen-a="food-list">加菜</view>
+      <view class="menu-button" bindtap="open" data-wpyopen-a="store-user-food-list">商品</view>
+    </view>
+    <view class="tabs">
+      <i-tabs current="{{dayType}}" color="{{tabColor}}" bindchange="dayChange">
+        <i-tab key="last1Days" title="昨日"/>
+        <i-tab key="last7Days" title="近7天"/>
+        <i-tab key="last30Days" title="近30天"/>
+        <i-tab key="customDays" title="自定义"/>
+      </i-tabs>
+    </view>
+    <view class="time-range-bar"  wx:if="{{dayType === 'customDays'}}">
+      <picker bindchange="bindPickerChange" data-key="startDate" mode="date" value="{{startDate}}" end="{{endDate}}">
+        <view class="day-input">{{startDate}}</view>
+      </picker>
+      <view>至</view>
+      <picker bindchange="bindPickerChange" data-key="endDate" mode="date" value="{{endDate}}" start="{{startDate}}" end="{{maxDate}}">
+        <view class="day-input">{{endDate}}</view>
+      </picker>
+    </view>
+    <view class="grid biz-data-grid" bindtap="toggleDetailShow">
+      <view class="grid-row">
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title"><text>营业额</text> <text class="iconfont icon-detail {{showDetail ? 'icon-detail-show' : ''}}"/></view>
+          <view class="biz-cell-val">¥{{dayBizData.total}}</view>
+          <view class="biz-cell-plat-info"  wx:if="{{showDetail}}">
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.meituanTotal}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.eleTotal}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title">单均价</view>
+          <view class="biz-cell-val">¥{{dayBizData.perFee}}</view>
+          <view class="biz-cell-plat-info" wx:if="{{showDetail}}">
+            <view class="biz-cell-plat" wx:if="{{showDetail}}">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.meituanPerFee}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">¥{{dayBizData.elePerFee}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="grid-row">
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title">
+            有效订单
+          </view>
+          <view class="biz-cell-val">{{dayBizData.validOrderNum}}单</view>
+          <view class="biz-cell-plat-info" wx:if="{{showDetail}}">
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">{{dayBizData.meituanValidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">{{dayBizData.eleValidOrderNum}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="grid-item biz-cell">
+          <view class="biz-cell-title">无效订单</view>
+          <view class="biz-cell-val">{{dayBizData.invalidOrderNum}}单</view>
+          <view class="biz-cell-plat-info" wx:if="{{showDetail}}">
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-m">美</text>
+              <text class="biz-cell-plat-val">{{dayBizData.meituanInvalidOrderNum}}</text>
+            </view>
+            <view class="biz-cell-plat">
+              <text class="biz-cell-plat-e">饿</text>
+              <text class="biz-cell-plat-val">{{dayBizData.eleInvalidOrderNum}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="balance-card">
+      <view class="balance-card-left">
+        <view class="balance-card-dqye">当前余额</view>
+        <view class="balance-card-value" bindtap="open" data-wpyopen-a="wallet-flow-detail-list">
+          <text class="balance-card-value-y"> ¥</text>
+          <text class="balance-card-value-l">{{wallet.moneyInt}}</text>
+          <text class="balance-card-value-r">.{{wallet.moneyDecimal}}</text>
+          <text class="balance-card-value-detail-btn">余额流水</text>
+        </view>
+        <view class="balance-card-ljsr">累计收入</view>
+        <view class="balance-card-ljsr-value"> ¥ {{obtainedMoney}}</view>
+      </view>
+      <view class="balance-card-withdraw-btn" bindtap="withdraw">立即提现</view>
+      <view class="balance-card-sd" bindtap="open" data-wpyopen-a="settlement-sheet-list">
+        <view/>
+        <view>查询历史账单>></view>
+      </view>
+    </view>
+  </view>

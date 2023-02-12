@@ -1,0 +1,40 @@
+<meta title="提现配置" args="data"/>
+<style>
+
+</style>
+<form class="form-horizontal" id="form" s="form,datac,nda,valid" s-data="data" style="width: 600px;">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">开启提现</label>
+        <div class="col-sm-9">
+            <label class="s-checkbox-switch">
+                <input autocomplete="off" type="checkbox" name="openWithdraw" value="true" />
+                <span class="s-checkbox-indicator"></span>
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">自动审核</label>
+        <div class="col-sm-9">
+            <label class="s-checkbox-switch">
+                <input autocomplete="off" type="checkbox" name="autoVerify" value="true" />
+                <span class="s-checkbox-indicator"></span>
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">最小提现金额</label>
+        <div class="col-sm-9">
+            <input autocomplete="off" type="number" class="form-control" name="minWithdrawValue" placeholder="最小提现金额"
+                   s-valid-error="require(),number()"/>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    S.getContent = function () {
+        var deferred = $.Deferred();
+        $form.validate().done(function() {
+            deferred.resolve(Smart.serializeToObject($form.node))
+        })
+        return deferred;
+    }
+</script>

@@ -1,0 +1,57 @@
+<meta title="角色管理" />
+<div class="container-fluid space-v">
+    <div class="p">
+        <div class="p-b-xs">
+            <input type="button" class="btn btn-default btn-xs" value="新建角色"
+                   s-click="S.popupOpen('/manager-permission/role/role-add.html').done(function(flag){flag && $rolesGrid.refresh()})"/>
+        </div>
+        <div id="rolesGrid"
+             s='datac,nda'
+             s-data="S.get('/api/role/list')">
+            <table class="table table-striped table-bordered table-hover table-condensed" style="width: 100%;">
+                <tr>
+                    <th>角色名</th>
+                    <th>状态</th>
+                    <th class="text-right">操作</th>
+                </tr>
+                <tbody s="loop" id="roleLoop">
+                <tr s-loop-role="empty">
+                    <td colspan="3">
+                        未查询到角色信息
+                    </td>
+                </tr>
+                <tr s-loop-role="row" s="datac,row" s-check-role="i">
+                    <td name="name"></td>
+                    <td s="tpl">
+                        {%if(this.valid){%}
+                        <span class="label label-success">正常</span>
+                        {%} else {%}
+                        <span class="label label-default">冻结</span>
+                        {%}%}
+                    </td>
+                    <td class="text-right" s="tpl">
+                        <input type="button" class="btn btn-xs btn-outline btn-success" value="权限"
+                               s-click="S.popupOpen('/manager-permission/role/role-permission.html', {role: this.parent().data()})" />
+                        <input type="button" class="btn btn-xs btn-outline btn-primary" s-click="edit(this)" value="编辑" />
+                        <input type="button" class="btn btn-xs btn-outline btn-danger" s-click="del(this)" value="删除" />
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function del(s){
+        S.confirm("确定删除吗？").done(function(){
+            S.remove("/api/role/" + s.parent().data().id).done(function(rs){
+                $rolesGrid.refresh();
+            });
+        });
+    }
+    function edit(s){
+        S.popupOpen("/manager-permission/role/role-edit.html", {role: s.parent().data()}).done(function(rs){
+            rs && $rolesGrid.refresh();
+        });
+    }
+</script>

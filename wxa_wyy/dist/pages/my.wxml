@@ -1,0 +1,33 @@
+
+  <view class="container">
+    <view class="page-head">
+      <text class="page-title text-title">个人中心</text>
+    </view>
+    <i-cell-group>
+      <i-cell title="商家ID" value="{{storeUser.id}}"/>
+      <i-cell title="商家编号" value="{{storeUser.code}}"/>
+      <i-cell title="名称" value="{{storeUser.name}}"/>
+      <i-cell title="手机号" value="{{storeUser.phone}}"/>
+      <i-cell title="地址" value="{{storeUser.address}}"/>
+    </i-cell-group>
+    <view class="cell-group">
+      <i-cell-group>
+        <i-cell title="我的供应商" bindclick="open" is-link="is-link" data-wpyopen-a="/pages/food-suppliers"/>
+      </i-cell-group>
+    </view>
+    <view class="cell-group">
+      <i-cell-group>
+        <i-cell title="业务经理" label="如遇问题，请联系我帮您解决问题" bindclick="tel" is-link="is-link" value="{{storeUser.bizManager ? (storeUser.bizManager.name) : '未分配'}}" data-wpytel-a="{{storeUser.bizManager ? storeUser.bizManager.phone : ''}}"/>
+        <i-cell title="业务经理1" label="如遇问题，请联系我帮您解决问题" bindclick="tel" is-link="is-link" value="{{storeUser.bizManager2 ? (storeUser.bizManage2r.name) : '未分配'}}" data-wpytel-a="{{storeUser.bizManager2 ? storeUser.bizManager2.phone : ''}}"/>
+      </i-cell-group>
+    </view>
+    <view class="cell-group">
+      <i-cell-group>
+        <i-cell title="打印机" label="点击扫描打印机底部二维码进行绑定" bindclick="addPrinter" is-link="is-link" value="{{storeUser.feiePrinterSn ? ('已绑定 ' + storeUser.feiePrinterSn) : '未绑定'}}" data-wpyaddprinter-a=""/>
+      </i-cell-group>
+    </view>
+
+    <view class="bottom">
+      <i-button type="error" bindtap="logout" data-wpylogout-a="">退出登录</i-button>
+    </view>
+  </view>

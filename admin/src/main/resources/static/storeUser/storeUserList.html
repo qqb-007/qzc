@@ -1,0 +1,426 @@
+<meta title="商家"/>
+<div class="p">
+	<div class="panel panel-orange">
+		<div class="panel-heading">
+			<span class="h3">商家</span>
+		</div>
+		<div class="panel-body">
+			<div class="p-b clearfix">
+				<form class="form-inline pull-left" id="storeUsersSearchForm" s="form"
+							s-form="{action:function(){$page.node.val(1); $storeUsersGrid.refresh()}}"
+				>
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="手机号"
+								 style="width:150px;" name="phone"/>
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="姓名"
+								 style="width:150px;" name="name"/>
+					<input autocomplete="off" type="text" class="form-control input-sm" placeholder="编码"
+								 style="width:150px;" name="code"/>
+					<input type="hidden" name="storeUserType" name="BOSS" />
+					<div class="form-control s-select input-sm " style="width: 150px;"
+							 s="select"
+							 id="province"
+							 s-valid-label="省份"
+							 s-build="S.get('api/region/list/0')">
+						<input autocomplete="off" type="hidden" name="provinceId" class="s-select-input"/>
+						<div class="s-select-mirror">
+							<span></span>
+							<i class="fa fa-caret-down"></i>
+						</div>
+						<div class="s-select-panel">
+							<input autocomplete="off" type="text" class="s-select-filter">
+							<ul class="s-select-list">
+								<li class="s-select-list-item" value="">选择省份</li>
+							</ul>
+						</div>
+					</div>
+					<div class="form-control s-select input-sm" style="width: 150px;"
+							 s="select"
+							 id="city"
+							 s-data="''"
+							 s-build-switch="'off-on'"
+							 s-select="{title: 'name'}"
+							 s-build="S.get('api/region/list/' + ($province.val() || -1))">
+						<input autocomplete="off" type="hidden" class="s-select-input" name="cityId"/>
+						<div class="s-select-mirror">
+							<span></span>
+							<i class="fa fa-caret-down"></i>
+						</div>
+						<div class="s-select-panel">
+							<input autocomplete="off" type="text" class="s-select-filter">
+							<ul class="s-select-list">
+								<li class="s-select-list-item" value="">选择城市</li>
+							</ul>
+						</div>
+					</div>
+					<div class="form-control s-select input-sm" style="width: 150px;"
+							 s="select"
+							 id="district"
+							 s-data="''"
+							 s-build-switch="'off-on'"
+							 s-select="{title: 'name'}"
+							 s-build="S.get('api/region/list/' + ($city.val() || -1))">
+						<input autocomplete="off" type="hidden" class="s-select-input" name="districtId"/>
+						<div class="s-select-mirror">
+							<span></span>
+							<i class="fa fa-caret-down"></i>
+						</div>
+						<div class="s-select-panel">
+							<input autocomplete="off" type="text" class="s-select-filter">
+							<ul class="s-select-list">
+								<li class="s-select-list-item" value="">选择区域</li>
+							</ul>
+						</div>
+					</div>
+					<div style="padding-top: 10px;">
+						<select class="form-control input-sm" name="meituanOpened">
+							<option value="">美团开店</option>
+							<option value="true">已开店</option>
+							<option value="false">未开店</option>
+						</select>
+						<select class="form-control input-sm" name="clbmOpened">
+							<option value="">菜老板美开店</option>
+							<option value="true">已开店</option>
+							<option value="false">未开店</option>
+						</select>
+						<select class="form-control input-sm" name="eleOpened">
+							<option value="">饿百开店</option>
+							<option value="true">已开店</option>
+							<option value="false">未开店</option>
+						</select>
+						<select class="form-control input-sm" name="wanteOpened">
+							<option value="">客户端开店</option>
+							<option value="true">已开店</option>
+							<option value="false">未开店</option>
+						</select>
+						<select class="form-control input-sm" name="jddjOpened">
+							<option value="">京东到家开店</option>
+							<option value="true">已开店</option>
+							<option value="false">未开店</option>
+						</select>
+						<select class="form-control input-sm" name="opened">
+							<option value="">开店状态</option>
+							<option value="true">已开店</option>
+							<option value="false">未开店</option>
+						</select>
+						<select class="form-control input-sm" name="autoReceiptOrder">
+							<option value="">自动接单</option>
+							<option value="true">是</option>
+							<option value="false">否</option>
+						</select>
+						<select class="form-control input-sm" s="select"
+										name="settleType"
+										s-build="S.get('/api/enum/valuesMap/core.enums.SettleType')">
+							<option value="">结算方式</option>
+						</select>
+						<select class="form-control input-sm" s="select"
+										name="status"
+										s-build="S.get('/api/enum/valuesMap/core.enums.StoreUserStatus?igNames=DELETED')">
+							<option value="">选择状态</option>
+						</select>
+						<input autocomplete="off" type="hidden" name="page" id="page"/>
+						<input autocomplete="off" type="submit" class="btn btn-primary btn-sm" value="查找"/>
+					</div>
+				</form>
+				<div class="pull-right">
+					<div class="btn-group">
+						<a href="javascript:;" class="btn btn-default btn-sm"
+							 s-click="S.popupOpen('/storeUser/storeUser-add.html').done(function(flag){flag && $storeUsersGrid.refresh()})">
+							<i class="fa fa-plus"></i> 新建
+						</a>
+						<a href="javascript:;" class="btn btn-default btn-sm" s-click="lock(false)">
+							<i class="fa fa-unlock-alt"></i> 激活
+						</a>
+						<a href="javascript:;" class="btn btn-default btn-sm" s-click="lock(true)">
+							<i class="fa fa-lock"></i> 锁定
+						</a>
+						<a href="javascript:;" class="btn btn-default btn-sm" s-click="setStatus('DELETED')">
+							<i class="fa fa-remove"></i> 删除
+						</a>
+
+						<a href="javascript:;" class="btn btn-default btn-sm" s-click="getYlyToken()">
+							<i class="fa fa-remove"></i> 更新易联云token
+						</a>
+					</div>
+					<div id="pager" s="pager"
+							 s-pager="{action: function(){$page.node.val(this); $storeUsersGrid.refresh()}}"
+							 class="btn-group ">
+						<button class="btn btn-default btn-sm s-pager-prev"><i class="fa fa-arrow-left"></i></button>
+						<button class="btn btn-default btn-sm s-pager-next"><i class="fa fa-arrow-right"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="" id="storeUsersGrid" s='check,datac,nda'
+
+					 s-data="S.get('/api/store-user/search', $storeUsersSearchForm.node.serialize())">
+				<table class="table table-striped table-hover table-bordered" style="width: 100%;">
+					<tr>
+						<th style="width: 1px;">
+							<label class="s-checkbox">
+								<input autocomplete="off" type="checkbox" s-check-role="checkall-h"/>
+								<span class="s-checkbox-indicator"></span>
+							</label>
+						</th>
+						<th>ID</th>
+						<th>姓名</th>
+						<th>业务经理</th>
+						<th>外包经理</th>
+						<th class="text-center">加价(%)</th>
+						<th>地址</th>
+						<th class="text-center">结算方式</th>
+						<th class="text-center">扣点(%)</th>
+						<!--<th class="text-center">银行卡</th>-->
+						<th>创建时间</th>
+						<th class="text-center">开店</th>
+						<th class="text-center">接单</th>
+						<th class="text-center">状态</th>
+						<th class="text-right">操作</th>
+					</tr>
+					<tbody s="loop" s-data-filter="'results'">
+					<tr s-loop-role="empty">
+						<td colspan="15">
+							<div class="s-ui-none-data-info text-center"><i class="fa fa-info-circle text-info"></i>
+								未查询到商家
+							</div>
+						</td>
+					</tr>
+					<tr s-loop-role="row" s="datac,row" s-check-role="i">
+						<td>
+							<label class="s-checkbox">
+								<input autocomplete="off" type="checkbox" s-check-role="h"/>
+								<span class="s-checkbox-indicator"></span>
+							</label>
+						</td>
+						<td name="id"></td>
+						<td>
+							<div name="name"></div>
+							<div name="phone"></div>
+						</td>
+						<td>
+							<span name="bizManager.name"></span> <span name="bizManager.phone"></span>
+							<input type="button" class="btn btn-xs btn-info btn-outline" s-click="bindBizManager(this)"
+										 value="绑定"/>
+						</td>
+						<td>
+							<span name="bizManager2.name"></span> <span name="bizManager2.phone"></span>
+							<input type="button" class="btn btn-xs btn-info btn-outline" s-click="bindBizManager2(this)"
+								   value="绑定"/>
+						</td>
+						<td name="priceIncrease" class="text-center"></td>
+						<td style="width: 200px;">
+							<div>
+								<span name="province.name"></span>
+								<span name="city.name"></span>
+								<span name="district.name"></span>
+							</div>
+							<span name="address"></span>
+						</td>
+						<td name="settleTypeTitle"></td>
+						<td name="deductPoint"></td>
+						<!--<td class="text-center">-->
+							<!--<div>-->
+								<!--<span name="bankAccountName"></span>-->
+								<!--<a href="javascript:;" class="btn btn-success btn-outline btn-xs"-->
+									 <!--s-click="editBank(this)">修改</a>-->
+							<!--</div>-->
+							<!--<div>-->
+								<!--<span name="bankAccount"></span>-->
+							<!--</div>-->
+							<!--<span name="bankName"></span>-->
+						<!--</td>-->
+						<td name="createTime"></td>
+						<td class="text-center" s="tpl">
+							<span class="label {%=this.meituanOpened ? 'label-success' : 'label-default'%}">{%=this.meituanOpened ? '美团' : '美团'%}</span>
+							<span class="label {%=this.clbmOpened ? 'label-success' : 'label-default'%}">{%=this.clbmOpened ? '菜老板美' : '菜老板美'%}</span>
+							<span class="label {%=this.eleOpened ? 'label-success' : 'label-default'%}">{%=this.eleOpened ? '饿百' : '饿百'%}</span>
+                            <span class="label {%=this.wanteOpened ? 'label-success' : 'label-default'%}">{%=this.wanteOpened ? '客户端' : '客户端'%}</span>
+							<span class="label {%=this.jddjOpened ? 'label-success' : 'label-default'%}">{%=this.jddjOpened ? '京东到家' : '京东到家'%}</span>
+							<span
+									class="label {%=this.opened ? 'label-success' : 'label-default'%}">{%=this.opened ? '已开' : '未开'%}</span>
+						</td>
+						<td class="text-center" s="tpl">
+							<a href="javascript:;" s-click="autoReceiptOrder(this)"
+								 class="label {%=this.autoReceiptOrder ? 'label-success' : 'label-default'%}">{%=this.autoReceiptOrder ?
+								'自动' : '自动'%}</a>
+							{%if(this.feiePrinterSn) {%}
+							<a href="javascript:;" s-click="delFeie(this)"
+							   class="label label-success">解绑飞蛾</a>
+							{%}%}
+
+							{%if(this.xyySn) {%}
+							<a href="javascript:;" s-click="delXyy(this)"
+							   class="label label-success">解绑芯烨云</a>
+							{%}%}
+
+							{%if(this.machineCode) {%}
+							<a href="javascript:;" s-click="delYiLian(this)"
+							   class="label label-success">解绑易联云</a>
+							{%}%}
+						</td>
+						<td class="text-center" s="tpl">
+							<span class="label {%=this.status == 'INVALID' ? 'label-danger' : 'label-success'%}">{%=this.status == 'VALID' ? '正常' : '锁定'%}</span>
+						</td>
+						<td class="text-right">
+							<div style="display: inline-block" s="tpl">
+								{%if(this.status == 'INVALID') {%}
+								<a href="javascript:;" class="btn btn-warning btn-outline btn-xs"
+									 s-click="lock(this, false)">
+									<i class="fa fa-unlock-alt"></i> 激活
+								</a>
+								{%} else {%}
+								<a href="javascript:;" class="btn btn-danger btn-outline btn-xs"
+									 s-click="lock(this, true)">
+									<i class="fa fa-lock"></i> 锁定
+								</a>
+								{%}%}
+
+								<a href="javascript:;" s-click="delSms(this)"
+								   class="label label-success">重置验证码</a>
+
+								<a href="javascript:;" s-click="createUU(this)"
+								   class="label label-success">创建UU店铺</a>
+
+								<a href="javascript:;" s-click="createSS(this)"
+								   class="label label-success">创建闪送店铺</a>
+
+								<!--<a href="javascript:;" s-click="createDD(this)"-->
+								   <!--class="label label-success">创建达达店铺</a>-->
+
+							</div>
+							<input type="button" class="btn btn-xs btn-default" value="供应商" s-click="S.popupOpen('/food-supplier/foodSupplierList.html', {storeUser: this.parent().data()})"/>
+							<input autocomplete="off" type="button" value="编辑" class="btn btn-primary btn-xs"
+										 s-click="var that = this; S.popupOpen('/storeUser/storeUser-edit.html', {storeUser: this.parent().data()}).done(function(rs){rs && $storeUsersGrid.refresh();})"/>
+							<div class="p-t-xs">
+								<input autocomplete="off" type="button" value="密码" class="btn btn-default btn-xs"
+											 s-click="S.popupOpen('/storeUser/modify-storeUser-pwd.html', {storeUser: this.parent().data()})"/>
+								<a href="javascript:;" class="btn btn-danger btn-outline btn-xs" s-click="remove(this)">
+									删除
+								</a>
+							</div>
+						</td>
+					</tr>
+					</tbody>
+					<tfoot>
+					<tr>
+						<td colspan="15" class="text-right" style="vertical-align: middle">
+							<ul s="pagination" id="storeUserPagination"
+									s-pagination="{action:function(){$page.node.val(this); $storeUsersGrid.refresh()}}"
+									class="pagination pagination-sm ">
+							</ul>
+						</td>
+					</tr>
+					</tfoot>
+				</table>
+
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	function lock($s, flag) {
+		S.confirm("确定操作吗？").done(function () {
+			S.put("/api/store-user/lock/" + flag, {ids: $s.parent().data().id}).done(function () {
+				$storeUsersGrid.refresh();
+			})
+		});
+	}
+
+	S.on('s-ready', function () {
+		S.cascade($province, $city, $district);
+	})
+
+	function remove($s) {
+		S.confirm("确定要删除吗？该操作不可恢复").done(function () {
+			S.remove("/api/store-user/" + $s.parent().data().id).done(function () {
+				$storeUsersGrid.refresh();
+			})
+		});
+	}
+
+    function createDD($s) {
+        S.put("/api/store-user/toggle/createDD/" + $s.parent().data().id).done(function () {
+            $storeUsersGrid.refresh();
+        })
+    }
+
+	// function editBank($s) {
+	// 	S.popupOpen('/storeUser/storeUser-bank.html', {storeUser: $s.parent().data()}).done(function (rs) {
+	// 		rs && $storeUsersGrid.refresh();
+	// 	})
+	// }
+
+	function bindBizManager($s) {
+		S.popupOpen('/employee/employeeSelector.html', {multi: false}).done(function (rs) {
+			if (rs) {
+				var data = $s.parent().data();
+				S.put("/api/store-user/bizManager/" + data.id, {employeeId: rs[0].id}).done(function () {
+					$storeUsersGrid.refresh();
+				})
+			}
+		})
+	}
+
+    function bindBizManager2($s) {
+        S.popupOpen('/employee/employeeSelector.html', {multi: false}).done(function (rs) {
+            if (rs) {
+                var data = $s.parent().data();
+                S.put("/api/store-user/bizManager2/" + data.id, {employeeId: rs[0].id}).done(function () {
+                    $storeUsersGrid.refresh();
+                })
+            }
+        })
+    }
+
+	function autoReceiptOrder($s) {
+		S.put("/api/store-user/toggle/auto-receipt-order/" + $s.parent().data().id).done(function () {
+			$storeUsersGrid.refresh();
+		})
+	}
+
+    function delFeie($s) {
+        S.put("/api/store-user/toggle/delFeie/" + $s.parent().data().id).done(function () {
+            $storeUsersGrid.refresh();
+        })
+    }
+
+    function delSms($s) {
+        S.put("/api/store-user/toggle/delSms/" + $s.parent().data().id).done(function () {
+            $storeUsersGrid.refresh();
+        })
+    }
+
+
+    function createUU($s) {
+        S.put("/api/store-user/toggle/createUU/" + $s.parent().data().id).done(function () {
+            $storeUsersGrid.refresh();
+        })
+    }
+
+    function createSS($s) {
+        S.put("/api/store-user/toggle/createSS/" + $s.parent().data().id).done(function () {
+            $storeUsersGrid.refresh();
+        })
+    }
+
+
+
+    function getYlyToken() {
+        S.put("/api/store-user/toggle/getYlyToken").done(function () {
+
+        })
+    }
+
+    function delYiLian($s) {
+        S.put("/api/store-user/toggle/delYiLian/" + $s.parent().data().id).done(function () {
+            $storeUsersGrid.refresh();
+        })
+    }
+
+    function delXyy($s) {
+        S.put("/api/store-user/toggle/delXyy/" + $s.parent().data().id).done(function () {
+            $storeUsersGrid.refresh();
+        })
+    }
+
+
+
+</script>
