@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/warehouse/")
-public class Controller {
+public class RequireGoodsController {
 
 }
