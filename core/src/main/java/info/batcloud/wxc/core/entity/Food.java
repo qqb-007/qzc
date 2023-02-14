@@ -33,6 +33,7 @@ public class Food implements Serializable {
 
     private Float boxNum;
 
+    //包装盒单价
     private Float boxPrice;
     //分类
     @NotNull
