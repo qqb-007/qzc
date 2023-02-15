@@ -90,7 +90,7 @@
 						   s-valid-error="require()"
 						   name="meituanTagId" data-toggle="dropdown"/>
 					<input type="text" readonly s-click="selectMeituanTag()" class="form-control dropdown-toggle"
-						   placeholder="美团类目" id="meituanTagName" s-valid-error="require()"
+						   placeholder="美团类目" id="meituanTagName"
 						   name="meituanTagName" data-toggle="dropdown"/>
 				</td>
 			</tr>
@@ -170,7 +170,7 @@
 
 
 	function selectIcon() {
-		S.popupOpen("/oss/objects-selector.html", {prefix: 'adv'}).done(function (datas) {
+		S.popupOpen("/oss/objects-selector.html", {prefix: 'qzc'}).done(function (datas) {
 			if (datas) {
 				var icon = datas[0];
 				$icon.data({
@@ -191,7 +191,7 @@
 	}
 
     function selectVideo() {
-        S.popupOpen("/oss/objects-selector.html", {prefix: 'adv'}).done(function(datas) {
+        S.popupOpen("/oss/objects-selector.html", {prefix: 'qzc'}).done(function(datas) {
             if(datas) {
                 var icon = datas[0];
                 var target = 'mp4';

@@ -19,10 +19,7 @@ import info.batcloud.wxc.core.domain.FoodQuoteSku;
 import info.batcloud.wxc.core.domain.FoodSku;
 import info.batcloud.wxc.core.domain.Propertie;
 import info.batcloud.wxc.core.domain.Result;
-import info.batcloud.wxc.core.dto.FoodDTO;
-import info.batcloud.wxc.core.dto.FoodSupplierDTO;
-import info.batcloud.wxc.core.dto.StoreUserDTO;
-import info.batcloud.wxc.core.dto.StoreUserFoodDTO;
+import info.batcloud.wxc.core.dto.*;
 import info.batcloud.wxc.core.entity.*;
 import info.batcloud.wxc.core.enums.*;
 import info.batcloud.wxc.core.exception.BizException;
@@ -5048,8 +5045,26 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         StoreUserFoodDTO dto = new StoreUserFoodDTO();
         BeanUtils.copyProperties(suf, dto);
         dto.setFood(foodService.toDTO(suf.getFood()));
-        dto.setSkuList(JSON.parseObject(suf.getFoodSkuJson(), new TypeReference<List<FoodSku>>() {
-        }));
+//        List<FoodSku> skuList = JSON.parseObject(suf.getFoodSkuJson(), new TypeReference<List<FoodSku>>() {
+//        });
+//        List<FoodSkuDTO> skuDTOS = new ArrayList<>();
+//        for (FoodSku foodSku : skuList) {
+//            FoodSkuDTO skuDTO = new FoodSkuDTO();
+//            BeanUtils.copyProperties(foodSku, skuDTO);
+//            if (StringUtils.isNotBlank(foodSku.getWarehouseIds())) {
+//                List<String> names = new ArrayList<>();
+//                String[] split = foodSku.getWarehouseIds().split(",");
+//                for (String s : split) {
+//                    Warehouse warehouse = warehouseRepository.findOne(Long.valueOf(s));
+//                    names.add(warehouse.getName());
+//                }
+//                skuDTO.setWareHouseNames(String.join("、", names));
+//            } else {
+//                skuDTO.setWareHouseNames("暂未绑定库位");
+//            }
+//            skuDTOS.add(skuDTO);
+//        }
+        //dto.setSkuList(skuDTOS);
         StoreUserFoodDTO.StoreUser su = new StoreUserFoodDTO.StoreUser();
         su.setId(suf.getStoreUser().getId());
         su.setName(suf.getStoreUser().getName());
@@ -5071,18 +5086,18 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
             dto.setWarningPrice(suf.getFoodQuoteReport().getWarningPrice());
             dto.setRefPrice(suf.getFoodQuoteReport().getRefPrice());
         }
-        if (StringUtils.isNotBlank(suf.getWarehouseIds())) {
-            String warehouseIds = suf.getWarehouseIds();
-            String[] split = warehouseIds.split(",");
-            List<String> names = new ArrayList<>();
-            for (String s : split) {
-                Warehouse warehouse = warehouseRepository.findOne(Long.valueOf(s));
-                names.add(warehouse.getName());
-            }
-            dto.setWarehouseName(String.join("、", names));
-        } else {
-            dto.setWarehouseName("暂未绑定库位");
-        }
+//        if (StringUtils.isNotBlank(suf.getWarehouseIds())) {
+//            String warehouseIds = suf.getWarehouseIds();
+//            String[] split = warehouseIds.split(",");
+//            List<String> names = new ArrayList<>();
+//            for (String s : split) {
+//                Warehouse warehouse = warehouseRepository.findOne(Long.valueOf(s));
+//                names.add(warehouse.getName());
+//            }
+//            dto.setWarehouseName(String.join("、", names));
+//        } else {
+//            dto.setWarehouseName("暂未绑定库位");
+//        }
         dto.setStoreUser(su);
         return dto;
     }

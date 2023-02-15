@@ -1,4 +1,4 @@
-<meta title="商品SKU" args="food:_model_,id" model="S.get('/api/food/' + id)" width="1000"/>
+<meta title="商品SKU" args="food:_model_,id" model="S.get('/api/food/' + id)" width="2000"/>
 <style>
 </style>
 <div class="p">
@@ -20,15 +20,20 @@
 			   class="table table-striped table-middle table-bordered form-inline">
 			<tr>
 				<th>排序</th>
-				<th>SkuId</th>
+				<!--<th>SkuId</th>-->
 				<th>规格名</th>
-				<th class="text-right">售价倍数</th>
-				<th class="text-right">报价倍数</th>
+				<th class="text-right">upc编码</th>
 				<th class="text-center">重量(g)</th>
-				<th class="text-center">不发布</th>
+				<th class="text-right">售卖单位</th>
+				<th class="text-right">进项税</th>
+				<th class="text-right">销项税</th>
+				<th class="text-right">起购数量</th>
+				<th class="text-right">包装盒数量</th>
+				<th class="text-right">包装盒单价</th>
+				<!--<th class="text-center">不发布</th>-->
 				<th class="text-right">操作</th>
 			</tr>
-			<tbody s="loop" s-data="food.skuList" id="skuList">
+			<tbody s="loop" s-data="food.skus" id="skuList">
 			<tr s-loop-role="empty">
 				<td colspan="8" class="alert alert-warning">
 					暂无SKU
@@ -38,32 +43,49 @@
 				<td>
 					<i class="fa fa-arrows"></i>
 				</td>
+				<!--<td>-->
+					<!--<input type="text" readonly class="form-control " style="width: 100%" placeholder="sku id" name="skuIdList"-->
+						   <!--s-data-filter="'skuId'" s-valid-error="require()"/>-->
+				<!--</td>-->
 				<td>
-					<input type="text" readonly class="form-control " style="width: 100%" placeholder="sku id" name="skuIdList"
-						   s-data-filter="'skuId'" s-valid-error="require()"/>
+					<input type="hidden" class="form-control"  style="width: 100%" name="idList"
+						   s-data-filter="'id'"/>
+					<input type="text" class="form-control" style="width: 100%" placeholder="规格名" name="nameList"
+						   s-data-filter="'name'" s-valid-error="require()"/>
 				</td>
 				<td>
-					<input type="text" class="form-control" style="width: 100%" placeholder="规格名" name="specList"
+					<input type="text" class="form-control" style="width: 100%" placeholder="upc编码" name="upcList"
+						   s-data-filter="'upc'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" style="width: 100%" placeholder="重量(g)"
+						   s-data-filter="'weight'" name="weightList" s-valid-error="require()"/>
+				</td>
+				<td>
+					<input type="text" class="form-control" style="width: 100%" placeholder="售卖单位" name="specList"
 						   s-data-filter="'spec'" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<input type="number" class="form-control text-right" style="width: 100%" placeholder="售价倍数"
-						   s-data-filter="'priceRatio'" name="priceRatioList" s-valid-error="require()"/>
+					<input type="number" step="0.1" class="form-control text-right" style="width: 100%" placeholder="进项税"
+						   s-data-filter="'inputTax'" name="inputTaxList" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<input type="number" class="form-control text-right" style="width: 100%" placeholder="报价倍数"
-						   s-data-filter="'quoteUnitRatio'" name="quoteUnitRatioList" s-valid-error="require()"/>
+					<input type="number" step="0.1" class="form-control text-right" style="width: 100%" placeholder="销项税"
+						   s-data-filter="'outputTax'" name="outputTaxList" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<input type="number" class="form-control text-right" style="width: 100%" placeholder="重量"
-						   s-data-filter="'weight'" name="weightList" s-valid-error="require()"/>
+					<input type="number" class="form-control text-right" style="width: 100%" placeholder="最小起购份数"
+						   s-data-filter="'minOrderCount'" name="minOrderCountList" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<select class="form-control" s-data-filter="'ignore'" name="ignoreList">
-						<option value="false">发布</option>
-						<option value="true">不发布</option>
-					</select>
+					<input type="number" class="form-control text-right" style="width: 100%" placeholder="包装盒数量"
+						   s-data-filter="'boxNum'" name="boxNumList" s-valid-error="require()"/>
 				</td>
+				<td class="text-right">
+					<input type="number" step="0.1" class="form-control text-right" style="width: 100%" placeholder="包装盒单价"
+						   s-data-filter="'boxPrice'" name="boxPriceList" s-valid-error="require()"/>
+				</td>
+
 				<td class="text-right" s="tpl">
 					{%if(this.delable) {%}
 					<input type="button" class="btn btn-xs btn-danger btn-outline"
@@ -105,12 +127,13 @@
 
 	function add(data) {
 		$skuList.addRow($.extend({
-			skuId: id + '-' + parseInt(Math.random() * 100000),delable: true
+			// skuId: id + '-' + parseInt(Math.random() * 100000),
+			delable: true
 		}, data))
 	}
 
 	S.on('s-ready', function () {
-		if (!food.skuList.length) {
+		if (!food.skus.length) {
 			add({
 				quoteUnitRatio: 1,
 				priceRatio: 1

@@ -48,6 +48,8 @@ public class FoodDTO {
 
     private List<FoodSku> skuList;
 
+    private List<FoodSkuDTO> skus;
+
     //报价规格
     private String quoteUnit;
 
@@ -435,5 +437,13 @@ public class FoodDTO {
 
     public void setClbPictureId(String clbPictureId) {
         this.clbPictureId = clbPictureId;
+    }
+
+    public List<FoodSkuDTO> getSkus() {
+        return skus;
+    }
+
+    public void setSkus(List<FoodSkuDTO> skus) {
+        this.skus = skus;
     }
 }
