@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.batcloud.wxc.core.service.warehouse.dao.RequireGoodsRelationDao">
+
+    <insert id="savaRequireGoodsRelationInfo"  parameterType="info.batcloud.wxc.core.entity.PreRequireGoodsOrdersRelation" >
+        insert into pre_require_goods_orders_relation(require_goods_id,food_id,food_name,food_num,food_price,create_time)
+        VALUES
+       <foreach collection="list" item="item" separator=",">
+           (#{item.requireGoodsId},#{item.foodId},#{item.foodName},#{item.foodNum},#{item.foodPrice},#{item.createTime})
+       </foreach>
+    </insert>
+</mapper>

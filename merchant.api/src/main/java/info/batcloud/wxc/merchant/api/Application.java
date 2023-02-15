@@ -3,6 +3,7 @@ package info.batcloud.wxc.merchant.api;
 import com.zaxxer.hikari.HikariDataSource;
 import info.batcloud.wxc.core.CommonConfig;
 import info.batcloud.wxc.merchant.api.comsumers.OrderConsumer;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -28,6 +29,7 @@ import javax.sql.DataSource;
 @EntityScan(basePackages = {"info.batcloud.wxc.core.entity"})
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableKafka
+@MapperScan("info.batcloud.wxc.core.service.warehouse.dao.RequireGoodsRelationDao")
 public class Application extends CommonConfig {
 
     @Inject

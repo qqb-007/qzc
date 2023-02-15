@@ -17,3 +17,5 @@ spring:
   kafka:
     consumer:
       group-id: admin
+mybatis:
+  mapper-locations: classpath:info/batcloud/wxc/core/mapper/*.xml
