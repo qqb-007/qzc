@@ -148,8 +148,11 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
             for (String s : split) {
                 wnames.add(warehouseRepository.findOne(Long.valueOf(s)).getName());
             }
+            dto.setWarehouseNames(String.join("、", wnames));
+        }else {
+            dto.setWarehouseNames("暂未绑定库位");
         }
-        dto.setWarehouseNames(String.join("、", wnames));
+
         dto.setPicture(foodRepository.findOne(dto.getFoodId()).getPicture());
         return dto;
     }

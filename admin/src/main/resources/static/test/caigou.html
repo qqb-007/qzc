@@ -69,19 +69,18 @@
             </table>
             <label class="col-sm-2 control-label">商品种类数量：</label>
             <div class="col-sm-10">
-                <input class="form-control goodsTypeNum"  rows="3" name="goodsTypeNum "/>
+                <input class="form-control goodsTypeNum" rows="3" name="goodsTypeNum "/>
             </div>
 
             <label class="col-sm-2 control-label">采购总数量：</label>
             <div class="col-sm-10">
-                <input class="form-control"  rows="3" name="procurementNum "/>
+                <input class="form-control" rows="3" name="procurementNum "/>
             </div>
-
 
 
             <label class="col-sm-2 control-label">采购总金额：</label>
             <div class="col-sm-10">
-                <input class="form-control"  rows="3" name="procurementPrice"/>
+                <input class="form-control" rows="3" name="procurementPrice"/>
             </div>
         </div>
     </form>
@@ -106,11 +105,13 @@
                         var numNode = row.find('.num');
                         var inputPrice = inputPriceNode.val()
                         var num = numNode.val()
+                        var foodName = row.find('.food-name').val()
                         var detail = {
                             foodId: foodId,
                             skuId: skuId,
                             inputPrice: inputPrice,
-                            num: num
+                            num: num,
+                            foodName: foodName
                         }
                         list.push(detail)
                     })

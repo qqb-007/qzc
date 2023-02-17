@@ -1,4 +1,4 @@
-<meta title="自定SKU" args="id,food:_model_,foodId,specialSkuIdList,eleSkuId" model="S.get('/api/store-user-food/' + id)" width="1000"/>
+<meta title="自定SKU" args="id,food:_model_,foodId,specialSkuIdList,eleSkuId" model="S.get('/api/store-user-food/' + id)" width="2000"/>
 <style>
 </style>
 <div class="p">
@@ -11,11 +11,16 @@
 				<th>选择</th>
 				<th>SkuId</th>
 				<th>规格名</th>
-				<th class="text-right">售价倍数</th>
-				<th class="text-right">报价倍数</th>
-				<th class="text-center">重量(g)</th>
-				<th class="text-center">库存</th>
-				<th class="text-center">不发布</th>
+				<th class="text-right">upc</th>
+				<th class="text-center">售卖单位</th>
+				<th class="text-right">重量(g)</th>
+				<th class="text-right">库存</th>
+				<th class="text-right">库位</th>
+				<th class="text-right">进价</th>
+				<th class="text-right">零售价</th>
+				<th class="text-center">最小起购份数</th>
+				<th class="text-center">包装盒数量</th>
+				<th class="text-center">包装盒单价</th>
 				<th class="text-right">排序</th>
 			</tr>
 			<tbody s="loop" s-data="food.skuList" id="skuList">
@@ -26,41 +31,78 @@
 			</tr>
 			<tr s-loop-role="row" s="datac" class="sku-tr">
 				<td s="tpl">
-					{%if(specialSkuIdList.indexOf(this.skuId) == -1) {%}
-					<input type="checkbox" name="specialSkuIdList" value="{%=this.skuId%}" />
+					{%if(specialSkuIdList.indexOf(this.foodSkuId) == -1) {%}
+					<input type="checkbox" name="specialSkuIdList" value="{%=this.foodSkuId%}" />
 					{%} else {%}
-					<input type="checkbox" checked="checked" name="specialSkuIdList" value="{%=this.skuId%}" />
+					<input type="checkbox" checked="checked" name="specialSkuIdList" value="{%=this.foodSkuId%}" />
 					{%}%}
+				</td>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="skuId" s s-data-filter="'foodSkuId'" s-valid-error="require()"/>
 
 				</td>
 				<td>
-					<input type="text" readonly class="form-control " style="width: 100%" placeholder="sku id" s s-data-filter="'skuId'" name="skuId" s-valid-error="require()"/>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="规格名" s s-data-filter="'name'" s-valid-error="require()"/>
 				</td>
 				<td>
-					<input type="text" class="form-control" readonly style="width: 100%" placeholder="规格名" s s-data-filter="'spec'" s-valid-error="require()"/>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="upc" s s-data-filter="'upc'" s-valid-error="require()"/>
 				</td>
-				<td class="text-right">
-					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="售价倍数"
-								 s s-data-filter="'priceRatio'" s-valid-error="require()"/>
-				</td>
-				<td class="text-right">
-					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="报价倍数"
-								 s s-data-filter="'quoteUnitRatio'" s-valid-error="require()"/>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="售卖单位" s s-data-filter="'spec'" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
 					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="重量"
-								 s s-data-filter="'weight'" s-valid-error="require()"/>
+						   s s-data-filter="'weight'" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
 					<input type="number" class="form-control text-right" style="width: 100%" placeholder="库存"
 						   s s-data-filter="'stock'" name="stock" s-valid-error="require()"/>
 				</td>
-				<td class="text-right">
-					<select class="form-control" s s-data-filter="'ignore'" disabled name="ignoreList">
-						<option value="false">发布</option>
-						<option value="true">不发布</option>
-					</select>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="库位" s s-data-filter="'warehouseNames'" s-valid-error="require()"/>
 				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" step="0.1" style="width: 100%" placeholder="进价"
+						   s s-data-filter="'inputPrice'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" step="0.1" style="width: 100%" placeholder="零售价"
+						   s s-data-filter="'inputPrice'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" style="width: 100%" placeholder="最小起购份数"
+						   s s-data-filter="'minOrderCount'" name="minOrderCount" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" style="width: 100%" placeholder="包装盒数量"
+						   s s-data-filter="'boxNum'" name="boxNum" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" step="0.1" style="width: 100%" placeholder="包装盒单价"
+						   s s-data-filter="'boxPrice'" s-valid-error="require()"/>
+				</td>
+
+
+				<!--<td>-->
+					<!--<input type="text" readonly class="form-control " style="width: 100%" placeholder="sku id" s s-data-filter="'skuId'" name="skuId" s-valid-error="require()"/>-->
+				<!--</td>-->
+
+				<!--<td class="text-right">-->
+					<!--<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="售价倍数"-->
+								 <!--s s-data-filter="'priceRatio'" s-valid-error="require()"/>-->
+				<!--</td>-->
+				<!--<td class="text-right">-->
+					<!--<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="报价倍数"-->
+								 <!--s s-data-filter="'quoteUnitRatio'" s-valid-error="require()"/>-->
+				<!--</td>-->
+
+
+				<!--<td class="text-right">-->
+					<!--<select class="form-control" s s-data-filter="'ignore'" disabled name="ignoreList">-->
+						<!--<option value="false">发布</option>-->
+						<!--<option value="true">不发布</option>-->
+					<!--</select>-->
+				<!--</td>-->
 				<td>
 					<i class="fa fa-arrows"></i>
 				</td>
@@ -74,10 +116,16 @@
 				<th>选择</th>
 				<th>SkuId</th>
 				<th>规格名</th>
-				<th class="text-right">售价倍数</th>
-				<th class="text-right">报价倍数</th>
-				<th class="text-center">重量(g)</th>
-				<th class="text-center">不发布</th>
+				<th class="text-right">upc</th>
+				<th class="text-center">售卖单位</th>
+				<th class="text-right">重量(g)</th>
+				<th class="text-right">库存</th>
+				<th class="text-right">库位</th>
+				<th class="text-right">进价</th>
+				<th class="text-right">零售价</th>
+				<th class="text-center">最小起购份数</th>
+				<th class="text-center">包装盒数量</th>
+				<th class="text-center">包装盒单价</th>
 				<th class="text-right">排序</th>
 			</tr>
 			<tbody s="loop" s-data="food.skuList">
@@ -86,49 +134,69 @@
 					暂无SKU
 				</td>
 			</tr>
-			<!--<tr s-loop-role="row" s="datac" class="sku-tr">-->
-				<!--<td s="tpl">-->
-					<!--{%if(eleSkuId !== this.skuId) {%}-->
-					<!--<label class="s-radio">-->
-						<!--<input type="radio" name="eleSkuId" class="radio-{%=this.skuId%}" value="{%=this.skuId%}" />-->
-						<!--<span class="s-radio-indicator"></span>-->
-					<!--</label>-->
-					<!--{%} else {%}-->
-					<!--<label class="s-radio">-->
-						<!--<input type="radio" checked="checked" name="eleSkuId" class="radio-{%=this.skuId%}"  value="{%=this.skuId%}" />-->
-						<!--<span class="s-radio-indicator"></span>-->
-					<!--</label>-->
-					<!--{%}%}-->
+			<tr s-loop-role="row" s="datac" class="sku-tr">
+				<td s="tpl">
+					{%if(eleSkuId !== this.foodSkuId) {%}
+					<label class="s-radio">
+						<input type="radio" name="eleSkuId" class="radio-{%=this.foodSkuId%}" value="{%=this.foodSkuId%}" />
+						<span class="s-radio-indicator"></span>
+					</label>
+					{%} else {%}
+					<label class="s-radio">
+						<input type="radio" checked="checked" name="eleSkuId" class="radio-{%=this.foodSkuId%}"  value="{%=this.foodSkuId%}" />
+						<span class="s-radio-indicator"></span>
+					</label>
+					{%}%}
 
-				<!--</td>-->
-				<!--<td>-->
-					<!--<input type="text" readonly class="form-control " style="width: 100%" placeholder="sku id" s s-data-filter="'skuId'" s-valid-error="require()"/>-->
-				<!--</td>-->
-				<!--<td>-->
-					<!--<input type="text" class="form-control" readonly style="width: 100%" placeholder="规格名" s s-data-filter="'spec'" s-valid-error="require()"/>-->
-				<!--</td>-->
-				<!--<td class="text-right">-->
-					<!--<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="售价倍数"-->
-								 <!--s s-data-filter="'priceRatio'" s-valid-error="require()"/>-->
-				<!--</td>-->
-				<!--<td class="text-right">-->
-					<!--<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="报价倍数"-->
-								 <!--s s-data-filter="'quoteUnitRatio'" s-valid-error="require()"/>-->
-				<!--</td>-->
-				<!--<td class="text-right">-->
-					<!--<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="重量"-->
-								 <!--s s-data-filter="'weight'" s-valid-error="require()"/>-->
-				<!--</td>-->
-				<!--<td class="text-right">-->
-					<!--<select class="form-control" s s-data-filter="'ignore'" disabled name="ignoreList">-->
-						<!--<option value="false">发布</option>-->
-						<!--<option value="true">不发布</option>-->
-					<!--</select>-->
-				<!--</td>-->
-				<!--<td>-->
-					<!--<i class="fa fa-arrows"></i>-->
-				<!--</td>-->
-			<!--</tr>-->
+				</td>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="skuId" s s-data-filter="'foodSkuId'" s-valid-error="require()"/>
+
+				</td>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="规格名" s s-data-filter="'name'" s-valid-error="require()"/>
+				</td>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="upc" s s-data-filter="'upc'" s-valid-error="require()"/>
+				</td>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="售卖单位" s s-data-filter="'spec'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="重量"
+						   s s-data-filter="'weight'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" style="width: 100%" placeholder="库存"
+						   s s-data-filter="'stock'" readonly name="stock" s-valid-error="require()"/>
+				</td>
+				<td>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="库位" s s-data-filter="'warehouseNames'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="进价"
+						   s s-data-filter="'inputPrice'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="零售价"
+						   s s-data-filter="'inputPrice'" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="最小起购份数"
+						   s s-data-filter="'minOrderCount'" name="minOrderCount" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="包装盒数量"
+						   s s-data-filter="'boxNum'" name="boxNum" s-valid-error="require()"/>
+				</td>
+				<td class="text-right">
+					<input type="number" class="form-control text-right" readonly step="0.1" style="width: 100%" placeholder="包装盒单价"
+						   s s-data-filter="'boxPrice'" s-valid-error="require()"/>
+				</td>
+				<td>
+					<i class="fa fa-arrows"></i>
+				</td>
+			</tr>
 			</tbody>
 		</table>
 	</form>
