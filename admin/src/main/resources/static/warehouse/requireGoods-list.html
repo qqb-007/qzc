@@ -1,4 +1,4 @@
-<meta title="采购单" args="storeUser" width="1000px"/>
+<meta title="要货单" args="storeUser" width="1000px"/>
 <style>
     .store-user-dropdown {
         border: 1px solid #ddd;
@@ -15,9 +15,7 @@
         <form class="form-inline pull-left" id="purchase" s="form"
               s-form="{action:function(){$page.node.val(1); $purchaseGrid.refresh()}}"
         >
-
-
-<!--            <input type="hidden" name="storeUserId" s s-data="storeUser.id"/>-->
+            <!--            <input type="hidden" name="storeUserId" s s-data="storeUser.id"/>-->
             <input autocomplete="off" type="hidden" name="storeId" id="storeId"/>
             <div role="presentation" class="dropdown store-user-dropdown" style="display: inline-block">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
@@ -30,73 +28,55 @@
                 </div>
             </div>
             <span s s-data="storeUser.name"/>
-            <input autocomplete="off" type="text" class="form-control input-sm" placeholder="订单编号"
-                   style="width:150px;" name="orderNo"/>
+            <input autocomplete="off" type="text" class="form-control input-sm" placeholder="要货单号"
+                   style="width:150px;" name="requireNo"/>
+            <input autocomplete="off" type="text" class="form-control input-sm" placeholder="状态"
+                   style="width:150px;" name="status"/>
+            <input type="text" class="form-control input-sm" name="startTime" placeholder="开始时间"
+                   s="datetimepicker"/> -
+            <input type="text" class="form-control input-sm" name="endTime" placeholder="结束时间"
+                   s="datetimepicker"/>
             <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
             <input autocomplete="off" type="submit" class="btn btn-primary btn-sm" value="查找"/>
         </form>
-        <div class="pull-right">
-            <div class="btn-group">
-                <a href="javascript:;" class="btn btn-default btn-sm"
-                   s-click="S.popupOpen('/warehouse/purchase-add.html', {storeUser: storeUser}).done(function(flag){flag && $purchaseGrid.refresh()})">
-                    <i class="fa fa-plus"></i> 新建
-                </a>
-            </div>
-        </div>
+
     </div>
     <div class="" id="purchaseGrid" s='check,datac,nda'
-         s-data="S.get('/api/back/warehouse/getPurchaseList', $purchase.node.serialize())">
+         s-data="S.get('/api/back/requireGoods/getRequireGoods', $purchase.node.serialize())">
         <table class="table table-striped table-hover table-bordered" id="caigou"style="width: 100%;">
 
             <tr>
                 <th>ID</th>
-                <th>订单编号</th>
+                <th>要货单号</th>
                 <th>门店名称</th>
-                <th>供应商</th>
-                <th>采购计划单号</th>
-                <th>商品种类数</th>
-                <th>采购总数量</th>
-                <th>采购总金额</th>
-                <th>实收总数量</th>
-                <th>实收总金额</th>
-                <th>物流单号</th>
-                <th>收货单号</th>
+                <th>状态</th>
+                <th>要货商品数量</th>
+                <th>要货商品金额</th>
+                <th>备注</th>
                 <th>创建时间</th>
             </tr>
             <tbody s="loop" s-data-filter="'data.list'">
             <tr s-loop-role="empty">
                 <td colspan="12">
                     <div class="s-ui-none-data-info text-center"><i class="fa fa-info-circle text-info"></i>
-                        未查询到采购单
+                        未查询到要货单
                     </div>
                 </td>
             </tr>
             <tr s-loop-role="row" s="datac,row" s-check-role="i">
                 <td name="id"></td>
-                <td name="orderNo"></td>
-                <td name="store"></td>
-                <td name="supplier"></td>
-                <td name="procurementPlan"></td>
-                <td name="procurementType"></td>
-                <td name="procurementNum"></td>
-                <td name="procurementPrice"></td>
-                <td name="arrivalNum"></td>
-                <td name="arrivalPrice"></td>
-                <td name="logisticsNo"></td>
-                <td name="receiptNo"></td>
+                <td name="requireGoodsNo"></td>
+                <td name="storeName"></td>
+                <td name="status"></td>
+                <td name="requireGoodsNum"></td>
+                <td name="requireGoodsPrice"></td>
+                <td name="remark"></td>
                 <td name="date"></td>
                 <td class="text-center" s="tpl"></td>
 
                 <td class="text-right">
                     <input autocomplete="off" type="button" value="采购详情" class="btn btn-primary btn-xs"
-                           s-click="var that = this; S.popupOpen('/warehouse/purchase-detail.html', {storeData: this.parent().data()}).done(function(rs){rs && $purchaseGrid.refresh();})"/>
-                    <input autocomplete="off" type="button" value="编辑" class="btn btn-primary btn-xs"
-                           s-click="var that = this; S.popupOpen('/warehouse/purchase-edit.html', {storeData: this.parent().data()}).done(function(rs){rs && $purchaseGrid.refresh();})"/>
-                    <div class="p-t-xs">
-                        <a href="javascript:;" class="btn btn-danger btn-outline btn-xs" s-click="remove(this)">
-                            删除
-                        </a>
-                    </div>
+                           s-click="var that = this; S.popupOpen('/warehouse/requireGoods-detail.html', {storeData: this.parent().data()}).done(function(rs){rs && $purchaseGrid.refresh();})"/>
                 </td>
             </tr>
             </tbody>
@@ -105,10 +85,10 @@
                 <td colspan="12" class="text-right"  style="vertical-align: middle">
                     <div class="text-right" id="pager" s="datac,nda">
                         共有<span name="total"></span>个数据
-                        			<ul s="pagination"
-                        				s-pagination="{action:function(){$page.node.val(this); $purchaseGrid.refresh()}}"
-                        				class="pagination pagination-sm">
-                        			</ul>
+                        <ul s="pagination"
+                            s-pagination="{action:function(){$page.node.val(this); $purchaseGrid.refresh()}}"
+                            class="pagination pagination-sm">
+                        </ul>
                     </div>
                 </td>
             </tr>

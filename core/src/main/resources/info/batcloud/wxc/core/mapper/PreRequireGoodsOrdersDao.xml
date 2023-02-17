@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.batcloud.wxc.core.service.warehouse.dao.PreRequireGoodsOrdersDao">
+
+    <resultMap type="info.batcloud.wxc.core.entity.PreRequireGoodsOrders" id="PreRequireGoodsOrdersMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="requireGoodsNo" column="require_goods_no" jdbcType="VARCHAR"/>
+        <result property="storeId" column="store_id" jdbcType="INTEGER"/>
+        <result property="storeName" column="store_name" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="requireGoodsNum" column="require_goods_num" jdbcType="INTEGER"/>
+        <result property="requireGoodsPrice" column="require_goods_price" jdbcType="NUMERIC"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="INTEGER"/>
+        <result property="skuId" column="sku_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PreRequireGoodsOrdersMap">
+        select
+          id, require_goods_no, store_id, store_name, status, require_goods_num, require_goods_price, remark, create_time, sku_id
+        from pre_require_goods_orders
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAll" resultMap="PreRequireGoodsOrdersMap">
+        select
+          id, require_goods_no, store_id, store_name, status, require_goods_num, require_goods_price, remark, from_unixtime(create_time) as `date`, sku_id
+        from pre_require_goods_orders
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="requireGoodsNo != null and requireGoodsNo != ''">
+                and require_goods_no = #{requireGoodsNo}
+            </if>
+            <if test="storeId != null">
+                and store_id = #{storeId}
+            </if>
+            <if test="storeName != null and storeName != ''">
+                and store_name = #{storeName}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="requireGoodsNum != null">
+                and require_goods_num = #{requireGoodsNum}
+            </if>
+            <if test="requireGoodsPrice != null">
+                and require_goods_price = #{requireGoodsPrice}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="skuId != null">
+                and sku_id = #{skuId}
+            </if>
+        </where>
+
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from pre_require_goods_orders
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="requireGoodsNo != null and requireGoodsNo != ''">
+                and require_goods_no = #{requireGoodsNo}
+            </if>
+            <if test="storeId != null">
+                and store_id = #{storeId}
+            </if>
+            <if test="storeName != null and storeName != ''">
+                and store_name = #{storeName}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="requireGoodsNum != null">
+                and require_goods_num = #{requireGoodsNum}
+            </if>
+            <if test="requireGoodsPrice != null">
+                and require_goods_price = #{requireGoodsPrice}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="skuId != null">
+                and sku_id = #{skuId}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_require_goods_orders(require_goods_no, store_id, store_name, status, require_goods_num, require_goods_price, remark, create_time, sku_id)
+        values (#{requireGoodsNo}, #{storeId}, #{storeName}, #{status}, #{requireGoodsNum}, #{requireGoodsPrice}, #{remark}, #{createTime}, #{skuId})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_require_goods_orders(require_goods_no, store_id, store_name, status, require_goods_num, require_goods_price, remark, create_time, sku_id)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.requireGoodsNo}, #{entity.storeId}, #{entity.storeName}, #{entity.status}, #{entity.requireGoodsNum}, #{entity.requireGoodsPrice}, #{entity.remark}, #{entity.createTime}, #{entity.skuId})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_require_goods_orders(require_goods_no, store_id, store_name, status, require_goods_num, require_goods_price, remark, create_time, sku_id)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.requireGoodsNo}, #{entity.storeId}, #{entity.storeName}, #{entity.status}, #{entity.requireGoodsNum}, #{entity.requireGoodsPrice}, #{entity.remark}, #{entity.createTime}, #{entity.skuId})
+        </foreach>
+        on duplicate key update
+        require_goods_no = values(require_goods_no),
+        store_id = values(store_id),
+        store_name = values(store_name),
+        status = values(status),
+        require_goods_num = values(require_goods_num),
+        require_goods_price = values(require_goods_price),
+        remark = values(remark),
+        create_time = values(create_time),
+        sku_id = values(sku_id)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update pre_require_goods_orders
+        <set>
+            <if test="requireGoodsNo != null and requireGoodsNo != ''">
+                require_goods_no = #{requireGoodsNo},
+            </if>
+            <if test="storeId != null">
+                store_id = #{storeId},
+            </if>
+            <if test="storeName != null and storeName != ''">
+                store_name = #{storeName},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="requireGoodsNum != null">
+                require_goods_num = #{requireGoodsNum},
+            </if>
+            <if test="requireGoodsPrice != null">
+                require_goods_price = #{requireGoodsPrice},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="skuId != null">
+                sku_id = #{skuId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from pre_require_goods_orders where id = #{id}
+    </delete>
+
+
+</mapper>
+

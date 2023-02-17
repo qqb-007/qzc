@@ -5,6 +5,30 @@
     "url": "/dashboard.html"
   },
   {
+    "id": "PURCHASE_CENTER",
+    "title": "采购中心",
+    "children": [
+      {
+        "id": "YAOHUODAN",
+        "permissionId": "ORDER_MANAGE",
+        "title": "要货单",
+        "url": "/warehouse/requireGoods-list.html?bizStatus=WAIT_CHECK"
+      },
+      {
+        "id": "CAIGOUDAN",
+        "permissionId": "ORDER_MANAGE",
+        "title": "采购单",
+        "url": "/warehouse/purchase.html?bizStatus=WAIT_CHECK"
+      },
+      {
+        "id": "SHOUHUODAN",
+        "permissionId": "ORDER_MANAGE",
+        "title": "交货单",
+        "url": "/warehouse/receipt-list.html?bizStatus=WAIT_CHECK"
+      }
+    ]
+  },
+  {
     "id": "OPERATION_CENTER",
     "title": "运营中心",
     "children": [
@@ -23,11 +47,7 @@
         "title": "商品校对",
         "url": "/food/platStoreFoodProofread.html"
       },
-      {
-        "id": "STORE_FOOD_PURCHASE",
-        "title": "采购中心",
-        "url": "/food/platStoreFoodProofread.html"
-      },
+
       {
         "id": "ORDER_CENTER",
         "title": "订单管理",

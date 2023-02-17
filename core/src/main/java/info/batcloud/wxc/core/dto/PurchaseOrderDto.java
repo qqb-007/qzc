@@ -15,6 +15,24 @@ import java.util.List;
  */
 @Data
 public class PurchaseOrderDto {
-    private PreShopProcurement preShopProcurement;
-    private List<PreShopProcurementRelation> preShopProcurementRelations;
+    private String store;
+    private Integer storeId;
+    private String supplier;
+    private Integer supplierId;
+    private Integer procurementPlanId;
+    private String procurementPlan;
+    private Integer procurementType;
+    private Integer procurementNum;
+    private Double procurementPrice;
+    private Integer arrivalNum;
+    private Double arrivalPrice;
+    private String logisticsNo;
+    private String receiptNo;
+    private Integer receiptId;
+    private Integer createTime;
+    private List<Integer> foodId;
+    private List<String> foodName;
+    private List<Integer> foodNum;
+    private List<Double> foodPrice;
+    private List<Integer> skuId;
 }

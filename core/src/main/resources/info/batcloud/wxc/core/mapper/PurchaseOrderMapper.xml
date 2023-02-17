@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.batcloud.wxc.core.service.warehouse.dao.PurchaseOrderDao">
+
+    <select id="selectAllByOrderNo" resultType="info.batcloud.wxc.core.entity.PreShopProcurement">
+        select *,from_unixtime(create_time) as `date` from pre_shop_procurement
+       <where>
+           <if test="orderNo !=null and orderNo !='' ">
+               and order_no=#{orderNo}
+           </if>
+           <if test="storeId !=null  and storeId != '' ">
+               and store_id =#{storeId}
+           </if>
+       </where>
+    </select>
+
+    <update id="updatePurchase">
+        update pre_shop_procurement
+        <set>
+        <if test="logisticsNo !=null  and logisticsNo!='' ">
+            logistics_no=#{logisticsNo},
+        </if>
+        <if test="receiptNo !=null and receiptNo !='' " >
+            receipt_no=#{receiptNo},
+        </if>
+        <if test="procurementType !=null  and procurementType!='' ">
+            procurement_type=#{procurementType},
+        </if>
+        <if test="procurementNum !=null  and procurementNum!='' ">
+            procurement_num=#{procurementNum},
+        </if>
+        <if test="procurementPrice !=null  and procurementPrice!='' ">
+            procurement_price=#{procurementPrice},
+        </if>
+        <if test="arrivalNum !=null  and arrivalNum!='' ">
+            arrival_num=#{arrivalNum},
+        </if>
+        <if test="arrivalPrice !=null  and arrivalPrice!='' ">
+            arrival_price=#{arrivalPrice}
+        </if>
+        </set>
+        where id=#{id}
+    </update>
+</mapper>

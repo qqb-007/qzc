@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.batcloud.wxc.core.service.warehouse.dao.PreReceiptOrdersDao">
+
+    <resultMap type="info.batcloud.wxc.core.entity.PreReceiptOrders" id="PreReceiptOrdersMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="receiptNo" column="receipt_no" jdbcType="VARCHAR"/>
+        <result property="storeId" column="store_id" jdbcType="INTEGER"/>
+        <result property="storeName" column="store_name" jdbcType="VARCHAR"/>
+        <result property="procurementId" column="procurement_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="arrivePrice" column="arrive_price" jdbcType="NUMERIC"/>
+        <result property="arrivaNum" column="arriva_num" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isDel" column="is_del" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PreReceiptOrdersMap">
+        select
+          id, receipt_no, store_id, store_name, procurement_id, status, arrive_price, arriva_num, remark, is_del, create_time
+        from pre_receipt_orders
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PreReceiptOrdersMap">
+        select
+          id, receipt_no, store_id, store_name, procurement_id, status, arrive_price, arriva_num, remark, is_del, create_time
+        from pre_receipt_orders
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="receiptNo != null and receiptNo != ''">
+                and receipt_no = #{receiptNo}
+            </if>
+            <if test="storeId != null">
+                and store_id = #{storeId}
+            </if>
+            <if test="storeName != null and storeName != ''">
+                and store_name = #{storeName}
+            </if>
+            <if test="procurementId != null">
+                and procurement_id = #{procurementId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="arrivePrice != null">
+                and arrive_price = #{arrivePrice}
+            </if>
+            <if test="arrivaNum != null">
+                and arriva_num = #{arrivaNum}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isDel != null">
+                and is_del = #{isDel}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from pre_receipt_orders
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="receiptNo != null and receiptNo != ''">
+                and receipt_no = #{receiptNo}
+            </if>
+            <if test="storeId != null">
+                and store_id = #{storeId}
+            </if>
+            <if test="storeName != null and storeName != ''">
+                and store_name = #{storeName}
+            </if>
+            <if test="procurementId != null">
+                and procurement_id = #{procurementId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="arrivePrice != null">
+                and arrive_price = #{arrivePrice}
+            </if>
+            <if test="arrivaNum != null">
+                and arriva_num = #{arrivaNum}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="isDel != null">
+                and is_del = #{isDel}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_receipt_orders(receipt_no, store_id, store_name, procurement_id, status, arrive_price, arriva_num, remark, is_del, create_time)
+        values (#{receiptNo}, #{storeId}, #{storeName}, #{procurementId}, #{status}, #{arrivePrice}, #{arrivaNum}, #{remark}, #{isDel}, #{createTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_receipt_orders(receipt_no, store_id, store_name, procurement_id, status, arrive_price, arriva_num, remark, is_del, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.receiptNo}, #{entity.storeId}, #{entity.storeName}, #{entity.procurementId}, #{entity.status}, #{entity.arrivePrice}, #{entity.arrivaNum}, #{entity.remark}, #{entity.isDel}, #{entity.createTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_receipt_orders(receipt_no, store_id, store_name, procurement_id, status, arrive_price, arriva_num, remark, is_del, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.receiptNo}, #{entity.storeId}, #{entity.storeName}, #{entity.procurementId}, #{entity.status}, #{entity.arrivePrice}, #{entity.arrivaNum}, #{entity.remark}, #{entity.isDel}, #{entity.createTime})
+        </foreach>
+        on duplicate key update
+        receipt_no = values(receipt_no),
+        store_id = values(store_id),
+        store_name = values(store_name),
+        procurement_id = values(procurement_id),
+        status = values(status),
+        arrive_price = values(arrive_price),
+        arriva_num = values(arriva_num),
+        remark = values(remark),
+        is_del = values(is_del),
+        create_time = values(create_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update pre_receipt_orders
+        <set>
+            <if test="receiptNo != null and receiptNo != ''">
+                receipt_no = #{receiptNo},
+            </if>
+            <if test="storeId != null">
+                store_id = #{storeId},
+            </if>
+            <if test="storeName != null and storeName != ''">
+                store_name = #{storeName},
+            </if>
+            <if test="procurementId != null">
+                procurement_id = #{procurementId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="arrivePrice != null">
+                arrive_price = #{arrivePrice},
+            </if>
+            <if test="arrivaNum != null">
+                arriva_num = #{arrivaNum},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="isDel != null">
+                is_del = #{isDel},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from pre_receipt_orders where id = #{id}
+    </delete>
+
+    
+   <select id="getReceiptOrder" resultType="info.batcloud.wxc.core.entity.PreReceiptOrders">
+       SELECT
+       `order`.procurement_id,
+       `order`.id,`order`.receipt_no,`order`.store_name,`order`.store_id,
+       `order`.arrive_price,`order`.arriva_num,`order`.remark,from_unixtime(`order`.create_time) as `date`,
+        pro.logistics_no,pro.order_no
+       FROM `pre_shop_procurement`  pro inner join pre_receipt_orders  `order` ON pro.id=`order`.procurement_id
+      <where>
+          <if test="receiptNo !=null and  receiptNo!='' ">
+              and `order`.receipt_no=#{receiptNo}
+          </if>
+          <if test="storeId !=null and  storeId!='' ">
+              and `order`.store_id=#{storeId}
+          </if>
+          <if test="startTime!=0 and endTime!=0 ">
+              and `order`.create_time BETWEEN #{startTime} and #{endTime}
+          </if>
+          <if test="logisticsNo!=null  and logisticsNo !='' ">
+              and pro.logistics_no like concat('%',#{logisticsNo},'%')
+          </if>
+      </where>
+
+   </select>
+</mapper>
+

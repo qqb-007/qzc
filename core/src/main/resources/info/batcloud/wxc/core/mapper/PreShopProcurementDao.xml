@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="info.batcloud.wxc.core.service.warehouse.dao.PreShopProcurementDao">
+
+    <resultMap type="info.batcloud.wxc.core.entity.PreShopProcurement" id="PreShopProcurementMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
+        <result property="store" column="store" jdbcType="VARCHAR"/>
+        <result property="storeId" column="store_id" jdbcType="INTEGER"/>
+        <result property="supplier" column="supplier" jdbcType="VARCHAR"/>
+        <result property="supplierId" column="supplier_id" jdbcType="INTEGER"/>
+        <result property="procurementPlanId" column="procurement_plan_id" jdbcType="INTEGER"/>
+        <result property="procurementPlan" column="procurement_plan" jdbcType="VARCHAR"/>
+        <result property="procurementType" column="procurement_type" jdbcType="INTEGER"/>
+        <result property="procurementNum" column="procurement_num" jdbcType="INTEGER"/>
+        <result property="procurementPrice" column="procurement_price" jdbcType="NUMERIC"/>
+        <result property="arrivalNum" column="arrival_num" jdbcType="INTEGER"/>
+        <result property="arrivalPrice" column="arrival_price" jdbcType="NUMERIC"/>
+        <result property="logisticsNo" column="logistics_no" jdbcType="VARCHAR"/>
+        <result property="receiptNo" column="receipt_no" jdbcType="VARCHAR"/>
+        <result property="receiptId" column="receipt_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PreShopProcurementMap">
+        select
+          id, order_no, store, store_id, supplier, supplier_id, procurement_plan_id, procurement_plan, procurement_type, procurement_num, procurement_price, arrival_num, arrival_price, logistics_no, receipt_no, receipt_id, create_time
+        from pre_shop_procurement
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PreShopProcurementMap">
+        select
+          id, order_no, store, store_id, supplier, supplier_id, procurement_plan_id, procurement_plan, procurement_type, procurement_num, procurement_price, arrival_num, arrival_price, logistics_no, receipt_no, receipt_id, create_time
+        from pre_shop_procurement
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                and order_no = #{orderNo}
+            </if>
+            <if test="store != null and store != ''">
+                and store = #{store}
+            </if>
+            <if test="storeId != null">
+                and store_id = #{storeId}
+            </if>
+            <if test="supplier != null and supplier != ''">
+                and supplier = #{supplier}
+            </if>
+            <if test="supplierId != null">
+                and supplier_id = #{supplierId}
+            </if>
+            <if test="procurementPlanId != null">
+                and procurement_plan_id = #{procurementPlanId}
+            </if>
+            <if test="procurementPlan != null and procurementPlan != ''">
+                and procurement_plan = #{procurementPlan}
+            </if>
+            <if test="procurementType != null">
+                and procurement_type = #{procurementType}
+            </if>
+            <if test="procurementNum != null">
+                and procurement_num = #{procurementNum}
+            </if>
+            <if test="procurementPrice != null">
+                and procurement_price = #{procurementPrice}
+            </if>
+            <if test="arrivalNum != null">
+                and arrival_num = #{arrivalNum}
+            </if>
+            <if test="arrivalPrice != null">
+                and arrival_price = #{arrivalPrice}
+            </if>
+            <if test="logisticsNo != null and logisticsNo != ''">
+                and logistics_no = #{logisticsNo}
+            </if>
+            <if test="receiptNo != null and receiptNo != ''">
+                and receipt_no = #{receiptNo}
+            </if>
+            <if test="receiptId != null">
+                and receipt_id = #{receiptId}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from pre_shop_procurement
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                and order_no = #{orderNo}
+            </if>
+            <if test="store != null and store != ''">
+                and store = #{store}
+            </if>
+            <if test="storeId != null">
+                and store_id = #{storeId}
+            </if>
+            <if test="supplier != null and supplier != ''">
+                and supplier = #{supplier}
+            </if>
+            <if test="supplierId != null">
+                and supplier_id = #{supplierId}
+            </if>
+            <if test="procurementPlanId != null">
+                and procurement_plan_id = #{procurementPlanId}
+            </if>
+            <if test="procurementPlan != null and procurementPlan != ''">
+                and procurement_plan = #{procurementPlan}
+            </if>
+            <if test="procurementType != null">
+                and procurement_type = #{procurementType}
+            </if>
+            <if test="procurementNum != null">
+                and procurement_num = #{procurementNum}
+            </if>
+            <if test="procurementPrice != null">
+                and procurement_price = #{procurementPrice}
+            </if>
+            <if test="arrivalNum != null">
+                and arrival_num = #{arrivalNum}
+            </if>
+            <if test="arrivalPrice != null">
+                and arrival_price = #{arrivalPrice}
+            </if>
+            <if test="logisticsNo != null and logisticsNo != ''">
+                and logistics_no = #{logisticsNo}
+            </if>
+            <if test="receiptNo != null and receiptNo != ''">
+                and receipt_no = #{receiptNo}
+            </if>
+            <if test="receiptId != null">
+                and receipt_id = #{receiptId}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_shop_procurement(order_no, store, store_id, supplier, supplier_id, procurement_plan_id, procurement_plan, procurement_type, procurement_num, procurement_price, arrival_num, arrival_price, logistics_no, receipt_no, receipt_id, create_time)
+        values (#{orderNo}, #{store}, #{storeId}, #{supplier}, #{supplierId}, #{procurementPlanId}, #{procurementPlan}, #{procurementType}, #{procurementNum}, #{procurementPrice}, #{arrivalNum}, #{arrivalPrice}, #{logisticsNo}, #{receiptNo}, #{receiptId}, #{createTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_shop_procurement(order_no, store, store_id, supplier, supplier_id, procurement_plan_id, procurement_plan, procurement_type, procurement_num, procurement_price, arrival_num, arrival_price, logistics_no, receipt_no, receipt_id, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.orderNo}, #{entity.store}, #{entity.storeId}, #{entity.supplier}, #{entity.supplierId}, #{entity.procurementPlanId}, #{entity.procurementPlan}, #{entity.procurementType}, #{entity.procurementNum}, #{entity.procurementPrice}, #{entity.arrivalNum}, #{entity.arrivalPrice}, #{entity.logisticsNo}, #{entity.receiptNo}, #{entity.receiptId}, #{entity.createTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pre_shop_procurement(order_no, store, store_id, supplier, supplier_id, procurement_plan_id, procurement_plan, procurement_type, procurement_num, procurement_price, arrival_num, arrival_price, logistics_no, receipt_no, receipt_id, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.orderNo}, #{entity.store}, #{entity.storeId}, #{entity.supplier}, #{entity.supplierId}, #{entity.procurementPlanId}, #{entity.procurementPlan}, #{entity.procurementType}, #{entity.procurementNum}, #{entity.procurementPrice}, #{entity.arrivalNum}, #{entity.arrivalPrice}, #{entity.logisticsNo}, #{entity.receiptNo}, #{entity.receiptId}, #{entity.createTime})
+        </foreach>
+        on duplicate key update
+        order_no = values(order_no),
+        store = values(store),
+        store_id = values(store_id),
+        supplier = values(supplier),
+        supplier_id = values(supplier_id),
+        procurement_plan_id = values(procurement_plan_id),
+        procurement_plan = values(procurement_plan),
+        procurement_type = values(procurement_type),
+        procurement_num = values(procurement_num),
+        procurement_price = values(procurement_price),
+        arrival_num = values(arrival_num),
+        arrival_price = values(arrival_price),
+        logistics_no = values(logistics_no),
+        receipt_no = values(receipt_no),
+        receipt_id = values(receipt_id),
+        create_time = values(create_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update pre_shop_procurement
+        <set>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
+            <if test="store != null and store != ''">
+                store = #{store},
+            </if>
+            <if test="storeId != null">
+                store_id = #{storeId},
+            </if>
+            <if test="supplier != null and supplier != ''">
+                supplier = #{supplier},
+            </if>
+            <if test="supplierId != null">
+                supplier_id = #{supplierId},
+            </if>
+            <if test="procurementPlanId != null">
+                procurement_plan_id = #{procurementPlanId},
+            </if>
+            <if test="procurementPlan != null and procurementPlan != ''">
+                procurement_plan = #{procurementPlan},
+            </if>
+            <if test="procurementType != null">
+                procurement_type = #{procurementType},
+            </if>
+            <if test="procurementNum != null">
+                procurement_num = #{procurementNum},
+            </if>
+            <if test="procurementPrice != null">
+                procurement_price = #{procurementPrice},
+            </if>
+            <if test="arrivalNum != null">
+                arrival_num = #{arrivalNum},
+            </if>
+            <if test="arrivalPrice != null">
+                arrival_price = #{arrivalPrice},
+            </if>
+            <if test="logisticsNo != null and logisticsNo != ''">
+                logistics_no = #{logisticsNo},
+            </if>
+            <if test="receiptNo != null and receiptNo != ''">
+                receipt_no = #{receiptNo},
+            </if>
+            <if test="receiptId != null">
+                receipt_id = #{receiptId},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from pre_shop_procurement where id = #{id}
+    </delete>
+
+</mapper>
+
