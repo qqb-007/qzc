@@ -605,7 +605,7 @@
                         <!--{%}%}-->
                         <div style="padding-bottom: 2px;">
                             <input type="button" class="btn btn-xs btn-outline btn-warning" s-click="skuList(this)"
-                                   value="SKU({%=this.specialSkuIdList ? this.specialSkuIdList.split(',').length : 0%})"/>
+                                   value="SKU({%=this.skuList.length%})"/>
                         </div>
                         {%if(this.quotePriceLock) {%}
                         <div style="padding-bottom: 2px;">

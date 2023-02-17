@@ -10,7 +10,7 @@
             <input autocomplete="off" type="text" class="form-control input-sm" value="20" placeholder="每页数量"
                    style="width:200px;" name="pageSize"/>
             <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
-            <input autocomplete="off" type="hidden" name="excludeStoreUserId" s s-data="excludeStoreUserId"/>
+            <input autocomplete="off" type="hidden" name="StoreUserId" s s-data="excludeStoreUserId"/>
             <!--多选分类-->
             <!--<select id = "categorySelect" class="selectpicker show-tick hidden" s="select" s-select="{value: 'name'}"
                     s-build="S.get('/api/food-category/list')" multiple="multiple">
@@ -103,33 +103,34 @@
 </div>
 <script>
     // //初始化
-    // S.on('s-ready', function() {
-    //     $categorySelect.node.multiselect({
-    //         maxHeight :200,
-    //         checkboxName: function() {
-    //             return 'categoryNameList'
-    //         },
-    //         buttonText: function(options, select) {
-    //             if (options.length === 0) {
-    //                 return '选择分类';
-    //             } else {
-    //                 var labels = [];
-    //                 options.each(function(i) {
-    //                     if(i>1){
-    //                         return false;
-    //                     }
-    //                     if ($(this).attr('label') !== undefined) {
-    //                         labels.push($(this).attr('label'));
-    //                     }
-    //                     else {
-    //                         labels.push($(this).html());
-    //                     }
-    //                 });
-    //                 return labels.join(', ') + '';
-    //             }
-    //         }
-    //     });
-    // });
+    S.on('s-ready', function() {
+        $foodsGrid.refresh()
+        // $categorySelect.node.multiselect({
+        //     maxHeight :200,
+        //     checkboxName: function() {
+        //         return 'categoryNameList'
+        //     },
+        //     buttonText: function(options, select) {
+        //         if (options.length === 0) {
+        //             return '选择分类';
+        //         } else {
+        //             var labels = [];
+        //             options.each(function(i) {
+        //                 if(i>1){
+        //                     return false;
+        //                 }
+        //                 if ($(this).attr('label') !== undefined) {
+        //                     labels.push($(this).attr('label'));
+        //                 }
+        //                 else {
+        //                     labels.push($(this).html());
+        //                 }
+        //             });
+        //             return labels.join(', ') + '';
+        //         }
+        //     }
+        // });
+    });
     // //下拉框渲染
     // $('#categorySelect').selectpicker({
     //     'selectedText': 'cat'

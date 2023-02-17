@@ -5218,6 +5218,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
 //        } else {
 //            dto.setWarehouseName("暂未绑定库位");
 //        }
+        dto.setSkuList(storeUserFoodSkuService.getByStoreUserFoodId(suf.getId()));
         dto.setStoreUser(su);
         return dto;
     }

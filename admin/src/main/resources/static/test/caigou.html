@@ -67,6 +67,22 @@
                 </tr>
                 </tbody>
             </table>
+            <label class="col-sm-2 control-label">商品种类数量：</label>
+            <div class="col-sm-10">
+                <input class="form-control goodsTypeNum"  rows="3" name="goodsTypeNum "/>
+            </div>
+
+            <label class="col-sm-2 control-label">采购总数量：</label>
+            <div class="col-sm-10">
+                <input class="form-control"  rows="3" name="procurementNum "/>
+            </div>
+
+
+
+            <label class="col-sm-2 control-label">采购总金额：</label>
+            <div class="col-sm-10">
+                <input class="form-control"  rows="3" name="procurementPrice"/>
+            </div>
         </div>
     </form>
 </div>
@@ -98,7 +114,9 @@
                         }
                         list.push(detail)
                     })
-                    console.log(list)
+                    var tn = S.node.find('.goodsTypeNum');
+                    var sn = tn.val()
+                    console.log(tn.val())
                     if (list.length == 0) {
                         S.alert('请选择商品', 'warning')
                         deferred.reject()
