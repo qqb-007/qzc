@@ -24,6 +24,11 @@
         "url": "/food/platStoreFoodProofread.html"
       },
       {
+        "id": "STORE_FOOD_PURCHASE",
+        "title": "采购中心",
+        "url": "/food/platStoreFoodProofread.html"
+      },
+      {
         "id": "ORDER_CENTER",
         "title": "订单管理",
         "children": [
