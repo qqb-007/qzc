@@ -144,6 +144,18 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
     private FoodSupplierService foodSupplierService;
 
     @Inject
+    private FoodSkuRepository foodSkuRepository;
+
+    @Inject
+    private FoodSkuService foodSkuService;
+
+    @Inject
+    private StoreUserFoodSkuRepository storeUserFoodSkuRepository;
+
+    @Inject
+    private StoreUserFoodSkuService storeUserFoodSkuService;
+
+    @Inject
     private ThreadPoolExecutor threadPoolExecutor;
 
     private static final Logger logger = LoggerFactory.getLogger(StoreUserFoodServiceImpl.class);
@@ -4543,6 +4555,114 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 saveStoreUserFood(id, param.getFoodList(), foodMap);
             }
 
+        }
+    }
+
+    @Override
+    public void batchSaveNew(BatchAddNewParam param) {
+        //首先判断门店中是否存在该商品，不存在先添加商品
+        //假如存在，再判断是否有该skuid
+
+        StoreUser storeUser = storeUserRepository.findOne(param.getStoreUserId().get(0));
+        for (SaveNewParam saveParam : param.getFoodList()) {
+            info.batcloud.wxc.core.entity.FoodSku foodSku = foodSkuRepository.findOne(saveParam.getSkuId());
+            StoreUserFood storeUserFood = storeUserFoodRepository.findByStoreUserIdAndFoodId(storeUser.getId(), foodSku.getFoodId());
+            if (storeUserFood == null) {
+                //新增商品并且新增规格
+                Food food = foodRepository.findOne(foodSku.getFoodId());
+                FoodCategory category = foodCategoryRepository.findByName(food.getCategoryName());
+                StoreUserFood userFood = new StoreUserFood();
+                userFood.setMeituanVideoId(null);
+                userFood.setClbmVideoId(null);
+                userFood.setClbmPublishStatus(PublishStatus.WAIT);
+                userFood.setMinOrderCount(1);
+                userFood.setWanteSkuMap(null);
+                userFood.setSaleTimeMap(null);
+                userFood.setSaleTime(null);
+                userFood.setWanteSkuMapJson(null);
+                userFood.setWanteId(null);
+                userFood.setSupplierAlterQuotePrice(0f);
+                userFood.setSupplierQuotePrice(0f);
+                userFood.setSupplierIncrease(0f);
+                userFood.setFoodSupplier(null);
+                userFood.setEleSkuId(null);
+                userFood.setCityId(storeUser.getCity().getId());
+                userFood.setFoodQuoteReport(null);
+                userFood.setWarehouseIds(null);
+                userFood.setElePhotos(null);
+                userFood.setElePhotosJson(null);
+                userFood.setMeituanPublishStatus(PublishStatus.WAIT);
+                userFood.setJddjPublishStatus(PublishStatus.WAIT);
+                userFood.setWantePublishStatus(PublishStatus.WAIT);
+                userFood.setElePublishStatus(PublishStatus.WAIT);
+                userFood.setSpecialSkuIdList(null);
+                userFood.setCategory(category);
+                userFood.setFoodVersion(0);
+                userFood.setPublishMsg("");
+                userFood.setAlterQuotePrice(saveParam.getInputPrice());
+                userFood.setQuoteStatus(QuoteStatus.WAIT_VERIFY);
+                userFood.setPriceIncrease(0f);
+                userFood.setFoodUnit(food.getUnit());
+                userFood.setFoodSkuJson("");
+                userFood.setSalePrice(saveParam.getOutputPrice());
+                userFood.setSale(false);
+                userFood.setStoreUser(storeUser);
+                userFood.setCreateTime(new Date());
+                userFood.setUpdateTime(new Date());
+                userFood.setQuotePrice(saveParam.getInputPrice());
+                userFood.setFood(food);
+                userFood.setQuotePriceLock(false);
+                userFood.setUnlockTime(null);
+                userFood.setOriginalQuotePrice(saveParam.getInputPrice());
+                userFood.setActiveType(null);
+                StoreUserFood save = storeUserFoodRepository.save(userFood);
+                StoreUserFoodSku sku = new StoreUserFoodSku();
+                sku.setStoreUserId(storeUser.getId());
+                sku.setStoreUserFoodId(save.getId());
+                sku.setFoodSkuId(foodSku.getId());
+                sku.setWarehouseIds(null);
+                sku.setStock(saveParam.getStock());
+                sku.setInputPrice(saveParam.getInputPrice());
+                sku.setOutputPrice(saveParam.getOutputPrice());
+                sku.setFoodId(food.getId());
+                sku.setUpc(foodSku.getUpc());
+                sku.setName(foodSku.getName());
+                sku.setWeight(foodSku.getWeight());
+                sku.setSpec(foodSku.getSpec());
+                sku.setInputTax(foodSku.getInputTax());
+                sku.setOutputTax(foodSku.getOutputTax());
+                sku.setMinOrderCount(foodSku.getMinOrderCount());
+                sku.setBoxNum(foodSku.getBoxNum());
+                sku.setBoxPrice(foodSku.getBoxPrice());
+                storeUserFoodSkuRepository.save(sku);
+
+
+            } else {
+                //判断该商品是否含有已经存在的规格
+                StoreUserFoodSku ysku = storeUserFoodSkuRepository.findByStoreUserIdAndUpc(storeUser.getId(), foodSku.getUpc());
+
+                if (ysku == null) {
+                    StoreUserFoodSku sku = new StoreUserFoodSku();
+                    sku.setStoreUserId(storeUser.getId());
+                    sku.setStoreUserFoodId(storeUserFood.getId());
+                    sku.setFoodSkuId(foodSku.getId());
+                    sku.setWarehouseIds(null);
+                    sku.setStock(saveParam.getStock());
+                    sku.setInputPrice(saveParam.getInputPrice());
+                    sku.setOutputPrice(saveParam.getOutputPrice());
+                    sku.setFoodId(storeUserFood.getFood().getId());
+                    sku.setUpc(foodSku.getUpc());
+                    sku.setName(foodSku.getName());
+                    sku.setWeight(foodSku.getWeight());
+                    sku.setSpec(foodSku.getSpec());
+                    sku.setInputTax(foodSku.getInputTax());
+                    sku.setOutputTax(foodSku.getOutputTax());
+                    sku.setMinOrderCount(foodSku.getMinOrderCount());
+                    sku.setBoxNum(foodSku.getBoxNum());
+                    sku.setBoxPrice(foodSku.getBoxPrice());
+                    storeUserFoodSkuRepository.save(sku);
+                }
+            }
         }
     }
 

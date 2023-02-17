@@ -8,6 +8,8 @@ import com.sankuai.meituan.waimai.opensdk.exception.ApiSysException;
 import com.sankuai.meituan.waimai.opensdk.factory.APIFactory;
 import com.sankuai.meituan.waimai.opensdk.vo.PLSProductCategory;
 import com.sankuai.meituan.waimai.opensdk.vo.SystemParam;
+import info.batcloud.wxc.admin.permission.ManagerPermissions;
+import info.batcloud.wxc.admin.permission.annotation.Permission;
 import info.batcloud.wxc.core.entity.Food;
 import info.batcloud.wxc.core.entity.Region;
 import info.batcloud.wxc.core.entity.StoreUser;
@@ -16,12 +18,11 @@ import info.batcloud.wxc.core.repository.RegionRepository;
 import info.batcloud.wxc.core.repository.StoreUserRepository;
 import info.batcloud.wxc.core.service.MeituanWaimaiService;
 import info.batcloud.wxc.core.service.RegionService;
+import info.batcloud.wxc.core.service.StoreUserFoodService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -70,6 +71,15 @@ public class TestController {
         foodRepository.save(foodList);
         return true;
     }
+
+
+    @PostMapping()
+    @Permission(value = ManagerPermissions.STORE_USER_FOOD)
+    public Object batchSave(@RequestParam String json) {
+        System.out.println(json);
+        return true;
+    }
+
 
     @Transactional
     @GetMapping("/handle-store-user-region")

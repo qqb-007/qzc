@@ -182,6 +182,8 @@ public interface StoreUserFoodService {
 
     void batchSaveStoreUserFood(BatchSaveParam param);
 
+    void batchSaveNew(BatchAddNewParam param);
+
     StoreUserFoodDTO saveStoreUserFood(long storeUserId, SaveParam saveParam);
 
     StoreUserFoodDTO saveSupplierStoreUserFood(long foodSupplierId, SaveParam saveParam);
@@ -197,6 +199,75 @@ public interface StoreUserFoodService {
     void alignStoreUserFood(AlignStoreUserFoodParam param);
 
     File export(SearchParam param) throws IOException;
+
+    class BatchAddNewParam {
+        private List<Long> storeUserId;
+        private List<SaveNewParam> foodList;
+
+        public List<Long> getStoreUserId() {
+            return storeUserId;
+        }
+
+        public void setStoreUserId(List<Long> storeUserId) {
+            this.storeUserId = storeUserId;
+        }
+
+        public List<SaveNewParam> getFoodList() {
+            return foodList;
+        }
+
+        public void setFoodList(List<SaveNewParam> foodList) {
+            this.foodList = foodList;
+        }
+    }
+
+    class SaveNewParam{
+        private Long skuId;
+        private Float inputPrice;
+        private Float outputPrice;
+        private Integer minOrderCount;
+        private Integer stock;
+
+        public Long getSkuId() {
+            return skuId;
+        }
+
+        public void setSkuId(Long skuId) {
+            this.skuId = skuId;
+        }
+
+        public Float getInputPrice() {
+            return inputPrice;
+        }
+
+        public void setInputPrice(Float inputPrice) {
+            this.inputPrice = inputPrice;
+        }
+
+        public Float getOutputPrice() {
+            return outputPrice;
+        }
+
+        public void setOutputPrice(Float outputPrice) {
+            this.outputPrice = outputPrice;
+        }
+
+        public Integer getMinOrderCount() {
+            return minOrderCount;
+        }
+
+        public void setMinOrderCount(Integer minOrderCount) {
+            this.minOrderCount = minOrderCount;
+        }
+
+        public Integer getStock() {
+            return stock;
+        }
+
+        public void setStock(Integer stock) {
+            this.stock = stock;
+        }
+    }
 
     class AlignStoreUserFoodParam {
         private Long targetStoreUserId;

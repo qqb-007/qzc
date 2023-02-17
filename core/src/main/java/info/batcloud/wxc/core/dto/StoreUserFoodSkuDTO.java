@@ -11,6 +11,8 @@ public class StoreUserFoodSkuDTO {
 
     private Long foodSkuId;
 
+    private String picture;
+
     private String warehouseIds;
 
     private String warehouseNames;
@@ -39,6 +41,14 @@ public class StoreUserFoodSkuDTO {
     private Integer boxNum;
 
     private Float boxPrice;
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
 
     public String getWarehouseNames() {
         return warehouseNames;

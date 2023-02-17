@@ -1,22 +1,31 @@
 package info.batcloud.wxc.core.service.impl;
 
+import com.ctospace.archit.common.pagination.Paging;
 import info.batcloud.wxc.core.dto.FoodSkuDTO;
 import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
+import info.batcloud.wxc.core.entity.Bag;
 import info.batcloud.wxc.core.entity.Food;
 import info.batcloud.wxc.core.entity.StoreUserFood;
 import info.batcloud.wxc.core.entity.StoreUserFoodSku;
-import info.batcloud.wxc.core.repository.FoodSkuRepository;
-import info.batcloud.wxc.core.repository.StoreUserFoodRepository;
-import info.batcloud.wxc.core.repository.StoreUserFoodSkuRepository;
-import info.batcloud.wxc.core.repository.WarehouseRepository;
+import info.batcloud.wxc.core.helper.PagingHelper;
+import info.batcloud.wxc.core.repository.*;
 import info.batcloud.wxc.core.service.FoodSkuService;
 import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -29,6 +38,9 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
 
     @Inject
     private FoodSkuService foodSkuService;
+
+    @Inject
+    private FoodRepository foodRepository;
 
     @Inject
     private WarehouseRepository warehouseRepository;
@@ -105,6 +117,28 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
         return toDto(storeUserFoodSkuRepository.findByStoreUserIdAndUpc(storeUserId, upc));
     }
 
+    @Override
+    public Paging<StoreUserFoodSkuDTO> search(SearchParam param) {
+        Specification<StoreUserFoodSku> specification = (root, query, cb) -> {
+            Predicate predicate = cb.conjunction();
+            List<Expression<Boolean>> expressions = predicate.getExpressions();
+
+            if (param.getStoreUserId() != null) {
+                expressions.add(cb.equal(root.get("storeUserId"), param.getStoreUserId()));
+            }
+
+            if (StringUtils.isNotEmpty(param.getName())) {
+                expressions.add(cb.like(root.get("name"), "%" + param.getName() + "%"));
+            }
+            return predicate;
+        };
+        Sort sort = new Sort(Sort.Direction.DESC, "id");
+        Pageable pageable = new PageRequest(param.getPage() - 1,
+                param.getPageSize(), sort);
+        Page<StoreUserFoodSku> page = storeUserFoodSkuRepository.findAll(specification, pageable);
+        return PagingHelper.of(page, item -> toDto(item), param.getPage(), param.getPageSize());
+    }
+
     private StoreUserFoodSkuDTO toDto(StoreUserFoodSku storeUserFoodSku) {
         StoreUserFoodSkuDTO dto = new StoreUserFoodSkuDTO();
         BeanUtils.copyProperties(storeUserFoodSku, dto);
@@ -116,6 +150,7 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
             }
         }
         dto.setWarehouseNames(String.join("、", wnames));
+        dto.setPicture(foodRepository.findOne(dto.getFoodId()).getPicture());
         return dto;
     }
 }
