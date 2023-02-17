@@ -1,14 +1,18 @@
 package info.batcloud.wxc.admin.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.ctospace.archit.common.pagination.Paging;
 import info.batcloud.wxc.admin.controller.form.FoodSkuForm;
 import info.batcloud.wxc.admin.permission.ManagerPermissions;
 import info.batcloud.wxc.admin.permission.annotation.Permission;
 import info.batcloud.wxc.core.domain.FoodSku;
+import info.batcloud.wxc.core.dto.FoodDTO;
+import info.batcloud.wxc.core.dto.FoodSkuDTO;
 import info.batcloud.wxc.core.entity.Food;
 import info.batcloud.wxc.core.entity.FoodCategory;
 import info.batcloud.wxc.core.service.FoodCategoryService;
 import info.batcloud.wxc.core.service.FoodService;
+import info.batcloud.wxc.core.service.FoodSkuService;
 import info.batcloud.wxc.core.service.StoreUserFoodService;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +20,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/api/food")
 @RestController
@@ -28,9 +34,26 @@ public class FoodController {
     @Inject
     private FoodCategoryService foodCategoryService;
 
+    @Inject
+    private FoodSkuService foodSkuService;
+
     @GetMapping("/search")
     public Object search(FoodService.SearchParam param) {
         return foodService.search(param);
+    }
+
+    @GetMapping("/sku/search")
+    public Object skuSearch(FoodService.SearchParam param) {
+        Paging<FoodDTO> paging = foodService.search(param);
+        List<FoodSkuDTO> list = new ArrayList<>();
+        for (FoodDTO result : paging.getResults()) {
+            list.addAll(result.getSkus());
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("results", list);
+        map.put("page", paging.getPage());
+        map.put("maxPage",(paging.getTotal() + paging.getPageSize() - 1) / paging.getPageSize());
+        return map;
     }
 
     @PutMapping("/meituan-tag/{id}")
@@ -49,7 +72,7 @@ public class FoodController {
 
     @GetMapping("/sku/{id}")
     public Object skuList(@PathVariable long id) {
-        return foodService.findById(id).getSkuList();
+        return foodService.findById(id).getSkus();
     }
 
     @GetMapping("/detect-problematic-food")
@@ -238,19 +261,38 @@ public class FoodController {
     @PutMapping("/sku/{id}")
     @Permission(value = ManagerPermissions.FOOD_MANAGE)
     public Object setSku(@PathVariable long id, FoodSkuForm form) {
-        List<FoodSku> foodSkus = new ArrayList<>();
-        for (int i = 0; i < form.getPriceRatioList().size(); i++) {
-            FoodSku sku = new FoodSku();
-            sku.setSpec(form.getSpecList().get(i));
-            sku.setSkuId(form.getSkuIdList().get(i));
-            sku.setPriceRatio(form.getPriceRatioList().get(i));
-            sku.setQuoteUnitRatio(form.getQuoteUnitRatioList().get(i));
-            sku.setWeight(form.getWeightList().get(i));
-            sku.setIgnore(form.getIgnoreList().get(i));
-            sku.setStock(0);
-            foodSkus.add(sku);
+        //List<FoodSkuDTO> foodSkus = new ArrayList<>();
+        System.out.println(form.getNameList().size());
+        for (int i = 0; i < form.getNameList().size(); i++) {
+            if (form.getIdList().size() == 0 || form.getIdList().get(i) == null) {
+                //新增
+                FoodSkuService.CreateParam param = new FoodSkuService.CreateParam();
+                param.setFoodId(id);
+                param.setUpc(form.getUpcList().get(i));
+                param.setName(form.getNameList().get(i));
+                param.setWeight(form.getWeightList().get(i));
+                param.setSpec(form.getSpecList().get(i));
+                param.setInputTax(form.getInputTaxList().get(i));
+                param.setOutputTax(form.getOutputTaxList().get(i));
+                param.setMinOrderCount(form.getMinOrderCountList().get(i));
+                param.setBoxNum(form.getBoxNumList().get(i));
+                param.setBoxPrice(form.getBoxPriceList().get(i));
+                foodSkuService.createFoodSku(param);
+            } else {
+                FoodSkuService.UpdateParam updateParam = new FoodSkuService.UpdateParam();
+                updateParam.setId(form.getIdList().get(i));
+                updateParam.setUpc(form.getUpcList().get(i));
+                updateParam.setName(form.getNameList().get(i));
+                updateParam.setWeight(form.getWeightList().get(i));
+                updateParam.setSpec(form.getSpecList().get(i));
+                updateParam.setInputTax(form.getInputTaxList().get(i));
+                updateParam.setOutputTax(form.getOutputTaxList().get(i));
+                updateParam.setMinOrderCount(form.getMinOrderCountList().get(i));
+                updateParam.setBoxNum(form.getBoxNumList().get(i));
+                updateParam.setBoxPrice(form.getBoxPriceList().get(i));
+                foodSkuService.updateFoodSku(updateParam);
+            }
         }
-        foodService.setFoodSku(id, foodSkus);
-        return foodSkus;
+        return foodService.findById(id).getSkus();
     }
 }

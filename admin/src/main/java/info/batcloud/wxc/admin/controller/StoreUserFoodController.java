@@ -11,6 +11,7 @@ import info.batcloud.wxc.core.repository.StoreUserFoodRepository;
 import info.batcloud.wxc.core.service.FoodCategoryService;
 import info.batcloud.wxc.core.service.StoreService;
 import info.batcloud.wxc.core.service.StoreUserFoodService;
+import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.python.modules.itertools.count;
 import org.springframework.context.annotation.Lazy;
@@ -32,6 +33,9 @@ public class StoreUserFoodController {
 
     @Inject
     private FoodCategoryService foodCategoryService;
+
+    @Inject
+    private StoreUserFoodSkuService storeUserFoodSkuService;
 
     @PutMapping("/sold-out/{storeUserFoodId}")
     @Permission(value = ManagerPermissions.STORE_USER_FOOD)
@@ -84,6 +88,11 @@ public class StoreUserFoodController {
     @GetMapping("/search")
     public Object search(StoreUserFoodService.SearchParam param) {
         return storeUserFoodService.search(param);
+    }
+
+    @GetMapping("/searchSku")
+    public Object searchSku(StoreUserFoodSkuService.SearchParam param) {
+        return storeUserFoodSkuService.search(param);
     }
 
     @PutMapping("/reset-publish")
@@ -230,9 +239,9 @@ public class StoreUserFoodController {
 
     @PutMapping("/special-sku/{id}")
     @Permission(value = ManagerPermissions.STORE_USER_FOOD)
-    public Object setSpecialSku(@PathVariable long id, @RequestParam(required = false) List<String> specialSkuIdList,@RequestParam(required = false) List<String> skuId,@RequestParam(required = false) List<Integer> stock, @RequestParam(required = false) String eleSkuId) {
+    public Object setSpecialSku(@PathVariable long id, @RequestParam(required = false) List<String> specialSkuIdList, @RequestParam(required = false) List<String> skuId, @RequestParam(required = false) List<Integer> stock, @RequestParam(required = false) String eleSkuId) {
         storeUserFoodService.setSpecialSkuList(id, specialSkuIdList == null ? new ArrayList<>(0) : specialSkuIdList);
-        storeUserFoodService.updateStock(id,skuId,stock);
+        storeUserFoodService.updateStock(id, skuId, stock);
         storeUserFoodService.setEleSkuId(id, eleSkuId);
         return true;
     }
@@ -249,8 +258,10 @@ public class StoreUserFoodController {
     @PostMapping()
     @Permission(value = ManagerPermissions.STORE_USER_FOOD)
     public Object batchSave(@RequestParam String json) {
-        StoreUserFoodService.BatchSaveParam param = JSON.parseObject(json, StoreUserFoodService.BatchSaveParam.class);
-        storeUserFoodService.batchSaveStoreUserFood(param);
+//        StoreUserFoodService.BatchSaveParam param = JSON.parseObject(json, StoreUserFoodService.BatchSaveParam.class);
+//        storeUserFoodService.batchSaveStoreUserFood(param);
+        StoreUserFoodService.BatchAddNewParam param = JSON.parseObject(json, StoreUserFoodService.BatchAddNewParam.class);
+        storeUserFoodService.batchSaveNew(param);
         return true;
     }
 

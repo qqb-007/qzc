@@ -30,7 +30,7 @@ public class Food implements Serializable {
     private Boolean quotable;
     //饿了么品牌名
     private String eleBrandName;
-
+    //boxNum
     private Float boxNum;
 
     //包装盒单价

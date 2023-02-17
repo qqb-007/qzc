@@ -15,6 +15,17 @@ public class FoodSku {
 
     private Integer stock;
 
+    private String warehouseIds;
+
+
+    public String getWarehouseIds() {
+        return warehouseIds;
+    }
+
+    public void setWarehouseIds(String warehouseIds) {
+        this.warehouseIds = warehouseIds;
+    }
+
     /**
      * 忽略发布
      */

@@ -259,7 +259,7 @@
 					</td>
 					<td class="text-right" s="tpl">
 						<input type="button" class="btn btn-xs btn-outline btn-warning" s-click="skuList(this)"
-							   value="SKU({%=this.skuList.length%})"/>
+							   value="SKU({%=this.skus.length%})"/>
 						<input type="button" class="btn btn-xs btn-outline btn-warning" s-click="propertieList(this)"
 							   value="属性({%=this.propertieList.length%})"/>
 						<input type="button" class="btn btn-xs btn-success btn-outline" s-click="edit(this)"
@@ -493,7 +493,7 @@
 	function openSkuList(id, row) {
 		S.popupOpen('/food/foodSkuList.html', {id: id}).done(function (rs) {
 			var data = row.data()
-			data.skuList = rs
+			data.skus = rs
 			row.data(data)
 		})
 	}

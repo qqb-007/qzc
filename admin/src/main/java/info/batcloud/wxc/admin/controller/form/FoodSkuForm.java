@@ -1,25 +1,45 @@
 package info.batcloud.wxc.admin.controller.form;
 
+import org.python.antlr.ast.Str;
+
 import java.util.List;
 
 public class FoodSkuForm {
-
-    private List<String> skuIdList;
-    private List<String> specList;
-    private List<Float> boxNumList;
-    private List<Float> boxPriceList;
-    private List<Float> priceRatioList;
+    private List<Long> idList;
+    private List<String> nameList;
+    private List<String> upcList;
     private List<Integer> weightList;
-    private List<Boolean> ignoreList;
+    private List<String> specList;
+    private List<Float> inputTaxList;
+    private List<Float> outputTaxList;
+    private List<Integer> minOrderCountList;
+    private List<Integer> boxNumList;
+    private List<Float> boxPriceList;
 
     private List<Float> quoteUnitRatioList;
 
-    public List<Boolean> getIgnoreList() {
-        return ignoreList;
+    public List<Long> getIdList() {
+        return idList;
     }
 
-    public void setIgnoreList(List<Boolean> ignoreList) {
-        this.ignoreList = ignoreList;
+    public void setIdList(List<Long> idList) {
+        this.idList = idList;
+    }
+
+    public List<String> getNameList() {
+        return nameList;
+    }
+
+    public void setNameList(List<String> nameList) {
+        this.nameList = nameList;
+    }
+
+    public List<String> getUpcList() {
+        return upcList;
+    }
+
+    public void setUpcList(List<String> upcList) {
+        this.upcList = upcList;
     }
 
     public List<Integer> getWeightList() {
@@ -30,22 +50,6 @@ public class FoodSkuForm {
         this.weightList = weightList;
     }
 
-    public List<Float> getQuoteUnitRatioList() {
-        return quoteUnitRatioList;
-    }
-
-    public void setQuoteUnitRatioList(List<Float> quoteUnitRatioList) {
-        this.quoteUnitRatioList = quoteUnitRatioList;
-    }
-
-    public List<String> getSkuIdList() {
-        return skuIdList;
-    }
-
-    public void setSkuIdList(List<String> skuIdList) {
-        this.skuIdList = skuIdList;
-    }
-
     public List<String> getSpecList() {
         return specList;
     }
@@ -54,11 +58,35 @@ public class FoodSkuForm {
         this.specList = specList;
     }
 
-    public List<Float> getBoxNumList() {
+    public List<Float> getInputTaxList() {
+        return inputTaxList;
+    }
+
+    public void setInputTaxList(List<Float> inputTaxList) {
+        this.inputTaxList = inputTaxList;
+    }
+
+    public List<Float> getOutputTaxList() {
+        return outputTaxList;
+    }
+
+    public void setOutputTaxList(List<Float> outputTaxList) {
+        this.outputTaxList = outputTaxList;
+    }
+
+    public List<Integer> getMinOrderCountList() {
+        return minOrderCountList;
+    }
+
+    public void setMinOrderCountList(List<Integer> minOrderCountList) {
+        this.minOrderCountList = minOrderCountList;
+    }
+
+    public List<Integer> getBoxNumList() {
         return boxNumList;
     }
 
-    public void setBoxNumList(List<Float> boxNumList) {
+    public void setBoxNumList(List<Integer> boxNumList) {
         this.boxNumList = boxNumList;
     }
 
@@ -70,11 +98,11 @@ public class FoodSkuForm {
         this.boxPriceList = boxPriceList;
     }
 
-    public List<Float> getPriceRatioList() {
-        return priceRatioList;
+    public List<Float> getQuoteUnitRatioList() {
+        return quoteUnitRatioList;
     }
 
-    public void setPriceRatioList(List<Float> priceRatioList) {
-        this.priceRatioList = priceRatioList;
+    public void setQuoteUnitRatioList(List<Float> quoteUnitRatioList) {
+        this.quoteUnitRatioList = quoteUnitRatioList;
     }
 }

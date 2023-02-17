@@ -27,7 +27,7 @@ public class StoreUserFoodDTO {
 
     private String saleTime;
 
-    private List<FoodSku> skuList;
+    private List<FoodSkuDTO> skuList;
 
     private Float quotePrice;
 
@@ -91,11 +91,20 @@ public class StoreUserFoodDTO {
         this.warehouseName = warehouseName;
     }
 
-    public List<FoodSku> getSkuList() {
+//    public List<FoodSku> getSkuList() {
+//        return skuList;
+//    }
+//
+//    public void setSkuList(List<FoodSku> skuList) {
+//        this.skuList = skuList;
+//    }
+
+
+    public List<FoodSkuDTO> getSkuList() {
         return skuList;
     }
 
-    public void setSkuList(List<FoodSku> skuList) {
+    public void setSkuList(List<FoodSkuDTO> skuList) {
         this.skuList = skuList;
     }
 

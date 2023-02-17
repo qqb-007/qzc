@@ -1,0 +1,164 @@
+<metat title="选择商品(sku)" args="multi:true,name,quotable,excludeStoreUserId" width="1000"/>
+<div class="p">
+    <div class="m-b clearfix">
+        <form class="form-inline pull-left" id="form">
+            <!--<input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品编码"-->
+                   <!--style="width:200px;" name="code"/>-->
+            <input autocomplete="off" type="text" class="form-control input-sm" placeholder="商品名"
+                   s s-data="name"
+                   style="width:200px;" name="name"/>
+            <input autocomplete="off" type="text" class="form-control input-sm" value="20" placeholder="每页数量"
+                   style="width:200px;" name="pageSize"/>
+            <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
+            <input autocomplete="off" type="hidden" name="excludeStoreUserId" s s-data="excludeStoreUserId"/>
+            <!--多选分类-->
+            <!--<select id = "categorySelect" class="selectpicker show-tick hidden" s="select" s-select="{value: 'name'}"
+                    s-build="S.get('/api/food-category/list')" multiple="multiple">
+            </select>-->
+            <!--<select class="form-control input-sm" s="select" s-select="{value: 'name'}"-->
+                    <!--name="categoryName"-->
+                    <!--s-build="S.get('/api/food-category/list')">-->
+                <!--<option value="">选择分类</option>-->
+            <!--</select>-->
+            <label class="s-checkbox">
+                <input autocomplete="off" type="checkbox" name="quotable" s-data="quotable" s value="true"
+                       s-check-role="checkall-h"/>
+                <span class="s-checkbox-indicator"></span> 可报价
+            </label>
+            <button type="button" class="btn btn-default btn-sm"
+                    s-click="$page.node.val(1); $foodsGrid.refresh()">查询
+            </button>
+        </form>
+    </div>
+    <div id="foodsGrid"
+         s='check,datac,nda'
+         s-data-switch="'off-on'"
+         s-data="S.get('/api/store-user-food/searchSku', $form.node.serialize())">
+        <div style="max-height: 500px; overflow: auto">
+            <table class="table table-striped table-bordered form-inline">
+                <tr>
+                    <th style="width: 1px;">
+                        <label class="s-checkbox">
+                            <input autocomplete="off" type="checkbox" s-check-role="checkall-h"/>
+                            <span class="s-checkbox-indicator"></span>
+                        </label>
+                    </th>
+                    <th>图片</th>
+                    <th>名称</th>
+                    <th>所属商品编码</th>
+                    <th class="text-right">upc编码</th>
+                    <th class="text-center">重量</th>
+                    <th class="text-right">售卖单位</th>
+                    <th class="text-center">最小起购份数</th>
+                    <th class="text-center">包装盒数量</th>
+                    <th class="text-right">包装盒单价</th>
+                </tr>
+                <tbody s="loop" s-data-filter="'results'">
+                <tr s-loop-role="empty">
+                    <td colspan="10" class="alert alert-warning">
+                        暂无商品
+                    </td>
+                </tr>
+                <tr s-loop-role="row" class="food-row" s="datac" s-check-role="i">
+                    <td>
+                        <label class="s-checkbox">
+                            <input autocomplete="off" type="checkbox" s-check-role="h"/>
+                            <span class="s-checkbox-indicator"></span>
+                        </label>
+                    </td>
+                    <td s="tpl">
+                        <img src="{%=this.picture%}" style="max-width: 40px; max-height: 40px;"/>
+                    </td>
+                    <td>
+                        <span name="name"></span>
+                        <div>ID: <span name="id"></span></div>
+                    </td>
+                    <td name="foodId"></td>
+                    <td name="upc" class="text-right"></td>
+                    <td name="weight" class="text-center"></td>
+                    <td name="spec" class="text-right"></td>
+                    <td name="minOrderCount" class="text-center"></td>
+                    <td name="boxNum" class="text-right"></td>
+                    <td name="boxPrice" class="text-center"></td>
+                    <!--<td class="text-center">-->
+                        <!--<input autocomplete="off" type="text" style="width: 50px;"-->
+                               <!--class="form-control text-center" name="quoteUnit"-->
+                               <!--s-change="quoteUnitChange(this)"/>-->
+                    <!--</td>-->
+                    <!--<td class="text-right">-->
+                        <!--<span name="perIncrease"></span>%-->
+                    <!--</td>-->
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-t b-t text-right">
+            <!--共有<span name="total"></span>个数据-->
+            <ul s="pagination"
+                s-pagination="{action:function(){$page.node.val(this); $foodsGrid.refresh()}}"
+                class="pagination pagination-sm">
+            </ul>
+        </div>
+    </div>
+</div>
+<script>
+    // //初始化
+    // S.on('s-ready', function() {
+    //     $categorySelect.node.multiselect({
+    //         maxHeight :200,
+    //         checkboxName: function() {
+    //             return 'categoryNameList'
+    //         },
+    //         buttonText: function(options, select) {
+    //             if (options.length === 0) {
+    //                 return '选择分类';
+    //             } else {
+    //                 var labels = [];
+    //                 options.each(function(i) {
+    //                     if(i>1){
+    //                         return false;
+    //                     }
+    //                     if ($(this).attr('label') !== undefined) {
+    //                         labels.push($(this).attr('label'));
+    //                     }
+    //                     else {
+    //                         labels.push($(this).html());
+    //                     }
+    //                 });
+    //                 return labels.join(', ') + '';
+    //             }
+    //         }
+    //     });
+    // });
+    // //下拉框渲染
+    // $('#categorySelect').selectpicker({
+    //     'selectedText': 'cat'
+    // });
+
+    S.meta.btns = [
+        {
+            name: "选择",
+            style: "btn btn-primary",
+            click: function () {
+                var datas = $foodsGrid.getCheckedData();
+                if (datas.length) {
+                    S.close(datas);
+                } else {
+                    S.toast("您还没有选择商品！", "warning");
+                }
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function () {
+                S.close();
+            }
+        }
+    ]
+
+    S.node.delegate('.food-row', 'dblclick', function (e) {
+        var node = $(e.currentTarget);
+        S.close([Smart.of(node).data()])
+    })
+</script>

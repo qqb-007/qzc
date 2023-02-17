@@ -70,6 +70,9 @@ public class FoodServiceImpl implements FoodService {
     private FoodRepository foodRepository;
 
     @Inject
+    private FoodSkuService foodSkuService;
+
+    @Inject
     private OSSClient ossClient;
 
     @Inject
@@ -916,6 +919,7 @@ public class FoodServiceImpl implements FoodService {
         FoodDTO dto = new FoodDTO();
         BeanUtils.copyProperties(food, dto);
         dto.setSkuList(FoodHelper.parseFoodSkuList(food.getSkuJson()));
+        dto.setSkus(foodSkuService.getFoodSkuList(food.getId()));
         dto.setPropertieList(FoodHelper.parseFoodPropertieList(food.getPropertieJson()));
         return dto;
     }

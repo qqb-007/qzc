@@ -223,6 +223,9 @@
                 <a href="javascript:;" class="btn btn-default btn-sm" s-click="return addToStore()"><i
                         class="fa fa-plus"></i>
                     添加到门店</a>
+                <a href="javascript:;" class="btn btn-default btn-sm" s-click="return cg()"><i
+                        class="fa fa-plus"></i>
+                    采购</a>
                 <a href="javascript:;" class="btn btn-default btn-sm" s-click="return batchAdd()"><i
                         class="fa fa-plus"></i>
                     批量添加</a>
@@ -282,7 +285,7 @@
                     <th class="text-right">门店报价</th>
                     <th class="text-center">审核</th>
                     <th class="text-center">发布</th>
-                    <th class="text-center">库位</th>
+                    <!--<th class="text-center">库位</th>-->
                     <th class="text-right form-inline">
                         操作
                     </th>
@@ -571,11 +574,11 @@
                             </table>
                         </div>
                     </td>
-                    <td class="text-center" s="tpl">
-                        <div name="warehouseName" class="f-xs text-muted">{%=this.warehouseName%}</div>
-                        <a href="javascript:;" s-click="bindWarehouse(this)">绑定库位</a>
-                        <a href="javascript:;" s-click="delWarehouse(this)">解绑库位</a>
-                    </td>
+                    <!--<td class="text-center" s="tpl">-->
+                        <!--<div name="warehouseName" class="f-xs text-muted">{%=this.warehouseName%}</div>-->
+                        <!--<a href="javascript:;" s-click="bindWarehouse(this)">绑定库位</a>-->
+                        <!--<a href="javascript:;" s-click="delWarehouse(this)">解绑库位</a>-->
+                    <!--</td>-->
                     <!--<td name="warehouseName" class="text-center"></td>-->
                     <td class="text-right" s="tpl">
                         {%if(this.quoteStatus == 'WAIT_VERIFY') {%}
@@ -868,6 +871,13 @@
 
     function addToStore() {
         S.popupOpen('/storeUserFood/storeUserFoodAdd.html').done(function (rs) {
+            $page.node.val(1)
+            rs && $foodsGrid.refresh();
+        })
+    }
+
+    function cg() {
+        S.popupOpen('/test/caigou.html').done(function (rs) {
             $page.node.val(1)
             rs && $foodsGrid.refresh();
         })
