@@ -1,0 +1,11 @@
+<label class="col-sm-2 control-label">选择门店：</label>
+<div s="tpl" id="storeUserList" style="display: inline-block">
+    <div style="display: inline-block" class="store-info"  id="storeName" value="{%=this.name%}"  name="storeName">
+        {%=this.name%} <a href="javascript:;" s-click="this.node.parent().remove()"
+                          class="fa fa-times"></a>
+        <input type="hidden" name="storeId" data-name="{%=this.name%}" class="store-user-id"
+               value="{%=this.id%}"/>
+        <input type="hidden" name="store" data-name="{%=this.name%}" class="store-user-id"
+               value="{%=this.name%}"/>
+    </div>
+</div>

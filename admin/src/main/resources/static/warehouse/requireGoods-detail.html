@@ -15,7 +15,7 @@
         <form class="form-inline pull-left" id="purchase" s="form"
               s-form="{action:function(){$page.node.val(1); $purchaseGrid.refresh()}}"
         >
-            <input type="hidden" name="procurementId" s s-data="storeData.procurementId"/>
+            <input type="hidden" name="id" s s-data="storeData.id"/>
             <span s s-data="storeData.name"/>
             <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
 
@@ -46,8 +46,6 @@
                 <td name="foodName"></td>
                 <td name="foodNum"></td>
                 <td name="foodPrice"></td>
-                <td name="actualArrivalNum"></td>
-                <td name="actualArrivalSumprice"></td>
                 <td name="date"></td>
                 <td class="text-center" s="tpl"></td>
 
