@@ -1,11 +1,15 @@
 package info.batcloud.wxc.core.service.impl;
 
+import info.batcloud.wxc.core.dto.FoodDTO;
 import info.batcloud.wxc.core.dto.FoodSkuDTO;
+import info.batcloud.wxc.core.entity.Food;
 import info.batcloud.wxc.core.entity.FoodSku;
 import info.batcloud.wxc.core.exception.BizException;
+import info.batcloud.wxc.core.repository.FoodRepository;
 import info.batcloud.wxc.core.repository.FoodSkuRepository;
 import info.batcloud.wxc.core.service.FoodService;
 import info.batcloud.wxc.core.service.FoodSkuService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +24,10 @@ public class FoodSkuServiceImpl implements FoodSkuService {
 
     @Inject
     private FoodService foodService;
+
+    @Inject
+    private FoodRepository foodRepository;
+
 
     @Override
     public void createFoodSku(CreateParam createParam) {
@@ -46,16 +54,17 @@ public class FoodSkuServiceImpl implements FoodSkuService {
     @Override
     public List<FoodSkuDTO> getFoodSkuList(Long foodId) {
         List<FoodSku> foodSkus = foodSkuRepository.findByFoodId(foodId);
+        Food food = foodRepository.findOne(foodId);
         List<FoodSkuDTO> dtos = new ArrayList<>();
         for (FoodSku skus : foodSkus) {
-            dtos.add(toDTO(skus, false));
+            dtos.add(toDTO(skus, food.getPicture()));
         }
         return dtos;
     }
 
     @Override
     public FoodSkuDTO getFoodSku(Long skuId) {
-        return toDTO(foodSkuRepository.findOne(skuId), true);
+        return toDTO(foodSkuRepository.findOne(skuId), null);
     }
 
     @Override
@@ -99,12 +108,19 @@ public class FoodSkuServiceImpl implements FoodSkuService {
         return null;
     }
 
-    private FoodSkuDTO toDTO(FoodSku foodSku, boolean fenchFood) {
+    private FoodSkuDTO toDTO(FoodSku foodSku, String picture) {
         FoodSkuDTO dto = new FoodSkuDTO();
         BeanUtils.copyProperties(foodSku, dto);
-        if (fenchFood) {
-            dto.setFoodDTO(foodService.findById(foodSku.getId()));
+
+//        FoodDTO foodDTO = foodService.findById(foodSku.getFoodId());
+        //dto.setFoodId(foodSku.getFoodId());
+        if (StringUtils.isNotBlank(picture)) {
+            dto.setPicture(picture);
+        } else {
+            dto.setPicture(foodRepository.findOne(foodSku.getFoodId()).getPicture());
         }
+
+
         return dto;
     }
 }

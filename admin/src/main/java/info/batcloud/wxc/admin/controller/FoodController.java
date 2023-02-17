@@ -1,10 +1,12 @@
 package info.batcloud.wxc.admin.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.ctospace.archit.common.pagination.Paging;
 import info.batcloud.wxc.admin.controller.form.FoodSkuForm;
 import info.batcloud.wxc.admin.permission.ManagerPermissions;
 import info.batcloud.wxc.admin.permission.annotation.Permission;
 import info.batcloud.wxc.core.domain.FoodSku;
+import info.batcloud.wxc.core.dto.FoodDTO;
 import info.batcloud.wxc.core.dto.FoodSkuDTO;
 import info.batcloud.wxc.core.entity.Food;
 import info.batcloud.wxc.core.entity.FoodCategory;
@@ -18,7 +20,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/api/food")
 @RestController
@@ -36,6 +40,20 @@ public class FoodController {
     @GetMapping("/search")
     public Object search(FoodService.SearchParam param) {
         return foodService.search(param);
+    }
+
+    @GetMapping("/sku/search")
+    public Object skuSearch(FoodService.SearchParam param) {
+        Paging<FoodDTO> paging = foodService.search(param);
+        List<FoodSkuDTO> list = new ArrayList<>();
+        for (FoodDTO result : paging.getResults()) {
+            list.addAll(result.getSkus());
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("results", list);
+        map.put("page", paging.getPage());
+        map.put("maxPage",(paging.getTotal() + paging.getPageSize() - 1) / paging.getPageSize());
+        return map;
     }
 
     @PutMapping("/meituan-tag/{id}")
@@ -244,8 +262,9 @@ public class FoodController {
     @Permission(value = ManagerPermissions.FOOD_MANAGE)
     public Object setSku(@PathVariable long id, FoodSkuForm form) {
         //List<FoodSkuDTO> foodSkus = new ArrayList<>();
+        System.out.println(form.getNameList().size());
         for (int i = 0; i < form.getNameList().size(); i++) {
-            if(form.getIdList().get(i) == null){
+            if (form.getIdList().size() == 0 || form.getIdList().get(i) == null) {
                 //新增
                 FoodSkuService.CreateParam param = new FoodSkuService.CreateParam();
                 param.setFoodId(id);
@@ -259,7 +278,7 @@ public class FoodController {
                 param.setBoxNum(form.getBoxNumList().get(i));
                 param.setBoxPrice(form.getBoxPriceList().get(i));
                 foodSkuService.createFoodSku(param);
-            }else {
+            } else {
                 FoodSkuService.UpdateParam updateParam = new FoodSkuService.UpdateParam();
                 updateParam.setId(form.getIdList().get(i));
                 updateParam.setUpc(form.getUpcList().get(i));

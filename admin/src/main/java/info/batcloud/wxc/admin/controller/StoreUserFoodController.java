@@ -249,8 +249,9 @@ public class StoreUserFoodController {
     @PostMapping()
     @Permission(value = ManagerPermissions.STORE_USER_FOOD)
     public Object batchSave(@RequestParam String json) {
-        StoreUserFoodService.BatchSaveParam param = JSON.parseObject(json, StoreUserFoodService.BatchSaveParam.class);
-        storeUserFoodService.batchSaveStoreUserFood(param);
+        System.out.println(json);
+//        StoreUserFoodService.BatchSaveParam param = JSON.parseObject(json, StoreUserFoodService.BatchSaveParam.class);
+//        storeUserFoodService.batchSaveStoreUserFood(param);
         return true;
     }
 

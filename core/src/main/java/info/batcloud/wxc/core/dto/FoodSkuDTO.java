@@ -3,7 +3,12 @@ package info.batcloud.wxc.core.dto;
 public class FoodSkuDTO {
     private Long id;
 
-    private FoodDTO foodDTO;
+    //private FoodDTO foodDTO;
+
+    private Long foodId;
+
+    private String picture;
+
     //upc
     private String upc;
 
@@ -23,6 +28,22 @@ public class FoodSkuDTO {
 
     private Float boxPrice;
 
+    public Long getFoodId() {
+        return foodId;
+    }
+
+    public void setFoodId(Long foodId) {
+        this.foodId = foodId;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
     public Long getId() {
         return id;
     }
@@ -31,13 +52,13 @@ public class FoodSkuDTO {
         this.id = id;
     }
 
-    public FoodDTO getFoodDTO() {
-        return foodDTO;
-    }
-
-    public void setFoodDTO(FoodDTO foodDTO) {
-        this.foodDTO = foodDTO;
-    }
+//    public FoodDTO getFoodDTO() {
+//        return foodDTO;
+//    }
+//
+//    public void setFoodDTO(FoodDTO foodDTO) {
+//        this.foodDTO = foodDTO;
+//    }
 
     public String getUpc() {
         return upc;
