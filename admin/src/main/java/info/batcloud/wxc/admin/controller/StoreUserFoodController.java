@@ -239,10 +239,11 @@ public class StoreUserFoodController {
 
     @PutMapping("/special-sku/{id}")
     @Permission(value = ManagerPermissions.STORE_USER_FOOD)
-    public Object setSpecialSku(@PathVariable long id, @RequestParam(required = false) List<String> specialSkuIdList, @RequestParam(required = false) List<String> skuId, @RequestParam(required = false) List<Integer> stock, @RequestParam(required = false) String eleSkuId) {
+    public Object setSpecialSku(@PathVariable long id, @RequestParam(required = false) List<String> specialSkuIdList, @RequestParam(required = false) List<Long> foodSkuId, @RequestParam(required = false) List<Integer> stock, @RequestParam(required = false) List<Float> inputPrice, @RequestParam(required = false) List<Float> outputPrice, @RequestParam(required = false) String eleSkuId) {
         storeUserFoodService.setSpecialSkuList(id, specialSkuIdList == null ? new ArrayList<>(0) : specialSkuIdList);
-        storeUserFoodService.updateStock(id, skuId, stock);
+        //storeUserFoodService.updateStock(id, skuId, stock);
         storeUserFoodService.setEleSkuId(id, eleSkuId);
+        storeUserFoodSkuService.adminUpdateSufSku(id, foodSkuId, stock, inputPrice, outputPrice);
         return true;
     }
 

@@ -38,7 +38,7 @@
 					{%}%}
 				</td>
 				<td>
-					<input type="text" class="form-control" readonly style="width: 100%" placeholder="skuId" s s-data-filter="'foodSkuId'" s-valid-error="require()"/>
+					<input type="text" class="form-control" readonly style="width: 100%" placeholder="skuId" name="foodSkuId" s s-data-filter="'foodSkuId'" s-valid-error="require()"/>
 
 				</td>
 				<td>
@@ -62,23 +62,23 @@
 					<input type="text" class="form-control" readonly style="width: 100%" placeholder="库位" s s-data-filter="'warehouseNames'" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<input type="number" class="form-control text-right" step="0.1" style="width: 100%" placeholder="进价"
-						   s s-data-filter="'inputPrice'" s-valid-error="require()"/>
+					<input type="number" class="form-control  text-right" step="0.1" style="width: 100%" placeholder="进价"
+						   s s-data-filter="'inputPrice'" name="inputPrice" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
 					<input type="number" class="form-control text-right" step="0.1" style="width: 100%" placeholder="零售价"
-						   s s-data-filter="'inputPrice'" s-valid-error="require()"/>
+						   s s-data-filter="'outputPrice'" name="outputPrice" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<input type="number" class="form-control text-right" style="width: 100%" placeholder="最小起购份数"
+					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="最小起购份数"
 						   s s-data-filter="'minOrderCount'" name="minOrderCount" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<input type="number" class="form-control text-right" style="width: 100%" placeholder="包装盒数量"
+					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="包装盒数量"
 						   s s-data-filter="'boxNum'" name="boxNum" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
-					<input type="number" class="form-control text-right" step="0.1" style="width: 100%" placeholder="包装盒单价"
+					<input type="number" class="form-control text-right" readonly step="0.1" style="width: 100%" placeholder="包装盒单价"
 						   s s-data-filter="'boxPrice'" s-valid-error="require()"/>
 				</td>
 
@@ -168,7 +168,7 @@
 				</td>
 				<td class="text-right">
 					<input type="number" class="form-control text-right" style="width: 100%" placeholder="库存"
-						   s s-data-filter="'stock'" readonly name="stock" s-valid-error="require()"/>
+						   s s-data-filter="'stock'" readonly s-valid-error="require()"/>
 				</td>
 				<td>
 					<input type="text" class="form-control" readonly style="width: 100%" placeholder="库位" s s-data-filter="'warehouseNames'" s-valid-error="require()"/>
@@ -179,7 +179,7 @@
 				</td>
 				<td class="text-right">
 					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="零售价"
-						   s s-data-filter="'inputPrice'" s-valid-error="require()"/>
+						   s s-data-filter="'outputPrice'" s-valid-error="require()"/>
 				</td>
 				<td class="text-right">
 					<input type="number" class="form-control text-right" readonly style="width: 100%" placeholder="最小起购份数"

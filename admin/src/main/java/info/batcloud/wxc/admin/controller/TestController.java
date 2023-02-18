@@ -80,6 +80,13 @@ public class TestController {
         return true;
     }
 
+    @GetMapping("/{id}")
+    public Object info(@PathVariable long id) {
+        String Json = "{\"msg\":\"数据获取成功\",\"code\":200,\"data\":{\"data\":[{\"id\":26,\"foodId\":26,\"foodName\":\"干桂圆858\",\"shopProcurementId\":45,\"foodNum\":null,\"foodPrice\":null,\"createTime\":1676683676,\"date\":null,\"actualArrivalNum\":null,\"actualArrivalSumprice\":null,\"skuId\":20364,\"updateTime\":null,\"num\":22,\"inputPrice\":22.0,\"img\":null,\"foodPicture\":null},{\"id\":27,\"foodId\":27,\"foodName\":\"黑芝麻300\",\"shopProcurementId\":45,\"foodNum\":null,\"foodPrice\":null,\"createTime\":1676683676,\"date\":null,\"actualArrivalNum\":null,\"actualArrivalSumprice\":null,\"skuId\":20363,\"updateTime\":null,\"num\":22,\"inputPrice\":22.0,\"img\":null,\"foodPicture\":null}],\"logisticsNo\":\"yt:1312323,sf：2222\",\"arrivalNum\":40,\"arrivalPrice\":1000.0}}";
+        JSONObject jsonObject1 = JSONObject.parseObject(Json);
+        return jsonObject1;
+    }
+
 
     @Transactional
     @GetMapping("/handle-store-user-region")

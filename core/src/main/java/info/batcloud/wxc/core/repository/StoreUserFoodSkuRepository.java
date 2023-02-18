@@ -13,4 +13,8 @@ public interface StoreUserFoodSkuRepository extends PagingAndSortingRepository<S
     StoreUserFoodSku findByStoreUserIdAndUpc(long stoerUserId, String upc);
 
     List<StoreUserFoodSku> findByFoodSkuId(long foodSkuId);
+
+    StoreUserFoodSku findByStoreUserFoodIdAndFoodSkuId(long storeUserId, long foodSkuId);
+
+    void deleteByStoreUserFoodId(long sfuId);
 }

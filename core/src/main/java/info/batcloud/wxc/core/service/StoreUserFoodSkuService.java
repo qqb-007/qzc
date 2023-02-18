@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface StoreUserFoodSkuService {
 
+    void adminUpdateSufSku(long sufId, List<Long> foodSkuId, List<Integer> stock, List<Float> inputPrice, List<Float> outputPrice);
+
     void createSufSku(Long sufId);
 
     void updateSufSku(UpdateParam updateParam);
@@ -58,6 +60,8 @@ public interface StoreUserFoodSkuService {
 
         private Integer stock;
 
+        private Boolean sale;
+
         private Float inputPrice;
 
         private Float outputPrice;
@@ -67,6 +71,14 @@ public interface StoreUserFoodSkuService {
         private Integer boxNum;
 
         private Float boxPrice;
+
+        public Boolean getSale() {
+            return sale;
+        }
+
+        public void setSale(Boolean sale) {
+            this.sale = sale;
+        }
 
         public Long getId() {
             return Id;

@@ -46,6 +46,19 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     private WarehouseRepository warehouseRepository;
 
     @Override
+    public void adminUpdateSufSku(long sufId, List<Long> foodSkuId, List<Integer> stock, List<Float> inputPrice, List<Float> outputPrice) {
+        for (int i = 0; i < foodSkuId.size(); i++) {
+            StoreUserFoodSku storeUserFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(sufId, foodSkuId.get(i));
+            storeUserFoodSku.setStock(stock.get(i));
+            storeUserFoodSku.setInputPrice(inputPrice.get(i));
+            storeUserFoodSku.setOutputPrice(outputPrice.get(i));
+            storeUserFoodSkuRepository.save(storeUserFoodSku);
+        }
+        //发布商品
+
+    }
+
+    @Override
     public void createSufSku(Long sufId) {
         //店铺添加商品时添加sku
         StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sufId);
@@ -149,7 +162,7 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
                 wnames.add(warehouseRepository.findOne(Long.valueOf(s)).getName());
             }
             dto.setWarehouseNames(String.join("、", wnames));
-        }else {
+        } else {
             dto.setWarehouseNames("暂未绑定库位");
         }
 
