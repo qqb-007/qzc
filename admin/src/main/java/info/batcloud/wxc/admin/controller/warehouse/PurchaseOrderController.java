@@ -87,10 +87,14 @@ public class PurchaseOrderController {
     * @param
     * @return
     */
-   @PutMapping("/updatePurchase/{id}")
-    public CommonResult updatePurchase(@PathVariable("id") Integer id, UpdatePurchaseDto updatePurchaseDto){
-       updatePurchaseDto.setId(id);
-       purchaseOrderService.updatePurchase(updatePurchaseDto);
+   @PostMapping("/updatePurchase")
+    public CommonResult updatePurchase(@RequestParam("id") Integer id,@RequestParam("data")String data,
+                                       @RequestParam("storeName")String storeName,@RequestParam("logisticsNo")String logisticsNo,
+                                       @RequestParam("arrivalPrice")Double arrivalPrice,@RequestParam("arrivalNum") Integer arrivalNum,
+                                       @RequestParam("storeId")Integer storeId){
+       System.out.println(data);
+       JSONArray array = JSONArray.parseArray(data);
+       purchaseOrderService.updatePurchase(id,array,storeName,logisticsNo,arrivalPrice,arrivalNum,storeId);
        return new CommonResult("操作成功");
    }
 

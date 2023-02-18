@@ -59,7 +59,10 @@ public interface PurchaseOrderService {
      * @param
      * @return
      */
-    Integer updatePurchase(UpdatePurchaseDto updatePurchaseDto);
+    Integer updatePurchase(Integer id,JSONArray data,
+                           String storeName,String logisticsNo,
+                           Double arrivalPrice,Integer arrivalNum,
+                           Integer storeId);
 
 
     /**
@@ -92,4 +95,15 @@ public interface PurchaseOrderService {
      * @return
      */
     Map<String,Object> getEditPurchaseInfo(Integer id);
+
+
+    /**
+     *
+     * describe 修改采购单实到商品数量金额
+     * @author V
+     * @date 18/2/2023 下午4:17
+     * @param
+     * @return
+     */
+    Integer updatePurchaseGoodsToApp(Integer id,Integer actualArrivalNum,Double actualArrivalSumprice);
 }

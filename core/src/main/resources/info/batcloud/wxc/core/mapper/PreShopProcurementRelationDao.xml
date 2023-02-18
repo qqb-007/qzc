@@ -130,6 +130,21 @@
             <if test="createTime != null">
                 create_time = #{createTime},
             </if>
+            <if test="skuId != null">
+                sku_id = #{skuId},
+            </if>
+            <if test="actualArrivalNum != null">
+                actual_arrival_num = #{actualArrivalNum},
+            </if>
+            <if test="actualArrivalSumprice != null">
+                actual_arrival_sumprice = #{actualArrivalSumprice},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="img != null and img != ''">
+                img = #{img},
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -145,7 +160,9 @@
     <select id="getPurchaseRelationByPurchaseIdToReceipt" resultType="info.batcloud.wxc.core.entity.PreShopProcurementRelation">
         select *,from_unixtime(update_time) as `date` from pre_shop_procurement_relation where shop_procurement_id=#{id}
     </select>
-
+    <delete id="deleteByPurchaseId">
+        delete from pre_shop_procurement_relation where shop_procurement_id = #{id}
+    </delete>
 
 </mapper>
 

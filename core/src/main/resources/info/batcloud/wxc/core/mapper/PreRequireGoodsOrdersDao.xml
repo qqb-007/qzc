@@ -26,7 +26,9 @@
     <!--查询指定行数据-->
     <select id="queryAll" resultMap="PreRequireGoodsOrdersMap">
         select
-          id, require_goods_no, store_id, store_name, status, require_goods_num, require_goods_price, remark, from_unixtime(create_time) as `date`, sku_id
+          id, require_goods_no, store_id, store_name, status,
+        (case status when 1 then '待处理' when 2 then'未处理' else '已作废' end) statusName,
+        require_goods_num, require_goods_price, remark, from_unixtime(create_time) as `date`, sku_id
         from pre_require_goods_orders
         <where>
             <if test="id != null">

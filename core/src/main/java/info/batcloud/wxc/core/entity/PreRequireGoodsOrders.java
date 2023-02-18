@@ -22,6 +22,7 @@ public class PreRequireGoodsOrders implements Serializable {
   private Integer skuId;
   private Long createTime;
   private String date;
+  private String statusName;
 
 
 

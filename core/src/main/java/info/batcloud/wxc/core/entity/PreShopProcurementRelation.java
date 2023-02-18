@@ -20,7 +20,7 @@ public class PreShopProcurementRelation {
   private Integer actualArrivalNum;
   private Double actualArrivalSumprice;
   private Integer skuId;
-  private Integer updateTime;
+  private Long updateTime;
   private Integer num;
   private Double inputPrice;
   private String img;

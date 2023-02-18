@@ -86,5 +86,7 @@ public interface PreShopProcurementRelationDao {
 
     List<PreShopProcurementRelation> getPurchaseRelationByPurchaseIdToReceipt(Integer id);
 
+    int deleteByPurchaseId(Integer id);
+
 }
 

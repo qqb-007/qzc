@@ -27,6 +27,14 @@ public class ReceiptController {
     @Resource
     private PurchaseOrderService purchaseOrderService;
 
+    /**
+     *
+     * describe 收货单列表
+     * @author V
+     * @date 18/2/2023 下午4:50
+     * @param
+     * @return
+     */
     @GetMapping("/getReceiptList")
     public CommonResultPage getReceiptList(@RequestParam("storeId") Integer storeId, @RequestParam("startTime")String startTime,
                                            @RequestParam("endTime") String endTime, @RequestParam("logisticsNo") String logisticsNo,

@@ -1,31 +1,13 @@
 <meta title="编辑采购单" width="900px" args="goods:_model_,storeData" model="S.get('/api/back/warehouse/getEditPurchaseInfo/' + storeData.id)"/>
 <div class="p">
     <form id="form" s="valid,form,nda,datac">
-        <div class="form-group" s-valid-role="item">
-            <label class="col-sm-2 control-label">实收总数量：</label>
-            <div class="col-sm-10">
-                <input  s s-data="goods.data.arrivalNum" type="text" s-data-filter="'goods.data.arrivalNum'" name="goods.data.arrivalNum" class="form-control">
-            </div>
-        </div>
-        <div class="form-group" s-valid-role="item">
-            <label class="col-sm-2 control-label">实收总金额：</label>
-            <div class="col-sm-10">
-                <input  s s-data="goods.data.arrivalPrice" type="text" s-data-filter="'goods.data.arrivalPrice'"     name="arrivalPrice" class="form-control" placeholder="实收总金额">
-            </div>
-        </div>
-        <div class="form-group" s-valid-role="item">
-            <label class="col-sm-2 control-label">物流单号：</label>
-            <div class="col-sm-10">
-                <input s s-data="goods.data.logisticsNo" type="text" s-data-filter="'goods.data.logisticsNo'" type="text" name="logisticsNo" class="form-control" placeholder="如yt:XXX,sf:XXX">
-            </div>
-        </div>
         <div class="p-b clearfix">
+            <div class="pull-left"  s s-data="storeData.store storeId" s-data-filter="storeData.store"></div>
             <div class="pull-left">
-                <div s-valid-role="item" id="storeUser" s="tpl" s-data="{}" s-valid-label="门店"
-                     s-click="selectStoreUser()" style="display: inline-block">
-                    <a href="javascript:;" class="h3">{%=this.name || '选择门店'%} <i class="fa fa-plus"></i></a>
-                    <input type="hidden" name="storeUserId" value="{%=this.id%}" s-valid-error="require()"/>
-                    <input type="hidden" class="storeName" name="storeName" value="{%=this.name%}" s-valid-error="require()"/>
+                <div  id="storeUser" s="tpl" s-data="{}" s-valid-label="门店" style="display: inline-block">
+                    <div href="javascript:;" class="h3" s s-data="storeData.store">{%=this.name || '选择门店'%} <i class="fa fa-plus"></i></div>
+                    <input type="hidden"  name="storeUserId" s s-data="storeData.storeId" />
+                    <input type="hidden" class="storeName" name="storeName" value="{%=this.name%}" />
                 </div>
             </div>
             <div class="pull-right">
@@ -45,18 +27,6 @@
                     <th class="text-right">操作</th>
                 </tr>
                 <tbody s="loop" id="foodList" s-data="goods.data.data">
-                <tr s-loop-role="row" class="food-quote-row" s="datac"  >
-                    <td s="tpl" class="text-right">
-                        <img src="{%=this.foodPicture%}" style="max-width: 40px; max-height: 40px;"/>
-                    </td>
-                    <td class="text-right" s s-data-filter="'foodName'"></td>
-                    <td class="text-right" s s-data-filter="'inputPrice'"></td>
-                    <td class="text-right" s s-data-filter="'num'"></td>
-                    <td class="text-right">
-                        <a href="javascript:;" class="btn btn-xs btn-danger" s-click="this.node.closest('tr').remove()">删除</a>
-                    </td>
-                </tr>
-                </tbody>
                 <tr s-loop-role="empty">
                     <td colspan="5" class="alert alert-warning">
                         暂无商品
@@ -65,6 +35,7 @@
                 <tr s-loop-role="row" class="food-quote-row" s="datac">
                     <td s="tpl">
                         <img src="{%=this.foodPicture%}" style="max-width: 40px; max-height: 40px;"/>
+                        <input type="hidden" class="img" value="{%=this.foodPicture%}"/>
                         <input type="hidden" class="sku-id" value="{%=this.skuId%}"/>
                         <input type="hidden" class="food-id" value="{%=this.foodId%}"/>
                         <!--<input type="hidden" class="sale" value="{%=this.sale%}"/>-->
@@ -96,9 +67,28 @@
                         <a href="javascript:;" class="btn btn-xs btn-danger" s-click="this.node.closest('tr').remove()">删除</a>
                     </td>
                 </tr>
+                </tbody>
+
             </table>
 
-
+            <div class="form-group" s-valid-role="item">
+                <label class="col-sm-2 control-label">实收总数量：</label>
+                <div class="col-sm-10">
+                    <input  s s-data="goods.data.arrivalNum" type="text" s-data-filter="'goods.data.arrivalNum'" name="goods.data.arrivalNum" class="form-control arrivalNum">
+                </div>
+            </div>
+            <div class="form-group" s-valid-role="item">
+                <label class="col-sm-2 control-label">实收总金额：</label>
+                <div class="col-sm-10">
+                    <input  s s-data="goods.data.arrivalPrice" type="text" s-data-filter="'goods.data.arrivalPrice'"     name="arrivalPrice" class="form-control arrivalPrice" placeholder="实收总金额">
+                </div>
+            </div>
+            <div class="form-group" s-valid-role="item">
+                <label class="col-sm-2 control-label">物流单号：</label>
+                <div class="col-sm-10">
+                    <input s s-data="goods.data.logisticsNo" type="text" s-data-filter="'goods.data.logisticsNo'" type="text" name="logisticsNo" class="form-control logisticsNo" placeholder="如yt:XXX,sf:XXX">
+                </div>
+            </div>
             <!--            <label class="col-sm-2 control-label">商品种类数量：</label>-->
             <!--            <div class="col-sm-10">-->
             <!--                <input class="form-control goodsTypeNum"  rows="3" name="goodsTypeNum "/>-->
@@ -132,7 +122,6 @@
             name: "确定",
             style: "btn btn-primary",
             click: function () {
-                S.alert($goods.data.data.foodName)
                 var deferred = $.Deferred()
                 $form.validate().done(function () {
                     var list = []
@@ -146,13 +135,14 @@
                         var inputPrice = inputPriceNode.val()
                         var num = numNode.val()
                         var foodName = row.find('.food-name').val()
-
+                        var img = row.find('.img').val()
                         var detail = {
                             foodId: parseInt(foodId),
                             skuId: parseInt(skuId),
                             inputPrice: parseInt(inputPrice),
                             num: parseInt(num),
-                            foodName:foodName
+                            foodName:foodName,
+                            img:img
                         }
                         list.push(detail)
                     })
@@ -167,12 +157,19 @@
                     var loadingDeferred = S.loading()
                     var param = {};
                     param.foodList = list
-                    param.storeUserId = [currentStoreUser.id]
-                    param.storeName=S.node.find('.storeName').val();
-                    // param.goodsTypeNum=S.node.find('.goodsTypeNum').val();
-                    // param.procurementNum=S.node.find('.procurementNum').val();
-                    // param.procurementPrice=S.node.find('.procurementPrice').val();
-                    S.post('/api/back/warehouse/createPurchaseOrder', {storeName:S.node.find('.storeName').val(),storeId:currentStoreUser.id,data: JSON.stringify(list)}).done(function (rs) {
+                    param.storeUserId = [storeData.storeId]
+
+                    // param.storeName=S.node.find('.storeName').val();
+                    // param.logisticsNo =S.node.find('.logisticsNo ').val();
+                    // param.arrivalPrice =S.node.find('.arrivalPrice ').val();
+                    // param.arrivalNum=S.node.find('.arrivalNum').val();
+                    S.post('/api/back/warehouse/updatePurchase', {id:storeData.id,
+                                                                    arrivalNum:parseInt(S.node.find('.arrivalNum').val()),
+                                                                    arrivalPrice:parseFloat(S.node.find('.arrivalPrice').val()),
+                                                                    logisticsNo:S.node.find('.logisticsNo').val(),
+                                                                    storeName:S.node.find('.storeName').val(),
+                                                                    storeId:storeData.storeId,
+                                                                    data: JSON.stringify(list)}).done(function (rs) {
                         if (rs) {
                             S.toast('创建成功', 'success')
                             S.close(true)
@@ -211,14 +208,14 @@
         })
     }
 
-    selectStoreUser();
+    // selectStoreUser();
 
 
     function selectFood() {
         S.popupOpen('/test/foodSkuSelector.html', {
             multi: true,
             quotable: true,
-            excludeStoreUserId: currentStoreUser.id
+            excludeStoreUserId: storeData.storeId
         }).done(function (foodList) {
             console.log(foodList)
             if (foodList) {
