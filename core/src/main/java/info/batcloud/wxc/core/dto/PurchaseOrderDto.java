@@ -1,5 +1,6 @@
 package info.batcloud.wxc.core.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import info.batcloud.wxc.core.entity.PreShopProcurement;
 import info.batcloud.wxc.core.entity.PreShopProcurementRelation;
 import lombok.Data;
@@ -30,9 +31,6 @@ public class PurchaseOrderDto {
     private String receiptNo;
     private Integer receiptId;
     private Integer createTime;
-    private List<Integer> foodId;
-    private List<String> foodName;
-    private List<Integer> foodNum;
-    private List<Double> foodPrice;
-    private List<Integer> skuId;
+    private List<GoodsDto> foodList;
+
 }

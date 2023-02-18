@@ -31,7 +31,7 @@ public interface PreShopProcurementRelationDao {
      * @param pageable         分页对象
      * @return 对象列表
      */
-    List<PreShopProcurementRelation> queryAllByLimit(PreShopProcurementRelation preShopProcurementRelation, @Param("pageable") Pageable pageable);
+    List<PreShopProcurementRelation> queryAll(PreShopProcurementRelation preShopProcurementRelation);
 
     /**
      * 统计总行数

@@ -1,5 +1,7 @@
 package info.batcloud.wxc.core.service.warehouse.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import info.batcloud.wxc.core.dto.PurchaseOrderDto;
 import info.batcloud.wxc.core.dto.UpdatePurchaseDto;
@@ -7,6 +9,7 @@ import info.batcloud.wxc.core.entity.PreShopProcurement;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName: PurchaseOrderService
@@ -24,7 +27,7 @@ public interface PurchaseOrderService {
      * @param
      * @return
      */
-    Integer createPurchaseOrder(PurchaseOrderDto purchaseOrderDto);
+    Integer createPurchaseOrder(JSONArray jsonArray,String storeName,Integer storeId);
 
     /**
      *
@@ -78,4 +81,15 @@ public interface PurchaseOrderService {
      * @return
      */
     PageInfo getPurchaseRelationToReceipt(Integer id,Integer pageNum);
+
+
+    /**
+     *
+     * describe 获取采购单编辑数据信息
+     * @author V
+     * @date 18/2/2023 上午9:56
+     * @param
+     * @return
+     */
+    Map<String,Object> getEditPurchaseInfo(Integer id);
 }
