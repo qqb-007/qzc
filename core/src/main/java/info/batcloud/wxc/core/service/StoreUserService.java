@@ -4,6 +4,7 @@ import com.ctospace.archit.common.pagination.Paging;
 import com.ctospace.archit.common.pagination.PagingParam;
 import info.batcloud.wxc.core.dto.StoreUserDTO;
 import info.batcloud.wxc.core.entity.StoreUser;
+import info.batcloud.wxc.core.entity.StoreUserFood;
 import info.batcloud.wxc.core.enums.DeliveryType;
 import info.batcloud.wxc.core.enums.SettleType;
 import info.batcloud.wxc.core.enums.StoreUserStatus;

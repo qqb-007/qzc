@@ -5,6 +5,7 @@ import com.ctospace.archit.common.pagination.PagingParam;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import info.batcloud.wxc.core.domain.Result;
 import info.batcloud.wxc.core.dto.StoreUserFoodDTO;
+import info.batcloud.wxc.core.entity.StoreUserFood;
 import info.batcloud.wxc.core.enums.*;
 import org.apache.xpath.operations.Bool;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -199,6 +200,29 @@ public interface StoreUserFoodService {
     void alignStoreUserFood(AlignStoreUserFoodParam param);
 
     File export(SearchParam param) throws IOException;
+
+    LowPrice getStoreUserFoodPrice(StoreUserFood storeUserFood);
+
+    class LowPrice {
+        Float inputPrice;
+        Float outputPrice;
+
+        public Float getInputPrice() {
+            return inputPrice;
+        }
+
+        public void setInputPrice(Float inputPrice) {
+            this.inputPrice = inputPrice;
+        }
+
+        public Float getOutputPrice() {
+            return outputPrice;
+        }
+
+        public void setOutputPrice(Float outputPrice) {
+            this.outputPrice = outputPrice;
+        }
+    }
 
     class BatchAddNewParam {
         private List<Long> storeUserId;

@@ -10,6 +10,7 @@ import info.batcloud.wxc.core.entity.StoreUserFoodSku;
 import info.batcloud.wxc.core.helper.PagingHelper;
 import info.batcloud.wxc.core.repository.*;
 import info.batcloud.wxc.core.service.FoodSkuService;
+import info.batcloud.wxc.core.service.StoreUserFoodService;
 import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -45,6 +46,9 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     @Inject
     private WarehouseRepository warehouseRepository;
 
+    @Inject
+    private StoreUserFoodService storeUserFoodService;
+
     @Override
     public void adminUpdateSufSku(long sufId, List<Long> foodSkuId, List<Integer> stock, List<Float> inputPrice, List<Float> outputPrice) {
         for (int i = 0; i < foodSkuId.size(); i++) {
@@ -54,6 +58,11 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
             storeUserFoodSku.setOutputPrice(outputPrice.get(i));
             storeUserFoodSkuRepository.save(storeUserFoodSku);
         }
+        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sufId);
+        StoreUserFoodService.LowPrice lowPrice = storeUserFoodService.getStoreUserFoodPrice(storeUserFood);
+        storeUserFood.setSalePrice(lowPrice.getOutputPrice());
+        storeUserFood.setQuotePrice(lowPrice.getInputPrice());
+        storeUserFoodRepository.save(storeUserFood);
         //发布商品
 
     }

@@ -3817,6 +3817,9 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         }
         FoodSetting foodSetting = systemSettingService.findActiveSetting(FoodSetting.class);
         List<RetailSkuParam> skuParams = this.getRetailSkuParam(storeUserFood);
+        if (skuParams.size() == 0) {
+            throw new BizException("请勾选规格后再进行操作");
+        }
         Map<String, RetailSkuParam> retailBySkuId = new HashMap<>();
         for (RetailSkuParam skuParam : skuParams) {
             retailBySkuId.put(skuParam.getSku_id(), skuParam);
@@ -4646,6 +4649,34 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
     }
 
     @Override
+    public LowPrice getStoreUserFoodPrice(StoreUserFood storeUserFood) {
+        LowPrice lowPrice = new LowPrice();
+        List<StoreUserFoodSku> skuList = storeUserFoodSkuRepository.findByStoreUserFoodId(storeUserFood.getId());
+        List<StoreUserFoodSku> xSkuList = new ArrayList<>();
+        for (StoreUserFoodSku storeUserFoodSku : skuList) {
+            if (storeUserFood.getSpecialSkuIdList().indexOf(storeUserFoodSku.getFoodSkuId().toString()) != -1) {
+                xSkuList.add(storeUserFoodSku);
+            }
+        }
+        if (xSkuList.size() == 0) {
+            throw new BizException("请勾选规格后再进行操作");
+        }
+        lowPrice.setInputPrice(xSkuList.get(0).getInputPrice());
+        lowPrice.setOutputPrice(xSkuList.get(0).getOutputPrice());
+        for (StoreUserFoodSku storeUserFoodSku : xSkuList) {
+            if (storeUserFoodSku.getInputPrice() <= lowPrice.getInputPrice()) {
+                lowPrice.setInputPrice(storeUserFoodSku.getInputPrice());
+            }
+
+            if (storeUserFoodSku.getOutputPrice() <= lowPrice.getOutputPrice()) {
+                lowPrice.setOutputPrice(storeUserFoodSku.getOutputPrice());
+            }
+
+        }
+        return lowPrice;
+    }
+
+    @Override
     public void batchSaveNew(BatchAddNewParam param) {
         //首先判断门店中是否存在该商品，不存在先添加商品
         //假如存在，再判断是否有该skuid
@@ -4717,6 +4748,10 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 //将该规格设置为勾选规格(往后加)
                 save.setSpecialSkuIdList(storeUserFoodSku.getFoodSkuId().toString());
                 storeUserFoodRepository.save(save);
+                LowPrice lowPrice = this.getStoreUserFoodPrice(save);
+                save.setQuotePrice(lowPrice.getInputPrice());
+                save.setSalePrice(lowPrice.getOutputPrice());
+                storeUserFoodRepository.save(save);
             } else {
                 //判断该商品是否含有已经存在的规格
                 StoreUserFoodSku sku = storeUserFoodSkuRepository.findByStoreUserIdAndUpc(storeUser.getId(), foodSku.getUpc());
@@ -4735,6 +4770,10 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 } else {
                     storeUserFood.setSpecialSkuIdList(sku.getFoodSkuId().toString());
                 }
+                storeUserFoodRepository.save(storeUserFood);
+                LowPrice lowPrice = this.getStoreUserFoodPrice(storeUserFood);
+                storeUserFood.setQuotePrice(lowPrice.getInputPrice());
+                storeUserFood.setSalePrice(lowPrice.getOutputPrice());
                 storeUserFoodRepository.save(storeUserFood);
             }
         }
