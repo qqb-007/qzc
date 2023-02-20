@@ -29,7 +29,7 @@ public interface PreReceiptOrdersDao {
      * @param pageable         分页对象
      * @return 对象列表
      */
-    List<PreReceiptOrders> queryAllByLimit(PreReceiptOrders preReceiptOrders, @Param("pageable") Pageable pageable);
+    List<PreReceiptOrders> queryAllByLimit(PreReceiptOrders preReceiptOrders);
 
     /**
      * 统计总行数
@@ -83,7 +83,7 @@ public interface PreReceiptOrdersDao {
 
     List<PreReceiptOrders> getReceiptOrder(@Param("storeId") Integer storeId,@Param("startTime")Long startTime,
                                            @Param("endTime") Long endTime,@Param("logisticsNo") String logisticsNo,
-                                           @Param("receiptNo") String receiptNo);
+                                           @Param("receiptNo") String receiptNo,@Param("status")Integer status);
 
 }
 

@@ -1,12 +1,13 @@
 package info.batcloud.wxc.merchant.api.controller.warehouse;
 
+import com.github.pagehelper.PageInfo;
 import info.batcloud.wxc.core.domain.BusinessResponse;
 import info.batcloud.wxc.core.dto.RequireGoodsDto;
+import info.batcloud.wxc.core.entity.CommonResult;
+import info.batcloud.wxc.core.entity.CommonResultPage;
+import info.batcloud.wxc.core.entity.PreRequireGoodsOrdersRelation;
 import info.batcloud.wxc.core.service.warehouse.service.RequireGoodsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -40,6 +41,37 @@ public class RequireGoodsController {
             e.printStackTrace();
             return BusinessResponse.error("操作失败");
         }
+    }
+
+    /**
+     *
+     * describe 根据门店获取要货单信息
+     * @author V
+     * @date 20/2/2023 下午1:30
+     * @param
+     * @return
+     */
+    @GetMapping("/getRequireGoodsByStoreId")
+    public CommonResultPage getRequireGoodsByStoreId(@RequestParam("storeId")Integer storeId,@RequestParam("page")Integer page){
+        PageInfo requireGoodsByStoreId = requireGoodsService.getRequireGoodsByStoreId(storeId, page);
+        return new CommonResultPage(requireGoodsByStoreId,requireGoodsByStoreId.getPageNum(),requireGoodsByStoreId.getTotal(),requireGoodsByStoreId.getPageSize(),requireGoodsByStoreId.getNextPage(),requireGoodsByStoreId.isHasNextPage());
+    }
+
+    /**
+     *
+     * describe 根据id获取要货单详情
+     * @author V
+     * @date 20/2/2023 下午1:39
+     * @param
+     * @return
+     */
+    @GetMapping("/getRequireGoodsById")
+    public CommonResultPage getRequireGoodsById(@RequestParam("id")Integer id,@RequestParam("page")Integer page){
+        PageInfo<PreRequireGoodsOrdersRelation> requireGoodsById = requireGoodsService.getRequireGoodsById(id, page);
+        return new CommonResultPage(requireGoodsById,requireGoodsById.getPageNum(),requireGoodsById.getTotal(),requireGoodsById.getPageSize(),requireGoodsById.getNextPage(),requireGoodsById.isHasNextPage());
 
     }
+
+
+
 }

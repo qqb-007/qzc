@@ -29,7 +29,7 @@
                      s-window="{href: '/storeUser/storeUserSelectorLight.html', args: {select: storeUserSelect}}">
                 </div>
             </div>
-            <span s s-data="storeUser.name"/>
+            <span s s-data="storeUser"/>
             <input autocomplete="off" type="text" class="form-control input-sm" placeholder="订单编号"
                    style="width:150px;" name="orderNo"/>
             <input autocomplete="off" type="hidden" name="page" id="page" value="1"/>
@@ -85,8 +85,6 @@
                 <td name="logisticsNo"></td>
                 <td name="receiptNo"></td>
                 <td name="date"></td>
-                <td class="text-center" s="tpl"></td>
-
                 <td class="text-right">
                     <input autocomplete="off" type="button" value="采购详情" class="btn btn-primary btn-xs"
                            s-click="var that = this; S.popupOpen('/warehouse/purchase-detail.html', {storeData: this.parent().data()}).done(function(rs){rs && $purchaseGrid.refresh();})"/>

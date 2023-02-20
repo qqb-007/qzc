@@ -27,11 +27,15 @@
                      s-window="{href: '/storeUser/storeUserSelectorLight.html', args: {select: storeUserSelect}}">
                 </div>
             </div>
-            <span s s-data="storeUser.name"/>
+            <span s s-data="storeUser"/>
             <input autocomplete="off" type="text" class="form-control input-sm" placeholder="要货单号"
                    style="width:150px;" name="requireNo"/>
-            <input autocomplete="off" type="text" class="form-control input-sm" placeholder="状态"
-                   style="width:150px;" name="status"/>
+            <select class="form-control input-sm" name="status">
+                <option value="">要货单状态</option>
+                <option value="1">待处理</option>
+                <option value="2">已处理</option>
+                <option value="3">已作废</option>
+            </select>
             <input type="text" class="form-control input-sm" name="startTime" placeholder="开始时间"
                    s="datetimepicker"/> -
             <input type="text" class="form-control input-sm" name="endTime" placeholder="结束时间"
@@ -72,8 +76,6 @@
                 <td name="requireGoodsPrice"></td>
                 <td name="remark"></td>
                 <td name="date"></td>
-                <td class="text-center" s="tpl"></td>
-
                 <td class="text-right">
                     <input autocomplete="off" type="button" value="采购详情" class="btn btn-primary btn-xs"
                            s-click="var that = this; S.popupOpen('/warehouse/requireGoods-detail.html', {storeData: this.parent().data()}).done(function(rs){rs && $purchaseGrid.refresh();})"/>

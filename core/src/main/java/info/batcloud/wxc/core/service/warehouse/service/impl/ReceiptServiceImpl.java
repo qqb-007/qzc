@@ -5,7 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.sankuai.meituan.waimai.opensdk.util.StringUtil;
 import info.batcloud.wxc.core.entity.BaseException;
 import info.batcloud.wxc.core.entity.PreReceiptOrders;
+import info.batcloud.wxc.core.entity.PreShopProcurementRelation;
 import info.batcloud.wxc.core.service.warehouse.dao.PreReceiptOrdersDao;
+import info.batcloud.wxc.core.service.warehouse.dao.PreShopProcurementRelationDao;
 import info.batcloud.wxc.core.service.warehouse.dao.PurchaseOrderDao;
 import info.batcloud.wxc.core.service.warehouse.service.ReceiptService;
 import org.apache.commons.lang.StringUtils;
@@ -30,10 +32,13 @@ import java.util.List;
 public class ReceiptServiceImpl  implements ReceiptService {
     @Resource
     private PreReceiptOrdersDao preReceiptOrdersDao;
+    @Resource
+    private PreShopProcurementRelationDao preShopProcurementRelationDao;
+
     @Override
-    public PageInfo getReceiptOrderList(Integer storeId, String startTime, String endTime, String logisticsNo, Integer pageNum,String receiptNo) {
+    public PageInfo getReceiptOrderList(Integer storeId, String startTime, String endTime, String logisticsNo, Integer pageNum,String receiptNo,Integer status) {
         PageHelper.startPage(pageNum,10,"`order`.create_time  desc");
-        List<PreReceiptOrders> receiptOrder = preReceiptOrdersDao.getReceiptOrder(storeId, convertToTimestamp(startTime) ,convertToTimestamp(endTime) , logisticsNo,receiptNo);
+        List<PreReceiptOrders> receiptOrder = preReceiptOrdersDao.getReceiptOrder(storeId, convertToTimestamp(startTime) ,convertToTimestamp(endTime) , logisticsNo,receiptNo,status);
         PageInfo pageInfo=new PageInfo(receiptOrder);
         return pageInfo;
     }
@@ -47,6 +52,26 @@ public class ReceiptServiceImpl  implements ReceiptService {
         preReceiptOrders.setArrivaNum(arrivaNum);
         preReceiptOrders.setStatus(status);
         return preReceiptOrdersDao.update(preReceiptOrders);
+    }
+
+    @Override
+    public PageInfo getReceiptByStoreId(Integer storeId, Integer page) {
+        PageHelper.startPage(page,20,"create_time desc");
+        PreReceiptOrders preReceiptOrders=new PreReceiptOrders();
+        preReceiptOrders.setStoreId(storeId);
+        List<PreReceiptOrders> preReceiptOrder= preReceiptOrdersDao.queryAllByLimit(preReceiptOrders);
+        PageInfo pageInfo=new PageInfo(preReceiptOrder);
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo getReceiptGoodsById(Integer id, Integer page) {
+        PageHelper.startPage(page,20);
+        PreShopProcurementRelation preShopProcurementRelation=new PreShopProcurementRelation();
+        preShopProcurementRelation.setShopProcurementId(id);
+        List<PreShopProcurementRelation> preShopProcurementRelations = preShopProcurementRelationDao.queryAll(preShopProcurementRelation);
+        PageInfo pageInfo=new PageInfo(preShopProcurementRelations);
+        return pageInfo;
     }
 
     //传入指定时间

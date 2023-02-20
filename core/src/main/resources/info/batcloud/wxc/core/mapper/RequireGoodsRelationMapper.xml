@@ -5,10 +5,10 @@
 <mapper namespace="info.batcloud.wxc.core.service.warehouse.dao.RequireGoodsRelationDao">
 
     <insert id="savaRequireGoodsRelationInfo"  parameterType="info.batcloud.wxc.core.entity.PreRequireGoodsOrdersRelation" >
-        insert into pre_require_goods_orders_relation(require_goods_id,food_id,food_name,food_num,food_price,create_time)
+        insert into pre_require_goods_orders_relation(require_goods_id,food_id,food_name,food_num,food_price,create_time,sku_id,img)
         VALUES
        <foreach collection="list" item="item" separator=",">
-           (#{item.requireGoodsId},#{item.foodId},#{item.foodName},#{item.foodNum},#{item.foodPrice},#{item.createTime})
+           (#{item.requireGoodsId},#{item.foodId},#{item.foodName},#{item.foodNum},#{item.foodPrice},#{item.createTime},#{item.skuId},#{item.img})
        </foreach>
     </insert>
 </mapper>

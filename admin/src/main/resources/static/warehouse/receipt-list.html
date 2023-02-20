@@ -27,11 +27,16 @@
                      s-window="{href: '/storeUser/storeUserSelectorLight.html', args: {select: storeUserSelect}}">
                 </div>
             </div>
-            <span s s-data="storeUser.name"/>
+            <span s s-data="storeUser"/>
             <input autocomplete="off" type="text" class="form-control input-sm" placeholder="收货单号"
                    style="width:150px;" name="receiptNo"/>
             <input autocomplete="off" type="text" class="form-control input-sm" placeholder="物流单号"
                    style="width:150px;" name="logisticsNo"/>
+            <select class="form-control input-sm" name="status">
+                <option value="0">收货单状态</option>
+                <option value="1">已完成</option>
+                <option value="2">未完成</option>
+            </select>
             <input type="text" class="form-control input-sm" name="startTime" placeholder="开始时间"
                    s="datetimepicker"/> -
             <input type="text" class="form-control input-sm" name="endTime" placeholder="结束时间"
@@ -76,7 +81,6 @@
                 <td name="orderNo"></td>
                 <td name="date"></td>
                 <td name="remark"></td>
-                <td class="text-center" s="tpl"></td>
 
                 <td class="text-right">
                     <input autocomplete="off" type="button" value="采购详情" class="btn btn-primary btn-xs"

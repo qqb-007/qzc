@@ -2,6 +2,9 @@ package info.batcloud.wxc.core.service.warehouse.service;
 
 import com.github.pagehelper.PageInfo;
 import info.batcloud.wxc.core.dto.RequireGoodsDto;
+import info.batcloud.wxc.core.entity.PreRequireGoodsOrdersRelation;
+
+import java.util.List;
 
 /**
  * @ClassName: RequireGoodsService
@@ -41,4 +44,26 @@ public interface RequireGoodsService {
       * @return
       */
      PageInfo getRequireGoodsOrdersRelationList(Integer id,Integer pageNum);
+
+
+     /**
+      *
+      * describe 根据门店id获取门店要货信息
+      * @author V
+      * @date 20/2/2023 下午1:35
+      * @param
+      * @return
+      */
+     PageInfo getRequireGoodsByStoreId(Integer storeId,Integer page);
+
+
+     /**
+      *
+      * describe  根据id获取要货单商品信息
+      * @author V
+      * @date 20/2/2023 下午1:55
+      * @param
+      * @return
+      */
+     PageInfo<PreRequireGoodsOrdersRelation> getRequireGoodsById(Integer id,Integer page);
 }
