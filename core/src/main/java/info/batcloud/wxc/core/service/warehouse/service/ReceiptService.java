@@ -23,4 +23,16 @@ public interface ReceiptService {
      */
     PageInfo getReceiptOrderList( Integer storeId, String startTime,
                                  String endTime,String logisticsNo,Integer pageNum,String receiptNo);
+
+    /**
+     *
+     * describe 修改收货单信息
+     * @author V
+     * @date 18/2/2023 下午4:11
+     * @param
+     * @return
+     */
+    Integer updateReceiptOrderToApp(Integer id,Double arrivePrice,Integer arrivaNum,String remark,Integer status);
+
+
 }

@@ -15,12 +15,16 @@ public class PreShopProcurementRelation {
   private Integer shopProcurementId;
   private Integer foodNum;
   private Double foodPrice;
-  private Integer createTime;
+  private Long createTime;
   private String date;
   private Integer actualArrivalNum;
   private Double actualArrivalSumprice;
-  private Integer skuid;
-  private Integer updateTime;
+  private Integer skuId;
+  private Long updateTime;
+  private Integer num;
+  private Double inputPrice;
+  private String img;
+  private String foodPicture;
 
 
 }

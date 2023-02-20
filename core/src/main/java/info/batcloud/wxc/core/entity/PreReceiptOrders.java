@@ -64,6 +64,8 @@ public class PreReceiptOrders implements Serializable {
 
     private String orderNo;
 
+    private String statusName;
+
 
 }
 

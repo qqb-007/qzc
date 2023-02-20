@@ -1,5 +1,8 @@
 package info.batcloud.wxc.admin.controller.warehouse;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import info.batcloud.wxc.core.domain.BusinessResponse;
 import info.batcloud.wxc.core.dto.PurchaseOrderDto;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName: Controller
@@ -40,9 +44,10 @@ public class PurchaseOrderController {
     * @return
     */
    @PostMapping("/createPurchaseOrder")
-   @ResponseBody
-   public CommonResult createPurchaseOrder(PurchaseOrderDto purchaseOrderDto){
-       purchaseOrderService.createPurchaseOrder(purchaseOrderDto);
+   public CommonResult createPurchaseOrder(@RequestParam("data") String data,@RequestParam("storeName")String storeName ,@RequestParam("storeId")Integer storeId ){
+       System.out.println(data);
+       JSONArray array = JSONArray.parseArray(data);
+       purchaseOrderService.createPurchaseOrder(array, storeName,storeId);
        return new CommonResult("操作成功");
    }
    /**
@@ -82,10 +87,14 @@ public class PurchaseOrderController {
     * @param
     * @return
     */
-   @PutMapping("/updatePurchase/{id}")
-    public CommonResult updatePurchase(@PathVariable("id") Integer id, UpdatePurchaseDto updatePurchaseDto){
-       updatePurchaseDto.setId(id);
-       purchaseOrderService.updatePurchase(updatePurchaseDto);
+   @PostMapping("/updatePurchase")
+    public CommonResult updatePurchase(@RequestParam("id") Integer id,@RequestParam("data")String data,
+                                       @RequestParam("storeName")String storeName,@RequestParam("logisticsNo")String logisticsNo,
+                                       @RequestParam("arrivalPrice")Double arrivalPrice,@RequestParam("arrivalNum") Integer arrivalNum,
+                                       @RequestParam("storeId")Integer storeId){
+       System.out.println(data);
+       JSONArray array = JSONArray.parseArray(data);
+       purchaseOrderService.updatePurchase(id,array,storeName,logisticsNo,arrivalPrice,arrivalNum,storeId);
        return new CommonResult("操作成功");
    }
 
@@ -105,6 +114,18 @@ public class PurchaseOrderController {
 
    }
 
-
+    /**
+     *
+     * describe 获取采购单编辑数据信息
+     * @author V
+     * @date 18/2/2023 上午9:55
+     * @param
+     * @return
+     */
+    @GetMapping("/getEditPurchaseInfo/{id}")
+    public CommonResult getEditPurchaseInfo(@PathVariable("id") Integer id){
+        Map<String, Object> editPurchaseInfo = purchaseOrderService.getEditPurchaseInfo(id);
+        return new CommonResult(editPurchaseInfo);
+    }
 
 }

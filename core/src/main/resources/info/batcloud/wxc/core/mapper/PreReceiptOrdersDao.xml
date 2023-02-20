@@ -187,6 +187,7 @@
     
    <select id="getReceiptOrder" resultType="info.batcloud.wxc.core.entity.PreReceiptOrders">
        SELECT
+       (case `order`.`status`   when 0 then '未完成' else '已完成' end) as statusName  ,
        `order`.procurement_id,
        `order`.id,`order`.receipt_no,`order`.store_name,`order`.store_id,
        `order`.arrive_price,`order`.arriva_num,`order`.remark,from_unixtime(`order`.create_time) as `date`,

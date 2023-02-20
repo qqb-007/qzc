@@ -37,6 +37,18 @@ public class ReceiptServiceImpl  implements ReceiptService {
         PageInfo pageInfo=new PageInfo(receiptOrder);
         return pageInfo;
     }
+
+    @Override
+    public Integer updateReceiptOrderToApp(Integer id, Double arrivePrice, Integer arrivaNum, String remark,Integer status) {
+        PreReceiptOrders preReceiptOrders=new PreReceiptOrders();
+        preReceiptOrders.setId(id);
+        preReceiptOrders.setRemark(remark);
+        preReceiptOrders.setArrivePrice(arrivePrice);
+        preReceiptOrders.setArrivaNum(arrivaNum);
+        preReceiptOrders.setStatus(status);
+        return preReceiptOrdersDao.update(preReceiptOrders);
+    }
+
     //传入指定时间
     public Long convertToTimestamp(String time) {
         if (StringUtils.isEmpty(time)){

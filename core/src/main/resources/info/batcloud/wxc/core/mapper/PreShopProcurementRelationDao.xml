@@ -21,9 +21,9 @@
     </select>
 
     <!--查询指定行数据-->
-    <select id="queryAllByLimit" resultMap="PreShopProcurementRelationMap">
+    <select id="queryAll" resultMap="PreShopProcurementRelationMap">
         select
-          id, food_id, food_name, shop_procurement_id, food_num, food_price, create_time
+          id, food_id, food_name, shop_procurement_id, food_num as num, food_price as inputPrice, create_time,sku_id,img as foodPicture
         from pre_shop_procurement_relation
         <where>
             <if test="id != null">
@@ -48,7 +48,6 @@
                 and create_time = #{createTime}
             </if>
         </where>
-        limit #{pageable.offset}, #{pageable.pageSize}
     </select>
 
     <!--统计总行数-->
@@ -86,19 +85,19 @@
         values (#{foodId}, #{foodName}, #{shopProcurementId}, #{foodNum}, #{foodPrice}, #{createTime})
     </insert>
 
-    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into pre_shop_procurement_relation(food_id, food_name, shop_procurement_id, food_num, food_price, create_time)
+    <insert id="insertBatch">
+        insert into pre_shop_procurement_relation(food_id, food_name, shop_procurement_id, food_num, food_price, create_time,sku_id,img)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.foodId}, #{entity.foodName}, #{entity.shopProcurementId}, #{entity.foodNum}, #{entity.foodPrice}, #{entity.createTime})
+        (#{entity.foodId}, #{entity.foodName}, #{entity.shopProcurementId}, #{entity.foodNum}, #{entity.foodPrice}, #{entity.createTime},#{entity.skuId},#{entity.img})
         </foreach>
     </insert>
 
     <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into pre_shop_procurement_relation(food_id, food_name, shop_procurement_id, food_num, food_price, create_time)
+        insert into pre_shop_procurement_relation(food_id, food_name, shop_procurement_id, food_num, food_price, create_time,sku_id)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.foodId}, #{entity.foodName}, #{entity.shopProcurementId}, #{entity.foodNum}, #{entity.foodPrice}, #{entity.createTime})
+            (#{entity.foodId}, #{entity.foodName}, #{entity.shopProcurementId}, #{entity.foodNum}, #{entity.foodPrice}, #{entity.createTime},#{entity.skuId})
         </foreach>
         on duplicate key update
         food_id = values(food_id),
@@ -131,6 +130,21 @@
             <if test="createTime != null">
                 create_time = #{createTime},
             </if>
+            <if test="skuId != null">
+                sku_id = #{skuId},
+            </if>
+            <if test="actualArrivalNum != null">
+                actual_arrival_num = #{actualArrivalNum},
+            </if>
+            <if test="actualArrivalSumprice != null">
+                actual_arrival_sumprice = #{actualArrivalSumprice},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="img != null and img != ''">
+                img = #{img},
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -146,7 +160,9 @@
     <select id="getPurchaseRelationByPurchaseIdToReceipt" resultType="info.batcloud.wxc.core.entity.PreShopProcurementRelation">
         select *,from_unixtime(update_time) as `date` from pre_shop_procurement_relation where shop_procurement_id=#{id}
     </select>
-
+    <delete id="deleteByPurchaseId">
+        delete from pre_shop_procurement_relation where shop_procurement_id = #{id}
+    </delete>
 
 </mapper>
 
