@@ -46,7 +46,7 @@ public class FoodDTO {
 
     private String clbPicture;
 
-    private List<FoodSku> skuList;
+    //private List<FoodSku> skuList;
 
     private List<FoodSkuDTO> skus;
 
@@ -291,9 +291,9 @@ public class FoodDTO {
         this.pictureId = pictureId;
     }
 
-    public FoodSku findSku(String skuId) {
-        return FoodHelper.findSku(skuId, this.skuList);
-    }
+//    public FoodSku findSku(String skuId) {
+//        return FoodHelper.findSku(skuId, this.skuList);
+//    }
 
     public Float getPerIncrease() {
         return perIncrease;
@@ -423,13 +423,13 @@ public class FoodDTO {
         this.picture = picture;
     }
 
-    public List<FoodSku> getSkuList() {
-        return skuList;
-    }
-
-    public void setSkuList(List<FoodSku> skuList) {
-        this.skuList = skuList;
-    }
+//    public List<FoodSku> getSkuList() {
+//        return skuList;
+//    }
+//
+//    public void setSkuList(List<FoodSku> skuList) {
+//        this.skuList = skuList;
+//    }
 
     public String getClbPictureId() {
         return clbPictureId;

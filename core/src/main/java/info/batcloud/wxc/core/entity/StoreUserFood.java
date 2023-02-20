@@ -67,8 +67,8 @@ public class StoreUserFood {
     @NotNull
     private String foodUnit;
 
-    @NotNull
-    private String foodSkuJson;
+//    @NotNull
+//    private String foodSkuJson;
 
     private String saleTime;
 
@@ -384,13 +384,13 @@ public class StoreUserFood {
         this.foodUnit = foodUnit;
     }
 
-    public String getFoodSkuJson() {
-        return foodSkuJson;
-    }
-
-    public void setFoodSkuJson(String foodSkuJson) {
-        this.foodSkuJson = foodSkuJson;
-    }
+//    public String getFoodSkuJson() {
+//        return foodSkuJson;
+//    }
+//
+//    public void setFoodSkuJson(String foodSkuJson) {
+//        this.foodSkuJson = foodSkuJson;
+//    }
 
     public Float getSalePrice() {
         return salePrice;

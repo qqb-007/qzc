@@ -215,7 +215,7 @@ public class FoodQuoteSheetServiceImpl implements FoodQuoteSheetService {
             suf.setSale(true);
             suf.setSalePrice(detail.getSalePrice());
             suf.setFoodUnit(detail.getFoodUnit());
-            suf.setFoodSkuJson(detail.getFoodSkuJson());
+            //suf.setFoodSkuJson(detail.getFoodSkuJson());
             waitSaveStoreUserFoodList.add(suf);
         }
         storeUserFoodRepository.save(waitSaveStoreUserFoodList);
@@ -441,7 +441,7 @@ public class FoodQuoteSheetServiceImpl implements FoodQuoteSheetService {
                 rp.setZh_name(food.getZhName());
                 rp.setProduct_name(food.getProductName());
                 rp.setOrigin_name(food.getOriginName());
-                rp.setPrice(detail.getSalePrice());
+                //rp.setPrice(detail.getSalePrice());
                 rp.setUnit(food.getUnit());
                 List<RetailSkuParam> skuList = toFoodSkuParamList(foodQuoteSkus);
                 rp.setSkus(skuList);

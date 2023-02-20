@@ -627,6 +627,31 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         return soldOut(storeUserFood, plat);
     }
 
+    private List<RetailSkuParam> getRetailSkuParam(StoreUserFood storeUserFood) {
+        List<RetailSkuParam> list = new ArrayList<>();
+        if (StringUtils.isNotBlank(storeUserFood.getSpecialSkuIdList())) {
+            List<StoreUserFoodSku> skuList = storeUserFoodSkuRepository.findByStoreUserFoodId(storeUserFood.getId());
+            for (StoreUserFoodSku storeUserFoodSku : skuList) {
+                if (storeUserFood.getSpecialSkuIdList().indexOf(storeUserFoodSku.getFoodSkuId().toString()) != -1) {
+                    RetailSkuParam param = new RetailSkuParam();
+                    param.setSku_id(storeUserFoodSku.getFoodSkuId().toString());
+                    param.setSpec(storeUserFoodSku.getName());
+                    param.setUpc(storeUserFoodSku.getUpc());
+                    param.setStock(storeUserFoodSku.getStock().toString());
+                    param.setPrice(storeUserFoodSku.getOutputPrice().toString());
+                    //param.setLocation_code();
+                    //param.setAvailable_times();
+                    param.setMin_order_count(storeUserFoodSku.getMinOrderCount());
+                    param.setBox_num(storeUserFoodSku.getBoxNum().toString());
+                    param.setBox_price(storeUserFoodSku.getBoxPrice().toString());
+                    param.setWeight(Long.valueOf(storeUserFoodSku.getWeight()));
+                    list.add(param);
+                }
+            }
+        }
+        return list;
+    }
+
     // 商品下架（批量删除零售折扣商品）
     private boolean soldOut(StoreUserFood suf, Plat plat) {
         Food food = suf.getFood();
@@ -660,16 +685,14 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 rp.setProduct_name(food.getProductName());
                 rp.setOrigin_name(food.getOriginName());
                 BigDecimal b = new BigDecimal(suf.getSalePrice());
-                rp.setPrice(b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+                //rp.setPrice(b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
                 //rp.setPrice(suf.getSalePrice());
                 rp.setUnit(food.getUnit());
-                List<RetailSkuParam> skuList = new ArrayList<>();
-                if (StringUtils.isNotEmpty(suf.getFoodSkuJson())) {
-                    List<String> specialSkuList = suf.getSpecialSkuIdList() == null ? Collections.EMPTY_LIST : Arrays.asList(suf.getSpecialSkuIdList().split(","));
-                    List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(FoodHelper.parseFoodSkuList(food.getSkuJson()), specialSkuList, suf.getSalePrice(), true);
-                    skuList = toFoodSkuParamList(suf.getId(), foodQuoteSkus, foodSetting);
+                List<RetailSkuParam> retailSkuParam = getRetailSkuParam(suf);
+                if (retailSkuParam.size() == 0) {
+                    throw new BizException("请勾选商品规格后再操作");
                 }
-                rp.setSkus(skuList);
+                rp.setSkus(getRetailSkuParam(suf));
                 List<RetailParam> list = new ArrayList<>();
                 list.add(rp);
                 try {
@@ -2054,59 +2077,59 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
 
     @Override
     public void syncStock(long id) {
-        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(id);
-        List<FoodSku> _foodSkus = JSON.parseObject(storeUserFood.getFoodSkuJson(), new TypeReference<List<FoodSku>>() {
-        });
-
-        StoreUser storeUser = storeUserFood.getStoreUser();
-        Store store = storeRepository.findByStoreUserIdAndPlat(storeUser.getId(), Plat.MEITUAN);
-        try {
-            RetailParam retailGet = APIFactory.getNewRetailApi().retailGet(meituanWaimaiService.getSystemParam(), store.getCode(), storeUserFood.getFood().getCode());
-            List<RetailSkuParam> list = retailGet.getSkus();
-            for (RetailSkuParam retailSkuParam : list) {
-                for (FoodSku foodSkus : _foodSkus) {
-                    if (retailSkuParam.getSku_id().equals(foodSkus.getSkuId())) {
-                        foodSkus.setStock(Integer.valueOf(retailSkuParam.getStock()));
-                    }
-                }
-            }
-            storeUserFood.setFoodSkuJson(JSON.toJSONString(_foodSkus));
-            storeUserFoodRepository.save(storeUserFood);
-        } catch (ApiOpException e) {
-            e.printStackTrace();
-        } catch (ApiSysException e) {
-            e.printStackTrace();
-        }
+//        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(id);
+//        List<FoodSku> _foodSkus = JSON.parseObject(storeUserFood.getFoodSkuJson(), new TypeReference<List<FoodSku>>() {
+//        });
+//
+//        StoreUser storeUser = storeUserFood.getStoreUser();
+//        Store store = storeRepository.findByStoreUserIdAndPlat(storeUser.getId(), Plat.MEITUAN);
+//        try {
+//            RetailParam retailGet = APIFactory.getNewRetailApi().retailGet(meituanWaimaiService.getSystemParam(), store.getCode(), storeUserFood.getFood().getCode());
+//            List<RetailSkuParam> list = retailGet.getSkus();
+//            for (RetailSkuParam retailSkuParam : list) {
+//                for (FoodSku foodSkus : _foodSkus) {
+//                    if (retailSkuParam.getSku_id().equals(foodSkus.getSkuId())) {
+//                        foodSkus.setStock(Integer.valueOf(retailSkuParam.getStock()));
+//                    }
+//                }
+//            }
+//            storeUserFood.setFoodSkuJson(JSON.toJSONString(_foodSkus));
+//            storeUserFoodRepository.save(storeUserFood);
+//        } catch (ApiOpException e) {
+//            e.printStackTrace();
+//        } catch (ApiSysException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
     @Override
     public void addSkus(long foodId) {
-        Food food = foodRepository.findOne(foodId);
-        FoodDTO foodDTO = foodService.toDTO(food);
-        List<FoodSku> foodSkus = foodDTO.getSkuList();
-        Map<String, FoodSku> map = new HashMap<>();
-
-        List<StoreUserFood> storeUserFoods = storeUserFoodRepository.findByFoodId(foodId);
-        for (StoreUserFood storeUserFood : storeUserFoods) {
-            List<FoodSku> skuList = JSON.parseObject(storeUserFood.getFoodSkuJson(), new TypeReference<List<FoodSku>>() {
-            });
-            for (FoodSku foodSku : skuList) {
-                map.put(foodSku.getSkuId(), foodSku);
-            }
-
-            for (FoodSku skus : foodSkus) {
-                if (map.get(skus.getSkuId()) == null) {
-                    skuList.add(skus);
-                }
-            }
-
-            storeUserFood.setFoodSkuJson(JSON.toJSONString(skuList));
-            storeUserFoodRepository.save(storeUserFood);
-            //清空
-            map.clear();
-
-        }
+//        Food food = foodRepository.findOne(foodId);
+//        FoodDTO foodDTO = foodService.toDTO(food);
+//        List<FoodSku> foodSkus = foodDTO.getSkuList();
+//        Map<String, FoodSku> map = new HashMap<>();
+//
+//        List<StoreUserFood> storeUserFoods = storeUserFoodRepository.findByFoodId(foodId);
+//        for (StoreUserFood storeUserFood : storeUserFoods) {
+//            List<FoodSku> skuList = JSON.parseObject(storeUserFood.getFoodSkuJson(), new TypeReference<List<FoodSku>>() {
+//            });
+//            for (FoodSku foodSku : skuList) {
+//                map.put(foodSku.getSkuId(), foodSku);
+//            }
+//
+//            for (FoodSku skus : foodSkus) {
+//                if (map.get(skus.getSkuId()) == null) {
+//                    skuList.add(skus);
+//                }
+//            }
+//
+//            storeUserFood.setFoodSkuJson(JSON.toJSONString(skuList));
+//            storeUserFoodRepository.save(storeUserFood);
+//            //清空
+//            map.clear();
+//
+//        }
     }
 
     @Override
@@ -2114,29 +2137,29 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         return toDTO(storeUserFoodRepository.findOne(id));
     }
 
-    @Override
-    public void updateStock(long id, List<String> skuIds, List<Integer> stock) {
-        StoreUserFood userFood = storeUserFoodRepository.findOne(id);
-        List<FoodSku> bzSkuList = JSON.parseObject(userFood.getFood().getSkuJson(), new TypeReference<List<FoodSku>>() {
-        });
-        HashMap<String, FoodSku> map = new HashMap<>();
-        for (FoodSku foodSku : bzSkuList) {
-            map.put(foodSku.getSkuId(), foodSku);
-        }
-        List<FoodSku> newList = new ArrayList<>();
-
-        for (int i = 0; i < skuIds.size(); i++) {
-            FoodSku foodSku = map.get(skuIds.get(i));
-            foodSku.setStock(stock.get(i));
-            newList.add(foodSku);
-        }
-        userFood.setFoodSkuJson(JSON.toJSONString(newList));
-        storeUserFoodRepository.save(userFood);
-        if (userFood.getSale() && userFood.getMeituanPublishStatus() == PublishStatus.SUCCESS) {
-            //门店商品如果已经发布成功了，那么把库存更新上去
-            this.publish(userFood.getId(), true);
-        }
-    }
+//    @Override
+//    public void updateStock(long id, List<String> skuIds, List<Integer> stock) {
+//        StoreUserFood userFood = storeUserFoodRepository.findOne(id);
+//        List<FoodSku> bzSkuList = JSON.parseObject(userFood.getFood().getSkuJson(), new TypeReference<List<FoodSku>>() {
+//        });
+//        HashMap<String, FoodSku> map = new HashMap<>();
+//        for (FoodSku foodSku : bzSkuList) {
+//            map.put(foodSku.getSkuId(), foodSku);
+//        }
+//        List<FoodSku> newList = new ArrayList<>();
+//
+//        for (int i = 0; i < skuIds.size(); i++) {
+//            FoodSku foodSku = map.get(skuIds.get(i));
+//            foodSku.setStock(stock.get(i));
+//            newList.add(foodSku);
+//        }
+//        userFood.setFoodSkuJson(JSON.toJSONString(newList));
+//        storeUserFoodRepository.save(userFood);
+//        if (userFood.getSale() && userFood.getMeituanPublishStatus() == PublishStatus.SUCCESS) {
+//            //门店商品如果已经发布成功了，那么把库存更新上去
+//            this.publish(userFood.getId(), true);
+//        }
+//    }
 
     @Override
     public void batchSetSaleTime(BatchSaleTimeParam batchSaleTime) {
@@ -2540,9 +2563,10 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                             if (specialSkuList != null && specialSkuList.size() > 0) {
                                 skuStringList.add(specialSkuList.get(0));
                             }
-                            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(foodDTO.getSkuList(), skuStringList, storeUserFood.getSalePrice(), true);
-                            FoodSetting foodSetting = systemSettingService.findActiveSetting(FoodSetting.class);
-                            List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
+//                            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(foodDTO.getSkuList(), skuStringList, storeUserFood.getSalePrice(), true);
+//                            FoodSetting foodSetting = systemSettingService.findActiveSetting(FoodSetting.class);
+//                            List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
+                            List<RetailSkuParam> skuList = getRetailSkuParam(storeUserFood);
                             RetailSkuParam skuParam = skuList.get(0);
 
                             Double price = 0.0;
@@ -2830,30 +2854,87 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         return increase;
     }
 
-    private List<FoodQuoteSku> getFoodQuoteSkuList(List<FoodSku> foodSkuList, List<String> specialSkuList,
-                                                   float salePrice, boolean filterIgnore) {
-        List<FoodQuoteSku> foodQuoteSkus = new ArrayList<>();
-        for (FoodSku foodSku : foodSkuList) {
-            if (specialSkuList.size() > 0) {
-                if (specialSkuList.indexOf(foodSku.getSkuId()) == -1) {
-                    continue;
-                }
-            } else {
-                if (foodSku.isIgnore() && filterIgnore) {
-                    continue;
+    private List<StoreUserFoodSku> getPublishSkus(StoreUserFood storeUserFood) {
+        List<StoreUserFoodSku> list = new ArrayList<>();
+        if (StringUtils.isNotBlank(storeUserFood.getSpecialSkuIdList())) {
+            List<StoreUserFoodSku> skuList = storeUserFoodSkuRepository.findByStoreUserFoodId(storeUserFood.getId());
+            for (StoreUserFoodSku storeUserFoodSku : skuList) {
+                if (storeUserFood.getSpecialSkuIdList().indexOf(storeUserFoodSku.getFoodSkuId().toString()) != -1) {
+                    list.add(storeUserFoodSku);
                 }
             }
-
-            FoodQuoteSku sku = new FoodQuoteSku();
-            sku.setPrice(Math.round(salePrice * foodSku.getPriceRatio() * 100) / 100f);
-            sku.setSkuId(foodSku.getSkuId());
-            sku.setSpec(foodSku.getSpec());
-            sku.setIgnore(foodSku.isIgnore());
-            sku.setWeight(foodSku.getWeight() == null ? 0 : foodSku.getWeight());
-            foodQuoteSkus.add(sku);
         }
-        return foodQuoteSkus;
+        return list;
     }
+
+    private StoreUserFoodSku getEleSku(StoreUserFood storeUserFood) {
+        List<StoreUserFoodSku> skuList = storeUserFoodSkuRepository.findByStoreUserFoodId(storeUserFood.getId());
+        if (StringUtils.isNotBlank(storeUserFood.getEleSkuId())) {
+            for (StoreUserFoodSku storeUserFoodSku : skuList) {
+                if (storeUserFoodSku.getFoodSkuId().toString().equals(storeUserFood.getEleSkuId())) {
+                    return storeUserFoodSku;
+                }
+            }
+        } else {
+            for (StoreUserFoodSku storeUserFoodSku : skuList) {
+                if (storeUserFood.getSpecialSkuIdList().indexOf(storeUserFoodSku.getFoodSkuId().toString()) != -1) {
+                    return storeUserFoodSku;
+                }
+            }
+        }
+        return null;
+    }
+
+
+//        private List<FoodQuoteSku> getFoodQuoteSkuList(List<FoodSku> foodSkuList, List<String> specialSkuList,
+//                                                   float salePrice, boolean filterIgnore) {
+//        List<FoodQuoteSku> foodQuoteSkus = new ArrayList<>();
+//        for (FoodSku foodSku : foodSkuList) {
+//            if (specialSkuList.size() > 0) {
+//                if (specialSkuList.indexOf(foodSku.getSkuId()) == -1) {
+//                    continue;
+//                }
+//            } else {
+//                if (foodSku.isIgnore() && filterIgnore) {
+//                    continue;
+//                }
+//            }
+//
+//            FoodQuoteSku sku = new FoodQuoteSku();
+//            sku.setPrice(Math.round(salePrice * foodSku.getPriceRatio() * 100) / 100f);
+//            sku.setSkuId(foodSku.getSkuId());
+//            sku.setSpec(foodSku.getSpec());
+//            sku.setIgnore(foodSku.isIgnore());
+//            sku.setWeight(foodSku.getWeight() == null ? 0 : foodSku.getWeight());
+//            foodQuoteSkus.add(sku);
+//        }
+//        return foodQuoteSkus;
+//    }
+
+//    private List<FoodQuoteSku> getFoodQuoteSkuList(List<FoodSku> foodSkuList, List<String> specialSkuList,
+//                                                   float salePrice, boolean filterIgnore) {
+//        List<FoodQuoteSku> foodQuoteSkus = new ArrayList<>();
+//        for (FoodSku foodSku : foodSkuList) {
+//            if (specialSkuList.size() > 0) {
+//                if (specialSkuList.indexOf(foodSku.getSkuId()) == -1) {
+//                    continue;
+//                }
+//            } else {
+//                if (foodSku.isIgnore() && filterIgnore) {
+//                    continue;
+//                }
+//            }
+//
+//            FoodQuoteSku sku = new FoodQuoteSku();
+//            sku.setPrice(Math.round(salePrice * foodSku.getPriceRatio() * 100) / 100f);
+//            sku.setSkuId(foodSku.getSkuId());
+//            sku.setSpec(foodSku.getSpec());
+//            sku.setIgnore(foodSku.isIgnore());
+//            sku.setWeight(foodSku.getWeight() == null ? 0 : foodSku.getWeight());
+//            foodQuoteSkus.add(sku);
+//        }
+//        return foodQuoteSkus;
+//    }
 
     private Result publishToStore(StoreUserFood storeUserFood, Store store, boolean checkExists) {
         Result rs = new Result();
@@ -2875,14 +2956,14 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         if ((store.getPlat() == Plat.MEITUAN && storeUser.getMeituanOpened()) || (store.getPlat() == Plat.CLBM && storeUser.getClbmOpened())) {
             List<String> specialSkuList = StringUtils.isBlank(storeUserFood.getSpecialSkuIdList()) ? Collections.EMPTY_LIST
                     : Arrays.asList(storeUserFood.getSpecialSkuIdList().split(","));
-            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), specialSkuList, storeUserFood.getSalePrice(), true);
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
-            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
-                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
-                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
-            }
-            rs = this.publishToMeituan(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId, checkExists, store.getPlat());
+//            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), specialSkuList, storeUserFood.getSalePrice(), true);
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
+//            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
+//                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
+//                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
+//            }
+            rs = this.publishToMeituan(storeUserFood, store, checkExists, store.getPlat());
             if (rs.isSuccess()) {
                 if (store.getPlat() == Plat.MEITUAN) {
                     storeUserFood.setMeituanPublishStatus(PublishStatus.SUCCESS);
@@ -2901,50 +2982,50 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
 
         } else if (store.getPlat() == Plat.ELE && storeUser.getEleOpened()) {
             //查询出商品的sku集合foodQuoteSkus
-            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), new ArrayList<>(), storeUserFood.getSalePrice(), false);
+            //List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), new ArrayList<>(), storeUserFood.getSalePrice(), false);
             //以skuid为键的map
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
-            //以spec规格为键的map
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
-            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
-                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
-                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
-            }
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
+//            //以spec规格为键的map
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
+//            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
+//                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
+//                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
+//            }
             //rs = this.publishToEle(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId, checkExists);
-            rs = this.publishToEle(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId, checkExists);
+            rs = this.publishToEle(storeUserFood, store, checkExists);
             if (rs.isSuccess()) {
                 storeUserFood.setElePublishStatus(PublishStatus.SUCCESS);
             } else {
                 storeUserFood.setElePublishStatus(PublishStatus.FAIL);
             }
         } else if (store.getPlat() == Plat.WANTE && storeUser.getWanteOpened()) {
-            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), new ArrayList<>(), storeUserFood.getSalePrice(), false);
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
-            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
-                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
-                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
-            }
-            rs = this.publishToWante(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId);
-            if (rs.isSuccess()) {
-                storeUserFood.setWantePublishStatus(PublishStatus.SUCCESS);
-            } else {
-                storeUserFood.setWantePublishStatus(PublishStatus.FAIL);
-            }
+//            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), new ArrayList<>(), storeUserFood.getSalePrice(), false);
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
+//            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
+//                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
+//                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
+//            }
+//            rs = this.publishToWante(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId);
+//            if (rs.isSuccess()) {
+//                storeUserFood.setWantePublishStatus(PublishStatus.SUCCESS);
+//            } else {
+//                storeUserFood.setWantePublishStatus(PublishStatus.FAIL);
+//            }
         } else if (store.getPlat() == Plat.JDDJ && storeUser.getJddjOpened()) {
-            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), new ArrayList<>(), storeUserFood.getSalePrice(), false);
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
-            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
-            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
-                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
-                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
-            }
-            rs = this.publishToJddj(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId);
-            if (rs.isSuccess()) {
-                storeUserFood.setJddjPublishStatus(PublishStatus.SUCCESS);
-            } else {
-                storeUserFood.setJddjPublishStatus(PublishStatus.FAIL);
-            }
+//            List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), new ArrayList<>(), storeUserFood.getSalePrice(), false);
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId = new HashMap<>(5);
+//            Map<String, FoodQuoteSku> foodQuoteSkuMapBySpec = new HashMap<>(5);
+//            for (FoodQuoteSku quoteSkus : foodQuoteSkus) {
+//                foodQuoteSkuMapBySkuId.put(quoteSkus.getSkuId(), quoteSkus);
+//                foodQuoteSkuMapBySpec.put(quoteSkus.getSpec(), quoteSkus);
+//            }
+//            rs = this.publishToJddj(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId);
+//            if (rs.isSuccess()) {
+//                storeUserFood.setJddjPublishStatus(PublishStatus.SUCCESS);
+//            } else {
+//                storeUserFood.setJddjPublishStatus(PublishStatus.FAIL);
+//            }
         }
 
         if (rs.isSuccess()) {
@@ -2982,28 +3063,28 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         String publishId = null;
         Food food = storeUserFood.getFood();
         Map<String, String> jddjSkuMap = food.getJddjSkuMap();
-        for (int i = 1; i <= foodDto.getSkuList().size(); i++) {
-            String sku = null;
-            String publish = null;
-            if (i < 10) {
-                publish = foodId + "0" + i;
-                sku = jddjSkuMap.get(publish);
-            } else {
-                publish = foodId + "" + i;
-                sku = jddjSkuMap.get(publish);
-            }
-
-            if (sku == null) {
-                jddjSkuMap.put(publish, customSkuId);
-                publishId = publish;
-                break;
-            }
-            if (customSkuId.equals(sku)) {
-                publishId = publish;
-                break;
-            }
-
-        }
+//        for (int i = 1; i <= foodDto.getSkuList().size(); i++) {
+//            String sku = null;
+//            String publish = null;
+//            if (i < 10) {
+//                publish = foodId + "0" + i;
+//                sku = jddjSkuMap.get(publish);
+//            } else {
+//                publish = foodId + "" + i;
+//                sku = jddjSkuMap.get(publish);
+//            }
+//
+//            if (sku == null) {
+//                jddjSkuMap.put(publish, customSkuId);
+//                publishId = publish;
+//                break;
+//            }
+//            if (customSkuId.equals(sku)) {
+//                publishId = publish;
+//                break;
+//            }
+//
+//        }
         if (publishId == null) {
             logger.error("设置京东商品规格出错");
             rs.setSuccess(false);
@@ -3408,9 +3489,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         return rs;
     }
 
-    private Result publishToEle(StoreUserFood storeUserFood, FoodDTO food, Store store,
-                                List<FoodQuoteSku> foodQuoteSkus,
-                                Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId, boolean checkExists) {
+    private Result publishToEle(StoreUserFood storeUserFood, Store store, boolean checkExists) {
         Result rs = new Result();
         String photoUrl;
         try {
@@ -3420,32 +3499,33 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
             rs.setSuccess(false);
             return rs;
         }
-        FoodQuoteSku foodQuoteSku = null;
+        //FoodQuoteSku foodQuoteSku = null;
         /**
          * 寻找饿了么自定义的
          * */
-        String eleSkuId = storeUserFood.getEleSkuId();
-        if (StringUtils.isNotBlank(eleSkuId)) {
-            //从以skuid为键的map中取出sku
-            foodQuoteSku = foodQuoteSkuMapBySkuId.get(eleSkuId);
-        }
-        if (foodQuoteSku == null) {
-            /**
-             * 寻找到最小规格的sku
-             * */
-            foodQuoteSkus.sort((f1, f2) -> Float.valueOf(f1.getPrice() - f2.getPrice()).intValue());
-            for (FoodQuoteSku sku : foodQuoteSkus) {
-                if (sku.isIgnore()) {
-                    continue;
-                }
-                foodQuoteSku = sku;
-                break;
-            }
-            if (foodQuoteSku == null) {
-                throw new RuntimeException("没有可发布的规格");
-            }
-        }
-        String customSkuId = foodQuoteSku.getSkuId();
+        //String eleSkuId = storeUserFood.getEleSkuId();
+//        if (StringUtils.isNotBlank(eleSkuId)) {
+//            //从以skuid为键的map中取出sku
+//            foodQuoteSku = foodQuoteSkuMapBySkuId.get(eleSkuId);
+//        }
+//        if (foodQuoteSku == null) {
+//            /**
+//             * 寻找到最小规格的sku
+//             * */
+//            foodQuoteSkus.sort((f1, f2) -> Float.valueOf(f1.getPrice() - f2.getPrice()).intValue());
+//            for (FoodQuoteSku sku : foodQuoteSkus) {
+//                if (sku.isIgnore()) {
+//                    continue;
+//                }
+//                foodQuoteSku = sku;
+//                break;
+//            }
+//            if (foodQuoteSku == null) {
+//                throw new RuntimeException("没有可发布的规格");
+//            }
+//        }
+        StoreUserFoodSku storeUserFoodSku = this.getEleSku(storeUserFood);
+        String customSkuId = storeUserFoodSku.getFoodSkuId().toString();
         //将得到的skuid设置成饿了么的skuid
         storeUserFood.setEleSkuId(customSkuId);
         /**
@@ -3468,15 +3548,15 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
             if (checkCustomerId.equals(customSkuId)) {
                 // 说明商品是存在的，那么名字就不用改，操作更新接口即可
                 SkuUpdateRequest req = new SkuUpdateRequest();
-                FoodCategory fc = foodCategoryRepository.findByName(food.getCategoryName());
+                FoodCategory fc = foodCategoryRepository.findByName(storeUserFood.getFood().getCategoryName());
                 Map<String, Long> categoryMap = store.getEleCategoryMap();
                 if (fc != null) {
                     req.setCategoryId(categoryMap.get(fc.getId().toString()));
                 }
 //            req.setPredictCat(1);
                 //req.setBrandName(food.getEleBrandName());
-                req.setUpc(store.getCode() + "_" + food.getCode());
-                req.setName(food.getName() + " " + foodQuoteSku.getSpec());
+                req.setUpc(store.getCode() + "_" + storeUserFoodSku.getFoodSkuId());
+                req.setName(storeUserFood.getFood().getName() + storeUserFoodSku.getName());
                 req.setStatus(1); // 上架
                 SkuUpdateRequest.Photo photo = new SkuUpdateRequest.Photo();
                 List<SkuUpdateRequest.Photo> photos = new ArrayList<>();
@@ -3486,14 +3566,14 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 photo.setUrl(photoUrl);
                 req.setLeftNum(9999);
                 Float priceIncrease = storeUserFood.getPriceIncrease();
-                float quotePrice = foodQuoteSku.getPrice() / (1 + priceIncrease / 100);
-                req.setSalePrice(Float.valueOf(quotePrice * (100 + priceIncrease + elePriceIncrease)).intValue());
+                //float quotePrice = foodQuoteSku.getPrice() / (1 + priceIncrease / 100);
+                req.setSalePrice((int) (storeUserFoodSku.getOutputPrice() * 100));
                 //req.setSalePrice(Float.valueOf(foodQuoteSku.getPrice() * 100).intValue());
                 req.setCustomSkuId(customSkuId);
-                req.setSaleUnit(food.getUnit());
-                req.setWeight(foodQuoteSku.getWeight());
-                if (StringUtils.isNotBlank(food.getDescription())) {
-                    req.setSummary(food.getDescription());
+                req.setSaleUnit(storeUserFoodSku.getSpec());
+                req.setWeight(storeUserFoodSku.getWeight());
+                if (StringUtils.isNotBlank(storeUserFood.getFood().getDescription())) {
+                    req.setSummary(storeUserFood.getFood().getDescription());
                 }
                 req.setShopId(store.getCode());
                 if (!storeUserFood.getSaleTimeMap().isEmpty()) {
@@ -3523,19 +3603,19 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         }
         //说明没有获取到商品或者删除了商品
         if (res == null) {
-            customSkuId = foodQuoteSku.getSkuId();
+            customSkuId = storeUserFoodSku.getFoodSkuId().toString();
             storeUserFood.setEleSkuId(customSkuId);
             //操作新建商品接口
             SkuCreateRequest req = new SkuCreateRequest();
-            FoodCategory fc = foodCategoryRepository.findByName(food.getCategoryName());
+            FoodCategory fc = foodCategoryRepository.findByName(storeUserFood.getFood().getCategoryName());
             Map<String, Long> categoryMap = store.getEleCategoryMap();
             if (fc != null) {
                 req.setCategoryId(categoryMap.get(fc.getId().toString()));
             }
 //            req.setPredictCat(1);
             //req.setBrandName(food.getEleBrandName());
-            req.setUpc(store.getCode() + "_" + food.getCode());
-            req.setName(food.getName() + " " + foodQuoteSku.getSpec());
+            req.setUpc(store.getCode() + "_" + storeUserFoodSku.getFoodSkuId());
+            req.setName(storeUserFood.getFood().getName() + " " + storeUserFoodSku.getName());
             req.setStatus(1); // 上架
             SkuCreateRequest.Photo photo = new SkuCreateRequest.Photo();
             List<SkuCreateRequest.Photo> photos = new ArrayList<>();
@@ -3545,16 +3625,16 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
             photo.setUrl(photoUrl);
             req.setLeftNum(9999);
             Float priceIncrease = storeUserFood.getPriceIncrease();
-            float quotePrice = foodQuoteSku.getPrice() / (1 + priceIncrease / 100);
-            req.setSalePrice(Float.valueOf(quotePrice * (100 + priceIncrease + elePriceIncrease)).intValue());
+            //float quotePrice = foodQuoteSku.getPrice() / (1 + priceIncrease / 100);
+            req.setSalePrice((int) (storeUserFoodSku.getOutputPrice() * 100));
             //req.setSalePrice(Float.valueOf(foodQuoteSku.getPrice() * 100).intValue());
             req.setCustomSkuId(customSkuId);
-            req.setSaleUnit(food.getUnit());
+            req.setSaleUnit(storeUserFoodSku.getSpec());
             req.setShopId(store.getCode());
-            if (StringUtils.isNotBlank(food.getDescription())) {
-                req.setSummary(food.getDescription());
+            if (StringUtils.isNotBlank(storeUserFood.getFood().getDescription())) {
+                req.setSummary(storeUserFood.getFood().getDescription());
             }
-            req.setWeight(foodQuoteSku.getWeight());
+            req.setWeight(storeUserFoodSku.getWeight());
             System.out.println(JSON.toJSON(req));
             res = eleClient.request(req);
             try {
@@ -3565,7 +3645,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
             //如果是之前删除过的商品  那么需要重新修改一下名称和价格才能正确在饿了么端显示（根据情况来判断是否重新发布商品  如果是因为类目和营业执照原因的话就不重新发布）
             //this.publishToEle(storeUserFood, food, store, foodQuoteSkus, foodQuoteSkuMapBySkuId, checkExists);
             if (res.getErrno() != 5020) {
-                logger.info("更新饿了么新发布的商品" + store.getName() + food.getName());
+                logger.info("更新饿了么新发布的商品" + store.getName() + storeUserFood.getFood().getName());
                 SkuUpdateRequest req1 = new SkuUpdateRequest();
                 //FoodCategory fc = foodCategoryRepository.findByName(food.getCategoryName());
                 //Map<String, Long> categoryMap = store.getEleCategoryMap();
@@ -3574,8 +3654,8 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 }
 //            req.setPredictCat(1);
                 //req.setBrandName(food.getEleBrandName());
-                req1.setUpc(store.getCode() + "_" + food.getCode());
-                req1.setName(food.getName() + " " + foodQuoteSku.getSpec());
+                req1.setUpc(store.getCode() + "_" + storeUserFoodSku.getFoodSkuId());
+                req1.setName(storeUserFood.getFood().getName() + " " + storeUserFoodSku.getName());
                 req1.setStatus(1); // 上架
                 //SkuUpdateRequest.Photo photo1 = new SkuUpdateRequest.Photo();
                 //List<SkuUpdateRequest.Photo> photos1 = new ArrayList<>();
@@ -3586,13 +3666,13 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 req1.setLeftNum(9999);
                 //Float priceIncrease = storeUserFood.getPriceIncrease();
                 //float quotePrice = foodQuoteSku.getPrice() / (1 + priceIncrease / 100);
-                req.setSalePrice(Float.valueOf(quotePrice * (100 + priceIncrease + elePriceIncrease)).intValue());
+                req.setSalePrice((int) (storeUserFoodSku.getOutputPrice() * 100));
                 //req.setSalePrice(Float.valueOf(foodQuoteSku.getPrice() * 100).intValue());
                 req1.setCustomSkuId(customSkuId);
-                req1.setSaleUnit(food.getUnit());
-                req1.setWeight(foodQuoteSku.getWeight());
-                if (StringUtils.isNotBlank(food.getDescription())) {
-                    req1.setSummary(food.getDescription());
+                req1.setSaleUnit(storeUserFoodSku.getSpec());
+                req1.setWeight(storeUserFoodSku.getWeight());
+                if (StringUtils.isNotBlank(storeUserFood.getFood().getDescription())) {
+                    req1.setSummary(storeUserFood.getFood().getDescription());
                 }
                 if (!storeUserFood.getSaleTimeMap().isEmpty()) {
                     //开启限时售卖
@@ -3610,12 +3690,12 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         }
         if (res.getErrno() == 0) {
             rs.setSuccess(true);
-            logger.info("发布到饿了么成功：" + food.getName());
+            logger.info("发布到饿了么成功：" + storeUserFood.getFood().getName());
             return rs;
         } else {
             rs.setSuccess(false);
-            logger.info("发布到饿了么失败：" + food.getName() + " " + res.getError());
-            rs.setMsg(res.getError() + " " + food.getName());
+            logger.info("发布到饿了么失败：" + storeUserFood.getFood().getName() + " " + res.getError());
+            rs.setMsg(res.getError() + " " + storeUserFood.getFood().getName());
         }
         return rs;
     }
@@ -3701,22 +3781,20 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         }
     }
 
-    private Integer getSkuStock(Long id, String skuId) {
-        StoreUserFood userFood = storeUserFoodRepository.findOne(id);
-        String skuJson = userFood.getFoodSkuJson();
-        List<FoodSku> skuList = JSON.parseObject(skuJson, new TypeReference<List<FoodSku>>() {
-        });
-        for (FoodSku foodSku : skuList) {
-            if (skuId.equals(foodSku.getSkuId())) {
-                return foodSku.getStock();
-            }
-        }
-        return 0;
-    }
+//    private Integer getSkuStock(Long id, String skuId) {
+//        StoreUserFood userFood = storeUserFoodRepository.findOne(id);
+//        String skuJson = userFood.getFoodSkuJson();
+//        List<FoodSku> skuList = JSON.parseObject(skuJson, new TypeReference<List<FoodSku>>() {
+//        });
+//        for (FoodSku foodSku : skuList) {
+//            if (skuId.equals(foodSku.getSkuId())) {
+//                return foodSku.getStock();
+//            }
+//        }
+//        return 0;
+//    }
 
-    private Result publishToMeituan(StoreUserFood storeUserFood, FoodDTO food, Store store,
-                                    List<FoodQuoteSku> foodQuoteSkus,
-                                    Map<String, FoodQuoteSku> foodQuoteSkuMapBySkuId, boolean checkExists, Plat plat) {
+    private Result publishToMeituan(StoreUserFood storeUserFood, Store store, boolean checkExists, Plat plat) {
         Result rs = new Result();
         SystemParam param = null;
         if (store.getPlat() == Plat.MEITUAN) {
@@ -3726,9 +3804,10 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         }
 
         RetailParam rp = null;
+        FoodDTO food = foodService.toDTO(storeUserFood.getFood());
         if (checkExists) {
             try {
-                rp = APIFactory.getNewRetailApi().retailGet(param, store.getCode(), storeUserFood.getFood().getCode());
+                rp = APIFactory.getNewRetailApi().retailGet(param, store.getCode(), food.getCode());
             } catch (ApiOpException e) {
                 String msg = e.getMsg();
                 logger.warn(msg);
@@ -3737,6 +3816,11 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
             }
         }
         FoodSetting foodSetting = systemSettingService.findActiveSetting(FoodSetting.class);
+        List<RetailSkuParam> skuParams = this.getRetailSkuParam(storeUserFood);
+        Map<String, RetailSkuParam> retailBySkuId = new HashMap<>();
+        for (RetailSkuParam skuParam : skuParams) {
+            retailBySkuId.put(skuParam.getSku_id(), skuParam);
+        }
         String actId = null;
         if (rp == null) {
             rp = new RetailParam();
@@ -3747,12 +3831,12 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                  * */
                 RetailSkuParam standardSku = new RetailSkuParam();
                 RetailSkuParam eSku = rp.getSkus().get(0);
-                FoodQuoteSku fos = foodQuoteSkus.get(0);
+                RetailSkuParam fos = skuParams.get(0);
                 standardSku.setSku_id(eSku.getSku_id());
                 standardSku.setSpec(eSku.getSpec());
                 standardSku.setPrice(String.valueOf(fos.getPrice()));
                 //设置库存
-                standardSku.setStock(getSkuStock(storeUserFood.getId(), fos.getSkuId()).toString());
+                standardSku.setStock(fos.getStock());
                 standardSku.setBox_price(String.valueOf(foodSetting.getBoxPrice()));
                 standardSku.setBox_num(String.valueOf(foodSetting.getBoxNum()));
                 try {
@@ -3794,7 +3878,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                             waitDeleteSkuList.add(skuParam);
                             continue;
                         }
-                        if (!foodQuoteSkuMapBySkuId.containsKey(skuParam.getSku_id())) {
+                        if (!retailBySkuId.containsKey(skuParam.getSku_id())) {
                             waitDeleteSkuList.add(skuParam);
                             continue;
                         }
@@ -3804,10 +3888,10 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 /**
                  * 更新sku信息
                  * */
-                List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
+                //List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
                 try {
-                    String ok = APIFactory.getNewRetailApi().retailSkuSave(param, store.getCode(), food.getCode(), null,
-                            skuList);
+                    String ok = APIFactory.getNewRetailApi().retailSkuSave(param, store.getCode(), food.getCode(), null, skuParams
+                    );
                     if (ok.equals("ok")) {
                         //发布成功
                         logger.info("更新非标品sku成功：" + food.getName());
@@ -3977,24 +4061,24 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         rp.setProduct_name(food.getProductName());
         rp.setOrigin_name(food.getOriginName());
         BigDecimal b = new BigDecimal(storeUserFood.getSalePrice());
-        rp.setPrice(b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
+        //rp.setPrice(b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
         rp.setUnit(food.getUnit());
         FoodCategory category = foodCategoryRepository.findByName(food.getCategoryName());
         //rp.setTag_id(category.getMeituanTagId() == null ? food.getMeituanTagId() : category.getMeituanTagId());
         rp.setTag_id(food.getMeituanTagId());
         rp.setSequence(food.getIdx());
-        List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
-        if (skuList.size() == 1) {
-            rp.setName(food.getName() + skuList.get(0).getSpec());
+        //List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
+        if (skuParams.size() == 1) {
+            rp.setName(food.getName() + skuParams.get(0).getSpec());
         } else {
             rp.setName(food.getName());
         }
         if (!storeUserFood.getSaleTimeMap().isEmpty()) {
-            for (RetailSkuParam retailSkuParam : skuList) {
+            for (RetailSkuParam retailSkuParam : skuParams) {
                 retailSkuParam.setAvailable_times(meituanWaimaiService.getTimeList(storeUserFood.getSaleTimeMap()));
             }
         }
-        rp.setSkus(skuList);
+        rp.setSkus(skuParams);
         String result;
         try {
             result = APIFactory.getNewRetailApi().retailInitData(param, rp);
@@ -4377,10 +4461,11 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
 
         List<String> newSkuList = StringUtils.isBlank(storeUserFood.getSpecialSkuIdList()) ? Collections.EMPTY_LIST
                 : Arrays.asList(storeUserFood.getSpecialSkuIdList().split(","));
-        List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), newSkuList, storeUserFood.getSalePrice(), true);
-        FoodSetting foodSetting = systemSettingService.findActiveSetting(FoodSetting.class);
+//        List<FoodQuoteSku> foodQuoteSkus = getFoodQuoteSkuList(food.getSkuList(), newSkuList, storeUserFood.getSalePrice(), true);
+//        FoodSetting foodSetting = systemSettingService.findActiveSetting(FoodSetting.class);
 
-        List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
+        //List<RetailSkuParam> skuList = toFoodSkuParamList(storeUserFood.getId(), foodQuoteSkus, foodSetting);
+        List<RetailSkuParam> skuList = this.getRetailSkuParam(storeUserFood);
         RetailSkuParam skuParam = skuList.get(0);
         List<ActRetailDiscountParam> list = new ArrayList<>();
         ActRetailDiscountParam actDiscountParam = new ActRetailDiscountParam();
@@ -4470,23 +4555,23 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         return result;
     }
 
-    private List<RetailSkuParam> toFoodSkuParamList(Long sufId, List<FoodQuoteSku> foodQuoteSkus, FoodSetting foodSetting) {
-        List<RetailSkuParam> skuList = new ArrayList<>();
-        for (int i = 0; i < foodQuoteSkus.size(); i++) {
-            FoodQuoteSku quoteSku = foodQuoteSkus.get(i);
-            RetailSkuParam skuParam = new RetailSkuParam();
-            skuParam.setSku_id(quoteSku.getSkuId());
-            skuParam.setSpec(quoteSku.getSpec());
-            skuParam.setPrice(String.valueOf(quoteSku.getPrice()));
-            skuParam.setBox_price(String.valueOf(foodSetting.getBoxPrice()));
-            skuParam.setBox_num(Float.valueOf(foodSetting.getBoxNum()).intValue() + "");
-            String[] split = quoteSku.getSkuId().split("-");
-            skuParam.setStock(getSkuStock(sufId, quoteSku.getSkuId()).toString());
-            skuParam.setWeight(Long.valueOf(quoteSku.getWeight()));
-            skuList.add(skuParam);
-        }
-        return skuList;
-    }
+//    private List<RetailSkuParam> toFoodSkuParamList(Long sufId, List<FoodQuoteSku> foodQuoteSkus, FoodSetting foodSetting) {
+//        List<RetailSkuParam> skuList = new ArrayList<>();
+//        for (int i = 0; i < foodQuoteSkus.size(); i++) {
+//            FoodQuoteSku quoteSku = foodQuoteSkus.get(i);
+//            RetailSkuParam skuParam = new RetailSkuParam();
+//            skuParam.setSku_id(quoteSku.getSkuId());
+//            skuParam.setSpec(quoteSku.getSpec());
+//            skuParam.setPrice(String.valueOf(quoteSku.getPrice()));
+//            skuParam.setBox_price(String.valueOf(foodSetting.getBoxPrice()));
+//            skuParam.setBox_num(Float.valueOf(foodSetting.getBoxNum()).intValue() + "");
+//            String[] split = quoteSku.getSkuId().split("-");
+//            skuParam.setStock(getSkuStock(sufId, quoteSku.getSkuId()).toString());
+//            skuParam.setWeight(Long.valueOf(quoteSku.getWeight()));
+//            skuList.add(skuParam);
+//        }
+//        return skuList;
+//    }
 
     private Food addClbPhoto(Food food) {
 
@@ -4605,7 +4690,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 userFood.setQuoteStatus(QuoteStatus.WAIT_VERIFY);
                 userFood.setPriceIncrease(0f);
                 userFood.setFoodUnit(food.getUnit());
-                userFood.setFoodSkuJson("");
+                //userFood.setFoodSkuJson("");
                 userFood.setSalePrice(saveParam.getOutputPrice());
                 userFood.setSale(false);
                 userFood.setStoreUser(storeUser);
@@ -4632,25 +4717,6 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 //将该规格设置为勾选规格(往后加)
                 save.setSpecialSkuIdList(storeUserFoodSku.getFoodSkuId().toString());
                 storeUserFoodRepository.save(save);
-//                StoreUserFoodSku sku = new StoreUserFoodSku();
-//                sku.setStoreUserId(storeUser.getId());
-//                sku.setStoreUserFoodId(save.getId());
-//                sku.setFoodSkuId(foodSku.getId());
-//                sku.setWarehouseIds(null);
-//                sku.setStock(saveParam.getStock());
-//                sku.setInputPrice(saveParam.getInputPrice());
-//                sku.setOutputPrice(saveParam.getOutputPrice());
-//                sku.setFoodId(food.getId());
-//                sku.setUpc(foodSku.getUpc());
-//                sku.setName(foodSku.getName());
-//                sku.setWeight(foodSku.getWeight());
-//                sku.setSpec(foodSku.getSpec());
-//                sku.setInputTax(foodSku.getInputTax());
-//                sku.setOutputTax(foodSku.getOutputTax());
-//                sku.setMinOrderCount(foodSku.getMinOrderCount());
-//                sku.setBoxNum(foodSku.getBoxNum());
-//                sku.setBoxPrice(foodSku.getBoxPrice());
-//                storeUserFoodSkuRepository.save(sku);
             } else {
                 //判断该商品是否含有已经存在的规格
                 StoreUserFoodSku sku = storeUserFoodSkuRepository.findByStoreUserIdAndUpc(storeUser.getId(), foodSku.getUpc());
@@ -4767,7 +4833,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
         suf.setAlterQuotePrice(suf.getQuotePrice());
         suf.setQuoteStatus(QuoteStatus.WAIT_VERIFY);
         suf.setFood(food);
-        suf.setFoodSkuJson(food.getSkuJson());
+        //suf.setFoodSkuJson(food.getSkuJson());
         suf.setFoodVersion(food.getVersion());
         return suf;
     }

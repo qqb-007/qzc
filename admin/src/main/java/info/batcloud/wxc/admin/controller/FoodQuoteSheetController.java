@@ -77,9 +77,9 @@ public class FoodQuoteSheetController {
 
     @PutMapping("/verify/{id}")
     public Object verify(@PathVariable long id, @RequestParam String json) {
-        FoodQuoteSheetService.VerifyParam param = JSON.parseObject(json, FoodQuoteSheetService.VerifyParam.class);
-        Result result = foodQuoteSheetService.verifyFoodQuoteSheet(id, param);
-        return result;
+//        FoodQuoteSheetService.VerifyParam param = JSON.parseObject(json, FoodQuoteSheetService.VerifyParam.class);
+//        Result result = foodQuoteSheetService.verifyFoodQuoteSheet(id, param);
+        return null;
     }
 
     @PostMapping()
@@ -117,12 +117,12 @@ public class FoodQuoteSheetController {
             vo.setSalePrice(perIncrease * detail.getPrice());
             vo.setFoodUnit(food.getQuoteUnit());
             List<FoodQuoteSkuVo> skus = new ArrayList<>();
-            for (FoodSku sku : food.getSkuList()) {
-                FoodQuoteSkuVo skuVo = new FoodQuoteSkuVo();
-                BeanUtils.copyProperties(sku, skuVo);
-                skuVo.setSalePrice(vo.getSalePrice() * sku.getPriceRatio());
-                skus.add(skuVo);
-            }
+//            for (FoodSku sku : food.getSkuList()) {
+//                FoodQuoteSkuVo skuVo = new FoodQuoteSkuVo();
+//                BeanUtils.copyProperties(sku, skuVo);
+//                skuVo.setSalePrice(vo.getSalePrice() * sku.getPriceRatio());
+//                skus.add(skuVo);
+//            }
             vo.setFoodSkuList(skus);
             detailVoList.add(vo);
         }

@@ -56,9 +56,9 @@ public class FoodQuoteSheetDetailServiceImpl implements FoodQuoteSheetDetailServ
         dto.setFoodPicture(food.getPicture());
         dto.setFood(foodService.toDTO(food));
         Map<String, FoodSku> foodSkuMap = new HashMap<>();
-        for (FoodSku sku : dto.getFood().getSkuList()) {
-            foodSkuMap.put(sku.getSkuId(), sku);
-        }
+//        for (FoodSku sku : dto.getFood().getSkuList()) {
+//            foodSkuMap.put(sku.getSkuId(), sku);
+//        }
         dto.setFoodQuoteSkuList(JSON.parseObject(detail.getFoodSkuJson(), new TypeReference<List<FoodQuoteSku>>() {
         }));
         return dto;

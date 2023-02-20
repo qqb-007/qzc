@@ -14,6 +14,15 @@ public class RetailSkuParam {
     private String box_num;
     private String box_price;
     private Long weight;
+    private Integer min_order_count;
+
+    public Integer getMin_order_count() {
+        return min_order_count;
+    }
+
+    public void setMin_order_count(Integer min_order_count) {
+        this.min_order_count = min_order_count;
+    }
 
     public String getSku_id() {
         return sku_id;

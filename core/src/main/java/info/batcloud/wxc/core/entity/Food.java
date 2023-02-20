@@ -70,8 +70,8 @@ public class Food implements Serializable {
     private String pictureId;
     private String clbPictureId;
 
-    @NotNull
-    private String skuJson;
+//    @NotNull
+//    private String skuJson;
 
     //报价规格
     private String quoteUnit;
@@ -405,13 +405,13 @@ public class Food implements Serializable {
         this.picture = picture;
     }
 
-    public String getSkuJson() {
-        return skuJson;
-    }
-
-    public void setSkuJson(String skuJson) {
-        this.skuJson = skuJson;
-    }
+//    public String getSkuJson() {
+//        return skuJson;
+//    }
+//
+//    public void setSkuJson(String skuJson) {
+//        this.skuJson = skuJson;
+//    }
 
     public Map<String, String> getJddjSkuMap() {
         return JSON.parseObject(StringUtils.isBlank(jddjSkuMapJson) ? "{}" : jddjSkuMapJson, HashMap.class);

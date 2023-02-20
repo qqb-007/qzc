@@ -159,39 +159,39 @@ public class FoodServiceImpl implements FoodService {
                 priceIncrease = foodSetting.getPerIncrease();
             }
             List<Food> foodList = fetchFromMeituan(poiCode);
-            for (Food food : foodList) {
-                if (foodRepository.countByCodeAndDeletedFalse(food.getCode()) > 0) {
-                    continue;
-                }
-                if (foodRepository.countByNameAndDeletedFalse(food.getName()) > 0) {
-                    continue;
-                }
-                float price = food.getPrice() / (1 + priceIncrease / 100);
-                if (food.getPrice() == null ||
-                        food.getPrice() == 0 || price < food.getPrice()) {
-                    food.setPrice(price);
-                }
-                List<FoodSku> _foodSkus = JSON.parseObject(food.getSkuJson(), new TypeReference<List<FoodSku>>() {
-                });
-                Map<String, FoodSku> skuIdMap = new HashMap<>();
-                for (FoodSku skus : _foodSkus) {
-                    if (StringUtils.isNotEmpty(skus.getSkuId())) {
-                        skuIdMap.put(skus.getSkuId(), skus);
-                    }
-                }
-                for (int i = 0; i < _foodSkus.size(); i++) {
-                    FoodSku fs = _foodSkus.get(i);
-                    if (StringUtils.isEmpty(fs.getSkuId())) {
-                        fs.setSkuId(getSkuId(skuIdMap));
-                    }
-                    if (_foodSkus.size() == 1) {
-                        fs.setQuoteUnitRatio(1);
-                        fs.setPriceRatio(1);
-                    }
-                }
-
-                food.setSkuJson(JSON.toJSONString(_foodSkus));
-            }
+//            for (Food food : foodList) {
+////                if (foodRepository.countByCodeAndDeletedFalse(food.getCode()) > 0) {
+////                    continue;
+////                }
+////                if (foodRepository.countByNameAndDeletedFalse(food.getName()) > 0) {
+////                    continue;
+////                }
+////                float price = food.getPrice() / (1 + priceIncrease / 100);
+////                if (food.getPrice() == null ||
+////                        food.getPrice() == 0 || price < food.getPrice()) {
+////                    food.setPrice(price);
+////                }
+//////                List<FoodSku> _foodSkus = JSON.parseObject(food.getSkuJson(), new TypeReference<List<FoodSku>>() {
+//////                });
+////                Map<String, FoodSku> skuIdMap = new HashMap<>();
+////                for (FoodSku skus : _foodSkus) {
+////                    if (StringUtils.isNotEmpty(skus.getSkuId())) {
+////                        skuIdMap.put(skus.getSkuId(), skus);
+////                    }
+////                }
+////                for (int i = 0; i < _foodSkus.size(); i++) {
+////                    FoodSku fs = _foodSkus.get(i);
+////                    if (StringUtils.isEmpty(fs.getSkuId())) {
+////                        fs.setSkuId(getSkuId(skuIdMap));
+////                    }
+////                    if (_foodSkus.size() == 1) {
+////                        fs.setQuoteUnitRatio(1);
+////                        fs.setPriceRatio(1);
+////                    }
+////                }
+////
+////                food.setSkuJson(JSON.toJSONString(_foodSkus));
+////            }
             foodRepository.save(foodList);
             List<Food> emptyCodeFoodList = foodList.stream().filter(o -> StringUtils.isEmpty(o.getCode())).collect(Collectors.toList());
             for (Food food : emptyCodeFoodList) {
@@ -255,72 +255,72 @@ public class FoodServiceImpl implements FoodService {
             foodMapByCode.put(food.getCode(), food);
             foodMapByName.put(food.getName(), food);
         }
-        for (RetailParam foodParam : foodParams) {
-            Food food;
-            if (StringUtils.isNotEmpty(foodParam.getApp_food_code())) {
-                food = foodMapByCode.get(foodParam.getApp_food_code());
-            } else {
-                food = foodMapByName.get(foodParam.getName());
-            }
-            if (food == null || food.getDeleted()) {
-                food = new Food();
-                food.setCreateTime(new Date());
-                food.setDeleted(false);
-                food.setQuotable(true);
-            }
-            food.setBoxNum(foodParam.getBox_num());
-            food.setBoxPrice(foodParam.getBox_price());
-            if (foodParam.getSecondary_category_name() == null) {
-                food.setCategoryName(foodParam.getCategory_name());
-            } else {
-                food.setCategoryName(foodParam.getSecondary_category_name());
-            }
-
-            food.setIsSp(foodParam.getIs_sp());
-            if (StringUtils.isEmpty(food.getCode())) {
-                food.setCode(foodParam.getApp_food_code());
-            }
-            food.setDescription(foodParam.getDescription());
-            food.setMinOrderCount(foodParam.getMin_order_count());
-            food.setName(foodParam.getName());
-            food.setPicture(foodParam.getPicture());
-            //food.setUpdateTime(new Date());
-            food.setPrice(foodParam.getPrice());
-            food.setIdx(1000);
-//            this.detectFoodQuoteUnit(food);
-            List<RetailSkuParam> skuParams = foodParam.getSkus();
-            List<FoodSku> foodSkus = new ArrayList<>();
-            List<FoodSku> _foodSkus = JSON.parseObject(food.getSkuJson(), new TypeReference<List<FoodSku>>() {
-            });
-            _foodSkus = _foodSkus == null ? new ArrayList<>() : _foodSkus;
-            Map<String, FoodSku> skuIdMap = new HashMap<>();
-            Map<String, FoodSku> skuSpecMap = new HashMap<>();
-            for (FoodSku skus : _foodSkus) {
-                if (StringUtils.isNotEmpty(skus.getSkuId())) {
-                    skuIdMap.put(skus.getSkuId(), skus);
-                }
-                skuSpecMap.put(skus.getSpec(), skus);
-            }
-            for (RetailSkuParam skuParam : skuParams) {
-                FoodSku sku = skuIdMap.get(skuParam.getSku_id());
-                if (sku == null) {
-                    sku = skuSpecMap.get(skuParam.getSpec());
-                }
-
-                if (sku == null) {
-                    sku = new FoodSku();
-                }
-
-                sku.setBoxNum(skuParam.getBox_num());
-                sku.setBoxPrice(skuParam.getBox_price());
-                sku.setSpec(skuParam.getSpec());
-                foodSkus.add(sku);
-            }
-            food.setSkuJson(JSON.toJSONString(foodSkus));
-            food.setUnit(foodParam.getUnit());
-
-            foodList.add(food);
-        }
+//        for (RetailParam foodParam : foodParams) {
+//            Food food;
+//            if (StringUtils.isNotEmpty(foodParam.getApp_food_code())) {
+//                food = foodMapByCode.get(foodParam.getApp_food_code());
+//            } else {
+//                food = foodMapByName.get(foodParam.getName());
+//            }
+//            if (food == null || food.getDeleted()) {
+//                food = new Food();
+//                food.setCreateTime(new Date());
+//                food.setDeleted(false);
+//                food.setQuotable(true);
+//            }
+//            food.setBoxNum(foodParam.getBox_num());
+//            food.setBoxPrice(foodParam.getBox_price());
+//            if (foodParam.getSecondary_category_name() == null) {
+//                food.setCategoryName(foodParam.getCategory_name());
+//            } else {
+//                food.setCategoryName(foodParam.getSecondary_category_name());
+//            }
+//
+//            food.setIsSp(foodParam.getIs_sp());
+//            if (StringUtils.isEmpty(food.getCode())) {
+//                food.setCode(foodParam.getApp_food_code());
+//            }
+//            food.setDescription(foodParam.getDescription());
+//            food.setMinOrderCount(foodParam.getMin_order_count());
+//            food.setName(foodParam.getName());
+//            food.setPicture(foodParam.getPicture());
+//            //food.setUpdateTime(new Date());
+//            //food.setPrice(foodParam.getPrice());
+//            food.setIdx(1000);
+////            this.detectFoodQuoteUnit(food);
+//            List<RetailSkuParam> skuParams = foodParam.getSkus();
+//            List<FoodSku> foodSkus = new ArrayList<>();
+//            List<FoodSku> _foodSkus = JSON.parseObject(food.getSkuJson(), new TypeReference<List<FoodSku>>() {
+//            });
+//            _foodSkus = _foodSkus == null ? new ArrayList<>() : _foodSkus;
+//            Map<String, FoodSku> skuIdMap = new HashMap<>();
+//            Map<String, FoodSku> skuSpecMap = new HashMap<>();
+//            for (FoodSku skus : _foodSkus) {
+//                if (StringUtils.isNotEmpty(skus.getSkuId())) {
+//                    skuIdMap.put(skus.getSkuId(), skus);
+//                }
+//                skuSpecMap.put(skus.getSpec(), skus);
+//            }
+//            for (RetailSkuParam skuParam : skuParams) {
+//                FoodSku sku = skuIdMap.get(skuParam.getSku_id());
+//                if (sku == null) {
+//                    sku = skuSpecMap.get(skuParam.getSpec());
+//                }
+//
+//                if (sku == null) {
+//                    sku = new FoodSku();
+//                }
+//
+//                sku.setBoxNum(skuParam.getBox_num());
+//                sku.setBoxPrice(skuParam.getBox_price());
+//                sku.setSpec(skuParam.getSpec());
+//                foodSkus.add(sku);
+//            }
+//            food.setSkuJson(JSON.toJSONString(foodSkus));
+//            food.setUnit(foodParam.getUnit());
+//
+//            foodList.add(food);
+//        }
         return foodList;
     }
 
@@ -494,50 +494,50 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public List<OnlineFoodDTO> onlineStoreFood(long storeId) {
         Store store = storeRepository.findOne(storeId);
-        if (store.getPlat() == Plat.MEITUAN) {
-            try {
-                List<OnlineFoodDTO> foodList = new ArrayList<>();
-                SystemParam param = meituanWaimaiService.getSystemParam();
-                List<RetailParam> foodParams = APIFactory.getNewRetailApi().retailList(param, store.getCode());
-                List<String> codeList = new ArrayList<>();
-                List<String> nameList = new ArrayList<>();
-                for (RetailParam foodParam : foodParams) {
-                    if (StringUtils.isNotEmpty(foodParam.getApp_food_code())) {
-                        codeList.add(foodParam.getApp_food_code());
-                    }
-                    nameList.add(foodParam.getName());
-                }
-                List<Food> checkFoodList = foodRepository.findByCodeInOrNameInAndDeletedFalse(codeList, nameList);
-                Map<String, Food> foodMapByName = new HashMap<>();
-                Map<String, Food> foodMapByCode = new HashMap<>();
-                for (Food food : checkFoodList) {
-                    foodMapByCode.put(food.getCode(), food);
-                    foodMapByName.put(food.getName(), food);
-                }
-                for (RetailParam foodParam : foodParams) {
-                    Food food = foodMapByCode.get(foodParam.getApp_food_code());
-                    OnlineFoodDTO oDto = new OnlineFoodDTO();
-                    oDto.setSalePrice(foodParam.getPrice());
-                    if (food != null) {
-                        oDto.setFoodName(food.getName());
-                        oDto.setFoodPicture(food.getPicture());
-                        oDto.setFoodId(food.getId());
-                        oDto.setFoodUnit(food.getQuoteUnit());
-                        oDto.setQuotePrice(foodParam.getPrice() / (1 + store.getPriceIncrease() / 100));
-                        foodList.add(oDto);
-                    } else {
-                        throw new BizException("商品：" + foodParam.getName() + "没有校对，请校对后再进行操作");
-                    }
-//                    oDto.setFoodPerIncrease();
-
-                }
-                return foodList;
-            } catch (ApiSysException e) {
-                logger.error(e.getExceptionEnum().getMsg(), e);
-            } catch (ApiOpException e) {
-                logger.error(e.getMsg(), e);
-            }
-        }
+//        if (store.getPlat() == Plat.MEITUAN) {
+//            try {
+//                List<OnlineFoodDTO> foodList = new ArrayList<>();
+//                SystemParam param = meituanWaimaiService.getSystemParam();
+//                List<RetailParam> foodParams = APIFactory.getNewRetailApi().retailList(param, store.getCode());
+//                List<String> codeList = new ArrayList<>();
+//                List<String> nameList = new ArrayList<>();
+//                for (RetailParam foodParam : foodParams) {
+//                    if (StringUtils.isNotEmpty(foodParam.getApp_food_code())) {
+//                        codeList.add(foodParam.getApp_food_code());
+//                    }
+//                    nameList.add(foodParam.getName());
+//                }
+//                List<Food> checkFoodList = foodRepository.findByCodeInOrNameInAndDeletedFalse(codeList, nameList);
+//                Map<String, Food> foodMapByName = new HashMap<>();
+//                Map<String, Food> foodMapByCode = new HashMap<>();
+//                for (Food food : checkFoodList) {
+//                    foodMapByCode.put(food.getCode(), food);
+//                    foodMapByName.put(food.getName(), food);
+//                }
+//                for (RetailParam foodParam : foodParams) {
+//                    Food food = foodMapByCode.get(foodParam.getApp_food_code());
+//                    OnlineFoodDTO oDto = new OnlineFoodDTO();
+//                    oDto.setSalePrice(foodParam.getPrice());
+//                    if (food != null) {
+//                        oDto.setFoodName(food.getName());
+//                        oDto.setFoodPicture(food.getPicture());
+//                        oDto.setFoodId(food.getId());
+//                        oDto.setFoodUnit(food.getQuoteUnit());
+//                        oDto.setQuotePrice(foodParam.getPrice() / (1 + store.getPriceIncrease() / 100));
+//                        foodList.add(oDto);
+//                    } else {
+//                        throw new BizException("商品：" + foodParam.getName() + "没有校对，请校对后再进行操作");
+//                    }
+////                    oDto.setFoodPerIncrease();
+//
+//                }
+//                return foodList;
+//            } catch (ApiSysException e) {
+//                logger.error(e.getExceptionEnum().getMsg(), e);
+//            } catch (ApiOpException e) {
+//                logger.error(e.getMsg(), e);
+//            }
+//        }
         return new ArrayList<>();
     }
 
@@ -549,43 +549,43 @@ public class FoodServiceImpl implements FoodService {
     @Override
     public List<FoodDTO> detectProblematicFoodList() {
         List<FoodDTO> foodList = new ArrayList<>();
-        SearchParam param = new SearchParam();
-        param.setSort(FoodSort.ID);
-        param.setPageSize(100);
-        int page = 1;
-        while (true) {
-            param.setPage(page++);
-            Paging<FoodDTO> paging = search(param);
-            for (FoodDTO food : paging.getResults()) {
-                /**
-                 * 检测food的quoteUnit
-                 * */
-                if (StringUtils.isEmpty(food.getQuoteUnit())) {
-                    foodList.add(food);
-                } else {
-                    List<FoodSku> skus = food.getSkuList();
-                    if (skus.size() > 0) {
-                        Set<String> skuIdSet = new HashSet<>();
-                        for (FoodSku sku : skus) {
-                            skuIdSet.add(sku.getSkuId());
-                            if (StringUtils.isEmpty(sku.getSkuId()) || sku.getPriceRatio() == 0
-                                    || sku.getQuoteUnitRatio() == 0) {
-                                foodList.add(food);
-                                break;
-                            }
-                        }
-                        if (skuIdSet.size() != skus.size()) {
-                            foodList.add(food);
-                        }
-                    } else {
-                        foodList.add(food);
-                    }
-                }
-            }
-            if (!paging.getHasNext()) {
-                break;
-            }
-        }
+//        SearchParam param = new SearchParam();
+//        param.setSort(FoodSort.ID);
+//        param.setPageSize(100);
+//        int page = 1;
+//        while (true) {
+//            param.setPage(page++);
+//            Paging<FoodDTO> paging = search(param);
+//            for (FoodDTO food : paging.getResults()) {
+//                /**
+//                 * 检测food的quoteUnit
+//                 * */
+//                if (StringUtils.isEmpty(food.getQuoteUnit())) {
+//                    foodList.add(food);
+//                } else {
+//                    List<FoodSku> skus = food.getSkuList();
+//                    if (skus.size() > 0) {
+//                        Set<String> skuIdSet = new HashSet<>();
+//                        for (FoodSku sku : skus) {
+//                            skuIdSet.add(sku.getSkuId());
+//                            if (StringUtils.isEmpty(sku.getSkuId()) || sku.getPriceRatio() == 0
+//                                    || sku.getQuoteUnitRatio() == 0) {
+//                                foodList.add(food);
+//                                break;
+//                            }
+//                        }
+//                        if (skuIdSet.size() != skus.size()) {
+//                            foodList.add(food);
+//                        }
+//                    } else {
+//                        foodList.add(food);
+//                    }
+//                }
+//            }
+//            if (!paging.getHasNext()) {
+//                break;
+//            }
+//        }
         return foodList;
     }
 
@@ -820,7 +820,7 @@ public class FoodServiceImpl implements FoodService {
             }
         }
         food.setQuotable(true);
-        food.setSkuJson("[]");
+        //food.setSkuJson("[]");
         food.setDeleted(false);
         food.setQuoteUnit(param.getUnit());
         food.setPrice(0f);
@@ -845,9 +845,9 @@ public class FoodServiceImpl implements FoodService {
             //如果是标品，只能是一个sku
             throw new RuntimeException("标品只能设置一个SKU");
         }
-        food.setSkuJson(JSON.toJSONString(foodSkus));
+        //food.setSkuJson(JSON.toJSONString(foodSkus));
         foodRepository.save(food);
-        storeUserFoodService.addSkus(id);
+        //storeUserFoodService.addSkus(id);
     }
 
     @Override
@@ -918,7 +918,7 @@ public class FoodServiceImpl implements FoodService {
     public FoodDTO toDTO(Food food) {
         FoodDTO dto = new FoodDTO();
         BeanUtils.copyProperties(food, dto);
-        dto.setSkuList(FoodHelper.parseFoodSkuList(food.getSkuJson()));
+        //dto.setSkuList(FoodHelper.parseFoodSkuList(food.getSkuJson()));
         dto.setSkus(foodSkuService.getFoodSkuList(food.getId()));
         dto.setPropertieList(FoodHelper.parseFoodPropertieList(food.getPropertieJson()));
         return dto;
@@ -982,14 +982,14 @@ public class FoodServiceImpl implements FoodService {
                             break;
                     }
                 }
-                List<FoodSku> skuList = dto.getSkuList();
-                for (int i = 0; i < skuList.size(); i++) {
-                    FoodSku sku = skuList.get(i);
-                    HSSFCell rowCell = row.createCell(6 + i);
-                    rowCell.setCellStyle(commonStyle);
-                    rowCell.setCellValue(dto.getCode());
-                    rowCell.setCellValue(sku.getSpec());
-                }
+                //List<FoodSku> skuList = dto.getSkuList();
+//                for (int i = 0; i < skuList.size(); i++) {
+//                    FoodSku sku = skuList.get(i);
+//                    HSSFCell rowCell = row.createCell(6 + i);
+//                    rowCell.setCellStyle(commonStyle);
+//                    rowCell.setCellValue(dto.getCode());
+//                    rowCell.setCellValue(sku.getSpec());
+//                }
             }
             if (!paging.getHasNext()) {
                 break;

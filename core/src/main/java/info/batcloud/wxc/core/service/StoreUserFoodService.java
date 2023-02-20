@@ -25,7 +25,7 @@ public interface StoreUserFoodService {
 
     StoreUserFoodDTO findById(Long id);
 
-    void updateStock(long id, List<String> skuIds, List<Integer> stock);
+    //void updateStock(long id, List<String> skuIds, List<Integer> stock);
 
     void batchSetSaleTime(BatchSaleTimeParam batchSaleTime);
 

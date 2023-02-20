@@ -12,7 +12,7 @@ public class RetailParam {
     private Integer operation; //标志位：0:新增，1:更改
     private String name;
     private String description;
-    private Float price;
+    //private Float price;
     private Integer min_order_count;
     private String unit;
     private Float box_num;
@@ -87,13 +87,13 @@ public class RetailParam {
         this.name = name;
     }
 
-    public Float getPrice() {
-        return price;
-    }
-
-    public void setPrice(Float price) {
-        this.price = price;
-    }
+//    public Float getPrice() {
+//        return price;
+//    }
+//
+//    public void setPrice(Float price) {
+//        this.price = price;
+//    }
 
     public Integer getMin_order_count() {
         return min_order_count;
@@ -311,7 +311,6 @@ public class RetailParam {
                 ", operation=" + operation +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", price=" + price +
                 ", min_order_count=" + min_order_count +
                 ", unit='" + unit + '\'' +
                 ", box_num=" + box_num +

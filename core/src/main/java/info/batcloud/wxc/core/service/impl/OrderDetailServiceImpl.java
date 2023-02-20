@@ -7,6 +7,7 @@ import info.batcloud.wxc.core.dto.OrderDetailDTO;
 import info.batcloud.wxc.core.entity.Food;
 import info.batcloud.wxc.core.entity.OrderDetail;
 import info.batcloud.wxc.core.entity.StoreUserFood;
+import info.batcloud.wxc.core.entity.StoreUserFoodSku;
 import info.batcloud.wxc.core.enums.OrderStatus;
 import info.batcloud.wxc.core.exception.BizException;
 import info.batcloud.wxc.core.helper.FoodHelper;
@@ -14,6 +15,7 @@ import info.batcloud.wxc.core.helper.PagingHelper;
 import info.batcloud.wxc.core.repository.FoodRepository;
 import info.batcloud.wxc.core.repository.OrderDetailRepository;
 import info.batcloud.wxc.core.repository.StoreUserFoodRepository;
+import info.batcloud.wxc.core.repository.StoreUserFoodSkuRepository;
 import info.batcloud.wxc.core.service.FoodService;
 import info.batcloud.wxc.core.service.OrderDetailService;
 import info.batcloud.wxc.core.service.OrderService;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 @Service
 public class OrderDetailServiceImpl implements OrderDetailService {
 
@@ -49,6 +52,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Inject
     private FoodRepository foodRepository;
+
+    @Inject
+    private StoreUserFoodSkuRepository storeUserFoodSkuRepository;
 
     @Inject
     private StoreUserFoodRepository storeUserFoodRepository;
@@ -148,11 +154,12 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         if (suf == null) {
             throw new BizException(food.getName() + " 未添加到门店，请先添加");
         }
-        for (FoodSku foodSku : FoodHelper.parseFoodSkuList(food.getSkuJson())) {
-            if (param.getSkuId().equals(foodSku.getSkuId())) {
-                od.setSkuId(foodSku.getSkuId());
+        List<StoreUserFoodSku> skuList = storeUserFoodSkuRepository.findByStoreUserFoodId(suf.getId());
+        for (StoreUserFoodSku foodSku : skuList) {
+            if (param.getSkuId().equals(foodSku.getFoodSkuId())) {
+                od.setSkuId(foodSku.getFoodSkuId().toString());
                 od.setSpec(foodSku.getSpec());
-                od.setQuotePrice(suf.getQuotePrice() * foodSku.getQuoteUnitRatio());
+                od.setQuotePrice(foodSku.getInputPrice());
                 od.setFoodCode(food.getCode());
                 od.setFood(food);
             }
@@ -177,7 +184,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             order.setId(orderDetail.getOrder().getId());
             dto.setOrder(order);
         }
-        if(orderDetail.getFood() != null) {
+        if (orderDetail.getFood() != null) {
             dto.setFoodPicture(orderDetail.getFood().getPicture());
         }
         return dto;

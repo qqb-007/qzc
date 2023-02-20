@@ -227,6 +227,9 @@ public class OrderServiceImpl implements OrderService {
     @Inject
     private SingleCallService singleCallService;
 
+    @Inject
+    private StoreUserFoodSkuService storeUserFoodSkuService;
+
 
     @Override
     public String pullPhoneNumberByStoreId(long storeId) {
@@ -828,10 +831,10 @@ public class OrderServiceImpl implements OrderService {
             Double refunded_weight = rp.getRefunded_weight();
             Food food = foodRepository.findByCode(rp.getApp_food_code());
             FoodDTO foodDTO = foodService.toDTO(food);
-            List<FoodSku> skuList = foodDTO.getSkuList();
+            List<FoodSkuDTO> skuList = foodDTO.getSkus();
             Integer weight = null;
-            for (FoodSku foodSku : skuList) {
-                if (foodSku.getSkuId().contains(rp.getSku_id())) {
+            for (FoodSkuDTO foodSku : skuList) {
+                if (foodSku.getId().toString().contains(rp.getSku_id())) {
                     weight = foodSku.getWeight();
                     continue;
                 }
@@ -3541,6 +3544,18 @@ public class OrderServiceImpl implements OrderService {
         return remind;
     }
 
+    StoreUserFoodSkuDTO getSkuDto(String skuId, List<StoreUserFoodSkuDTO> list) {
+        if (list == null) {
+            return null;
+        }
+        for (StoreUserFoodSkuDTO sku : list) {
+            if (sku.getFoodSkuId().equals(skuId)) {
+                return sku;
+            }
+        }
+        return null;
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean checkOrder(Order order) {
@@ -3566,13 +3581,16 @@ public class OrderServiceImpl implements OrderService {
             Food food = foodRepository.findOne(storeUserFood.getFood().getId());
             detail.setFood(food);
             detail.setUnit(food.getQuoteUnit());
-            List<FoodSku> foodSkuList = FoodHelper.parseFoodSkuList(food.getSkuJson());
-            FoodSku sku;
+            List<StoreUserFoodSkuDTO> skuDTOList = storeUserFoodSkuService.getByStoreUserFoodId(storeUserFood.getId());
+//            List<FoodSku> foodSkuList = FoodHelper.parseFoodSkuList(food.getSkuJson());
+//            FoodSku sku;
+            StoreUserFoodSkuDTO sku;
             if (food.getIsSp() == 1) {
                 //如果是标品，sku就是默认的sku
-                sku = foodSkuList.get(0);
+                sku = skuDTOList.get(0);
             } else {
-                sku = FoodHelper.findSku(detail.getSkuId(), foodSkuList);
+                //sku = FoodHelper.findSku(detail.getSkuId(), foodSkuList);
+                sku = getSkuDto(detail.getSkuId(), skuDTOList);
             }
             if (sku == null) {
                 detail.setRemark("商品SKU不存在，SKU：" + sku);
@@ -3584,7 +3602,7 @@ public class OrderServiceImpl implements OrderService {
              * 有的商品是不存在sku的
              * */
             if (detail.getQuotePrice() == null || detail.getQuotePrice() == 0) {
-                detail.setQuotePrice((sku.getQuoteUnitRatio()) * storeUserFood.getQuotePrice());
+                detail.setQuotePrice(sku.getInputPrice());
             }
             if (StringUtils.isEmpty(detail.getSpec())) {
                 detail.setSpec(sku.getSpec());
@@ -3593,7 +3611,7 @@ public class OrderServiceImpl implements OrderService {
             if (suf != null) {
                 detail.setFoodSupplier(suf.getFoodSupplier());
             }
-            detail.setQuoteUnitRatio(sku.getQuoteUnitRatio());
+            detail.setQuoteUnitRatio(1f);
 
             if (StringUtils.isNotBlank(suf.getWarehouseIds())) {
                 String warehouseIds = suf.getWarehouseIds();
