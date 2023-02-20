@@ -14,15 +14,20 @@ public interface WarehouseService {
 
     void update(UpdateParam updateParam);
 
-    void bindStoreUserFood(long id, long storeUserFoodId);
 
-    void deleteFood(long id, long storeUserFoodId);
+    void bindStoreUserFoodSku(long id, long storeUserFoodSkuId);
 
-    void delete(Long id);
+
+    void deleteFoodSku(long id, long storeUserFoodSkuId);
+
+
+    void deleteWarehouse(Long id);
 
     Paging<WarehouseDTO> search(SearchParam param);
 
-    List<WarehouseDTO> getsufWhList(Long sufId);
+//    List<WarehouseDTO> getsufWhList(Long sufId);
+
+    List<WarehouseDTO> getskuWhList(Long skuId);
 
 
     class SearchParam extends PagingParam {

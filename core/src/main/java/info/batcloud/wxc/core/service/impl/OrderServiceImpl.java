@@ -3613,8 +3613,8 @@ public class OrderServiceImpl implements OrderService {
             }
             detail.setQuoteUnitRatio(1f);
 
-            if (StringUtils.isNotBlank(suf.getWarehouseIds())) {
-                String warehouseIds = suf.getWarehouseIds();
+            if (StringUtils.isNotBlank(sku.getWarehouseIds())) {
+                String warehouseIds = sku.getWarehouseIds();
                 String[] split = warehouseIds.split(",");
                 List<String> names = new ArrayList<>();
                 for (String s : split) {

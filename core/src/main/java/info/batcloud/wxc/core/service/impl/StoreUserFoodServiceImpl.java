@@ -2062,18 +2062,18 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
 
     }
 
-    @Override
-    public List<StoreUserFoodDTO> getWhSufList(Long wid) {
-        Warehouse warehouse = warehouseRepository.findOne(wid);
-        List<StoreUserFoodDTO> list = new ArrayList<>();
-        if (StringUtils.isNotBlank(warehouse.getFoodIds())) {
-            String[] split = warehouse.getFoodIds().split(",");
-            for (String s : split) {
-                list.add(toDTO(storeUserFoodRepository.findOne(Long.valueOf(s))));
-            }
-        }
-        return list;
-    }
+//    @Override
+//    public List<StoreUserFoodDTO> getWhSufList(Long wid) {
+//        Warehouse warehouse = warehouseRepository.findOne(wid);
+//        List<StoreUserFoodDTO> list = new ArrayList<>();
+//        if (StringUtils.isNotBlank(warehouse.getFoodIds())) {
+//            String[] split = warehouse.getFoodIds().split(",");
+//            for (String s : split) {
+//                list.add(toDTO(storeUserFoodRepository.findOne(Long.valueOf(s))));
+//            }
+//        }
+//        return list;
+//    }
 
     @Override
     public void syncStock(long id) {
@@ -4706,7 +4706,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 userFood.setEleSkuId(null);
                 userFood.setCityId(storeUser.getCity().getId());
                 userFood.setFoodQuoteReport(null);
-                userFood.setWarehouseIds(null);
+                //userFood.setWarehouseIds(null);
                 userFood.setElePhotos(null);
                 userFood.setElePhotosJson(null);
                 userFood.setMeituanPublishStatus(PublishStatus.WAIT);

@@ -97,7 +97,7 @@ public class StoreUserFood {
 
     private String publishMsg;
 
-    private String warehouseIds;
+    //private String warehouseIds;
 
     private Integer foodVersion;
 
@@ -260,13 +260,13 @@ public class StoreUserFood {
     }
 
 
-    public String getWarehouseIds() {
-        return warehouseIds;
-    }
-
-    public void setWarehouseIds(String warehouseIds) {
-        this.warehouseIds = warehouseIds;
-    }
+//    public String getWarehouseIds() {
+//        return warehouseIds;
+//    }
+//
+//    public void setWarehouseIds(String warehouseIds) {
+//        this.warehouseIds = warehouseIds;
+//    }
 
     public Map<String, String> getElePhotos() {
         if (StringUtils.isBlank(getElePhotosJson())) {

@@ -20,7 +20,9 @@ public class Warehouse {
     @NotNull
     private StoreUser storeUser;
 
-    private String foodIds;
+    //private String foodIds;
+
+    private String skuIds;
 
     private Date createTime;
 
@@ -70,13 +72,13 @@ public class Warehouse {
         this.createTime = createTime;
     }
 
-    public String getFoodIds() {
-        return foodIds;
-    }
-
-    public void setFoodIds(String foodIds) {
-        this.foodIds = foodIds;
-    }
+//    public String getFoodIds() {
+//        return foodIds;
+//    }
+//
+//    public void setFoodIds(String foodIds) {
+//        this.foodIds = foodIds;
+//    }
 
     public Date getUpdateTime() {
         return updateTime;
@@ -94,6 +96,14 @@ public class Warehouse {
         this.deleted = deleted;
     }
 
+    public String getSkuIds() {
+        return skuIds;
+    }
+
+    public void setSkuIds(String skuIds) {
+        this.skuIds = skuIds;
+    }
+
     @Override
     public String toString() {
         return "Warehouse{" +
@@ -101,7 +111,7 @@ public class Warehouse {
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", storeUser=" + storeUser +
-                ", foodIds='" + foodIds + '\'' +
+                ", skuIds='" + skuIds + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 ", deleted=" + deleted +

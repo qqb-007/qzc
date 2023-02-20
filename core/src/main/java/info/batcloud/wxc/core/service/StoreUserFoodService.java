@@ -18,7 +18,7 @@ import java.util.Map;
 
 public interface StoreUserFoodService {
 
-    List<StoreUserFoodDTO> getWhSufList(Long wid);
+    //List<StoreUserFoodDTO> getWhSufList(Long wid);
 
     void syncStock(long id);
 

@@ -5,12 +5,15 @@ import info.batcloud.wxc.core.dto.StoreUserFoodDTO;
 import info.batcloud.wxc.core.dto.WarehouseDTO;
 import info.batcloud.wxc.core.entity.Bag;
 import info.batcloud.wxc.core.entity.StoreUserFood;
+import info.batcloud.wxc.core.entity.StoreUserFoodSku;
 import info.batcloud.wxc.core.entity.Warehouse;
 import info.batcloud.wxc.core.exception.BizException;
 import info.batcloud.wxc.core.helper.PagingHelper;
 import info.batcloud.wxc.core.repository.StoreUserFoodRepository;
+import info.batcloud.wxc.core.repository.StoreUserFoodSkuRepository;
 import info.batcloud.wxc.core.repository.StoreUserRepository;
 import info.batcloud.wxc.core.repository.WarehouseRepository;
+import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import info.batcloud.wxc.core.service.WarehouseService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -42,6 +45,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Inject
     private StoreUserFoodRepository storeUserFoodRepository;
+
+    @Inject
+    private StoreUserFoodSkuRepository storeUserFoodSkuRepository;
+
+    @Inject
+    private StoreUserFoodSkuService storeUserFoodSkuService;
 
 
     @Override
@@ -79,67 +88,95 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void bindStoreUserFood(long id, long storeUserFoodId) {
+    public void bindStoreUserFoodSku(long id, long storeUserFoodSkuId) {
         Warehouse warehouse = warehouseRepository.findOne(id);
-        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(storeUserFoodId);
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findOne(storeUserFoodSkuId);
         //判断是否同一个店铺
-        if (warehouse.getStoreUser().getId() != storeUserFood.getStoreUser().getId()) {
+        if (warehouse.getStoreUser().getId() != userFoodSku.getStoreUserId()) {
             throw new BizException("库位和商品不属于同一个门店，请核对后再进行绑定");
         }
-        String food_ids = warehouse.getFoodIds();
+        String food_ids = warehouse.getSkuIds();
         if (StringUtils.isNotBlank(food_ids)) {
             String[] split = food_ids.split(",");
             for (String s : split) {
-                if (s.equals(String.valueOf(storeUserFoodId))) {
+                if (s.equals(String.valueOf(storeUserFoodSkuId))) {
                     throw new BizException("该商品已经绑定到该库位中，无需重复绑定");
                 }
             }
-            food_ids = food_ids + "," + storeUserFoodId;
-            warehouse.setFoodIds(food_ids);
+            food_ids = food_ids + "," + storeUserFoodSkuId;
+            warehouse.setSkuIds(food_ids);
         } else {
-            warehouse.setFoodIds(String.valueOf(storeUserFoodId));
+            warehouse.setSkuIds(String.valueOf(storeUserFoodSkuId));
         }
         //在门店商品绑定该库位
-        String warehouseIds = storeUserFood.getWarehouseIds();
+        String warehouseIds = userFoodSku.getWarehouseIds();
         if (StringUtils.isNotBlank(warehouseIds)) {
             warehouseIds = warehouseIds + "," + warehouse.getId();
-            storeUserFood.setWarehouseIds(warehouseIds);
+            userFoodSku.setWarehouseIds(warehouseIds);
         } else {
-            storeUserFood.setWarehouseIds(warehouse.getId().toString());
+            userFoodSku.setWarehouseIds(warehouse.getId().toString());
         }
-        storeUserFoodRepository.save(storeUserFood);
+        storeUserFoodSkuRepository.save(userFoodSku);
         warehouseRepository.save(warehouse);
-
     }
 
     @Override
-    public void deleteFood(long id, long storeUserFoodId) {
+    public void deleteFoodSku(long id, long storeUserFoodSkuId) {
         //解绑商品  同时商品侧解绑库位
         Warehouse warehouse = warehouseRepository.findOne(id);
-        warehouse.setFoodIds(deteteString(warehouse.getFoodIds(), String.valueOf(storeUserFoodId)));
+        warehouse.setSkuIds(deteteString(warehouse.getSkuIds(), String.valueOf(storeUserFoodSkuId)));
         warehouseRepository.save(warehouse);
-        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(storeUserFoodId);
-        storeUserFood.setWarehouseIds(deteteString(storeUserFood.getWarehouseIds(), String.valueOf(id)));
-        storeUserFoodRepository.save(storeUserFood);
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findOne(storeUserFoodSkuId);
+        userFoodSku.setWarehouseIds(deteteString(userFoodSku.getWarehouseIds(), String.valueOf(id)));
+        storeUserFoodSkuRepository.save(userFoodSku);
     }
 
     @Override
-    public void delete(Long id) {
+    public void deleteWarehouse(Long id) {
         //删除库位
         Warehouse warehouse = warehouseRepository.findOne(id);
         //将绑定在该库位的门店商品中对应的库位字段删除
-        if (StringUtils.isNotBlank(warehouse.getFoodIds())) {
-            String[] split = warehouse.getFoodIds().split(",");
+        if (StringUtils.isNotBlank(warehouse.getSkuIds())) {
+            String[] split = warehouse.getSkuIds().split(",");
             for (String s : split) {
-                StoreUserFood storeUserFood = storeUserFoodRepository.findOne(Long.valueOf(s));
-                String warehouseIds = storeUserFood.getWarehouseIds();
-                storeUserFood.setWarehouseIds(deteteString(warehouseIds, id.toString()));
-                storeUserFoodRepository.save(storeUserFood);
+                StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findOne(Long.valueOf(s));
+                String warehouseIds = userFoodSku.getWarehouseIds();
+                userFoodSku.setWarehouseIds(deteteString(warehouseIds, id.toString()));
+                storeUserFoodSkuRepository.save(userFoodSku);
 
             }
         }
         warehouseRepository.delete(id);
     }
+
+//    @Override
+//    public void deleteFood(long id, long storeUserFoodId) {
+//        //解绑商品  同时商品侧解绑库位
+//        Warehouse warehouse = warehouseRepository.findOne(id);
+//        warehouse.setSkuIds(deteteString(warehouse.getSkuIds(), String.valueOf(storeUserFoodId)));
+//        warehouseRepository.save(warehouse);
+//        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(storeUserFoodId);
+//        storeUserFood.setWarehouseIds(deteteString(storeUserFood.getWarehouseIds(), String.valueOf(id)));
+//        storeUserFoodRepository.save(storeUserFood);
+//    }
+
+//    @Override
+//    public void delete(Long id) {
+//        //删除库位
+//        Warehouse warehouse = warehouseRepository.findOne(id);
+//        //将绑定在该库位的门店商品中对应的库位字段删除
+//        if (StringUtils.isNotBlank(warehouse.getFoodIds())) {
+//            String[] split = warehouse.getFoodIds().split(",");
+//            for (String s : split) {
+//                StoreUserFood storeUserFood = storeUserFoodRepository.findOne(Long.valueOf(s));
+//                String warehouseIds = storeUserFood.getWarehouseIds();
+//                storeUserFood.setWarehouseIds(deteteString(warehouseIds, id.toString()));
+//                storeUserFoodRepository.save(storeUserFood);
+//
+//            }
+//        }
+//        warehouseRepository.delete(id);
+//    }
 
     @Override
     public Paging<WarehouseDTO> search(SearchParam param) {
@@ -184,33 +221,47 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public List<WarehouseDTO> getsufWhList(Long sufId) {
-        StoreUserFood userFood = storeUserFoodRepository.findOne(sufId);
+    public List<WarehouseDTO> getskuWhList(Long skuId) {
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findOne(skuId);
         List<WarehouseDTO> list = new ArrayList<>();
-        String ids = userFood.getWarehouseIds();
+        String ids = userFoodSku.getWarehouseIds();
         if (StringUtils.isNotBlank(ids)) {
             String[] split = ids.split(",");
             for (String s : split) {
                 list.add(toDTO(warehouseRepository.findOne(Long.valueOf(s))));
             }
         }
-
         return list;
     }
+
+//    @Override
+//    public List<WarehouseDTO> getsufWhList(Long sufId) {
+//        StoreUserFood userFood = storeUserFoodRepository.findOne(sufId);
+//        List<WarehouseDTO> list = new ArrayList<>();
+//        String ids = userFood.getWarehouseIds();
+//        if (StringUtils.isNotBlank(ids)) {
+//            String[] split = ids.split(",");
+//            for (String s : split) {
+//                list.add(toDTO(warehouseRepository.findOne(Long.valueOf(s))));
+//            }
+//        }
+//
+//        return list;
+//    }
 
     private WarehouseDTO toDTO(Warehouse warehouse) {
         WarehouseDTO dto = new WarehouseDTO();
         BeanUtils.copyProperties(warehouse, dto);
         dto.setStoreUserName(warehouse.getStoreUser().getName());
-        List<StoreUserFood> storeUserFoodS = new ArrayList<>();
-        String foodIds = warehouse.getFoodIds();
+        List<StoreUserFoodSku> storeUserFoodSkuS = new ArrayList<>();
+        String foodIds = warehouse.getSkuIds();
         if (StringUtils.isNotBlank(foodIds)) {
             String[] split = foodIds.split(",");
             for (String s : split) {
-                storeUserFoodS.add(storeUserFoodRepository.findOne(Long.valueOf(s)));
+                storeUserFoodSkuS.add(storeUserFoodSkuRepository.findOne(Long.valueOf(s)));
             }
             //dto.setStoreUserFoodS(storeUserFoodS);
-            dto.setFoodNum(storeUserFoodS.size());
+            dto.setFoodNum(storeUserFoodSkuS.size());
         } else {
             dto.setFoodNum(0);
         }

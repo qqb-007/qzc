@@ -39,19 +39,19 @@ public class WarehouseController {
     public Map<String,Object> getSufList(WarehouseService.SearchParam param) {
         //Paging<WarehouseDTO> paging = warehouseService.search(param);
         Map<String,Object> map = new HashMap<>();
-        map.put("results",warehouseService.getsufWhList(param.getStoreUserId()));
+        map.put("results",warehouseService.getskuWhList(param.getStoreUserId()));
         return map;
     }
 
 
-    @GetMapping("/getWhSufList")
-    @ResponseBody
-    public Map<String,Object> getWhSufList(WarehouseService.SearchParam param) {
-        //Paging<WarehouseDTO> paging = warehouseService.search(param);
-        Map<String,Object> map = new HashMap<>();
-        map.put("results",storeUserFoodService.getWhSufList(param.getStoreUserId()));
-        return map;
-    }
+//    @GetMapping("/getWhSufList")
+//    @ResponseBody
+//    public Map<String,Object> getWhSufList(WarehouseService.SearchParam param) {
+//        //Paging<WarehouseDTO> paging = warehouseService.search(param);
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("results",storeUserFoodService.getWhSufList(param.getStoreUserId()));
+//        return map;
+//    }
 
     //
     @PostMapping("")
@@ -72,17 +72,17 @@ public class WarehouseController {
         return 1;
     }
 //
-    @PutMapping("/bizsuf/{sufId}")
-    public Object setBizManager(@PathVariable long sufId, @RequestParam long wid) {
-        warehouseService.bindStoreUserFood(wid, sufId);
-        return true;
-    }
+//    @PutMapping("/bizsuf/{sufId}")
+//    public Object setBizManager(@PathVariable long sufId, @RequestParam long wid) {
+//        warehouseService.bindStoreUserFoodSku(wid, sufId);
+//        return true;
+//    }
 
-    @PutMapping("/delsuf/{sufId}")
-    public Object delsuf(@PathVariable long sufId, @RequestParam long wid) {
-        warehouseService.deleteFood(wid, sufId);
-        return true;
-    }
+//    @PutMapping("/delsuf/{sufId}")
+//    public Object delsuf(@PathVariable long sufId, @RequestParam long wid) {
+//        warehouseService.deleteFoodSku(wid, sufId);
+//        return true;
+//    }
 //
 //    @PutMapping("/bizManager2/{storeUserId}")
 //    public Object setBizManager2(@PathVariable long storeUserId, @RequestParam long employeeId) {
@@ -108,7 +108,7 @@ public class WarehouseController {
     @DeleteMapping("/{id}")
     @Permission(value = ManagerPermissions.STORE_USER_MANAGE)
     public Object delete(@PathVariable long id) {
-        warehouseService.delete(id);
+        warehouseService.deleteWarehouse(id);
         return 1;
     }
 
