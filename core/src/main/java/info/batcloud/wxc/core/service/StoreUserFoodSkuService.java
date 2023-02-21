@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface StoreUserFoodSkuService {
 
+    void addNewSkus(long fooSkuId);
+
     void adminUpdateSufSku(long sufId, List<Long> foodSkuId, List<Integer> stock, List<Float> inputPrice, List<Float> outputPrice);
 
     void createSufSku(Long sufId);

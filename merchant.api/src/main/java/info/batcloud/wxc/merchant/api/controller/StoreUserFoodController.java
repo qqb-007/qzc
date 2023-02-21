@@ -106,7 +106,7 @@ public class StoreUserFoodController {
         Map<String, Object> map = new HashMap<>(3);
         map.put("specialSkuIdList", StringUtils.isNotBlank(suf.getSpecialSkuIdList()) ? Arrays.asList(suf.getSpecialSkuIdList().split(",")) : Collections.EMPTY_LIST);
         map.put("eleSkuId", suf.getEleSkuId());
-        map.put("foodSkuList", suf.getFood().getSkuList());
+        map.put("foodSkuList", suf.getSkuList());
         map.put("foodId", suf.getFood().getId());
         map.put("foodName", suf.getFood().getName());
         return BusinessResponse.ok(map);

@@ -3,10 +3,7 @@ package info.batcloud.wxc.core.service.impl;
 import com.ctospace.archit.common.pagination.Paging;
 import info.batcloud.wxc.core.dto.FoodSkuDTO;
 import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
-import info.batcloud.wxc.core.entity.Bag;
-import info.batcloud.wxc.core.entity.Food;
-import info.batcloud.wxc.core.entity.StoreUserFood;
-import info.batcloud.wxc.core.entity.StoreUserFoodSku;
+import info.batcloud.wxc.core.entity.*;
 import info.batcloud.wxc.core.helper.PagingHelper;
 import info.batcloud.wxc.core.repository.*;
 import info.batcloud.wxc.core.service.FoodSkuService;
@@ -41,6 +38,9 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     private FoodSkuService foodSkuService;
 
     @Inject
+    private FoodSkuRepository foodSkuRepository;
+
+    @Inject
     private FoodRepository foodRepository;
 
     @Inject
@@ -48,6 +48,34 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
 
     @Inject
     private StoreUserFoodService storeUserFoodService;
+
+    @Override
+    public void addNewSkus(long fooSkuId) {
+        //当商品池商品新增sku的时候，默认所有对应门店商品加上此sku
+        FoodSku foodSku = foodSkuRepository.findOne(fooSkuId);
+        List<StoreUserFood> storeUserFoodList = storeUserFoodRepository.findByFoodId(foodSku.getFoodId());
+        for (StoreUserFood storeUserFood : storeUserFoodList) {
+            StoreUserFoodSku userFoodSku = new StoreUserFoodSku();
+            userFoodSku.setFoodId(foodSku.getFoodId());
+            userFoodSku.setStoreUserId(storeUserFood.getStoreUser().getId());
+            userFoodSku.setStoreUserFoodId(storeUserFood.getId());
+            userFoodSku.setFoodSkuId(fooSkuId);
+            userFoodSku.setWarehouseIds(null);
+            userFoodSku.setStock(0);
+            userFoodSku.setInputPrice(0f);
+            userFoodSku.setOutputPrice(0f);
+            userFoodSku.setUpc(foodSku.getUpc());
+            userFoodSku.setName(foodSku.getName());
+            userFoodSku.setWeight(foodSku.getWeight());
+            userFoodSku.setSpec(foodSku.getSpec());
+            userFoodSku.setInputTax(foodSku.getInputTax());
+            userFoodSku.setOutputTax(foodSku.getOutputTax());
+            userFoodSku.setMinOrderCount(foodSku.getMinOrderCount());
+            userFoodSku.setBoxNum(foodSku.getBoxNum());
+            userFoodSku.setBoxPrice(foodSku.getBoxPrice());
+            storeUserFoodSkuRepository.save(userFoodSku);
+        }
+    }
 
     @Override
     public void adminUpdateSufSku(long sufId, List<Long> foodSkuId, List<Integer> stock, List<Float> inputPrice, List<Float> outputPrice) {

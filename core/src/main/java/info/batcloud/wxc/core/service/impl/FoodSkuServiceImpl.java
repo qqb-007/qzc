@@ -9,6 +9,7 @@ import info.batcloud.wxc.core.repository.FoodRepository;
 import info.batcloud.wxc.core.repository.FoodSkuRepository;
 import info.batcloud.wxc.core.service.FoodService;
 import info.batcloud.wxc.core.service.FoodSkuService;
+import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,10 @@ public class FoodSkuServiceImpl implements FoodSkuService {
 
     @Inject
     private FoodRepository foodRepository;
+
+    @Inject
+    private StoreUserFoodSkuService storeUserFoodSkuService;
+
 
 
     @Override
@@ -48,7 +53,9 @@ public class FoodSkuServiceImpl implements FoodSkuService {
         sku.setMinOrderCount(createParam.getMinOrderCount());
         sku.setBoxNum(createParam.getBoxNum());
         sku.setBoxPrice(createParam.getBoxPrice());
-        foodSkuRepository.save(sku);
+        FoodSku foodSku = foodSkuRepository.save(sku);
+        //将新增的规格添加到所有门店商品中，并设置价格和库存都为零
+        storeUserFoodSkuService.addNewSkus(foodSku.getId());
     }
 
     @Override
