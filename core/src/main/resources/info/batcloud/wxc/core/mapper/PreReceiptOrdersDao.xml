@@ -42,7 +42,7 @@
         select order.receipt_no,rela.food_name,rela.shop_procurement_id,rela.food_num,rela.food_price,
                rela.actual_arrival_num,rela.actual_arrival_sumprice,rela.img
         from pre_receipt_orders `order` inner join pre_shop_procurement_relation rela ON  `order`.procurement_id=rela.shop_procurement_id
-        where `rela`.sku_id=#{skuId} and `order`.store_id=#{storeId} and `order`.status=1
+        where `rela`.sku_id=#{skuId} and `order`.store_id=#{storeId} and `order`.status=2
 
     </select>
     <!--查询单个-->
@@ -216,7 +216,7 @@
     
    <select id="getReceiptOrder" resultType="info.batcloud.wxc.core.entity.PreReceiptOrders">
        SELECT
-       (case `order`.`status`   when 0 then '未完成' else '已完成' end) as statusName  ,
+       (case `order`.`status`   when 1 then '已完成' else '未完成' end) as statusName  ,
        `order`.procurement_id,
        `order`.id,`order`.receipt_no,`order`.store_name,`order`.store_id,
        `order`.arrive_price,`order`.arriva_num,`order`.remark,from_unixtime(`order`.create_time) as `date`,
