@@ -33,7 +33,6 @@ public class FoodSkuServiceImpl implements FoodSkuService {
     private StoreUserFoodSkuService storeUserFoodSkuService;
 
 
-
     @Override
     public void createFoodSku(CreateParam createParam) {
         if (foodSkuRepository.countByFoodIdAndName(createParam.getFoodId(), createParam.getName()) > 0) {
@@ -112,10 +111,13 @@ public class FoodSkuServiceImpl implements FoodSkuService {
 
     @Override
     public FoodSkuDTO getFoodSkuByUpc(String upc) {
-        return null;
+        return toDTO(foodSkuRepository.findByUpc(upc), null);
     }
 
     private FoodSkuDTO toDTO(FoodSku foodSku, String picture) {
+        if (foodSku == null) {
+            return null;
+        }
         FoodSkuDTO dto = new FoodSkuDTO();
         BeanUtils.copyProperties(foodSku, dto);
 
