@@ -1,12 +1,10 @@
 package info.batcloud.wxc.admin.controller.warehouse;
 
 import com.github.pagehelper.PageInfo;
+import info.batcloud.wxc.core.entity.CommonResult;
 import info.batcloud.wxc.core.entity.CommonResultPage;
 import info.batcloud.wxc.core.service.warehouse.service.RequireGoodsService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -54,4 +52,19 @@ public class RequireGoodsController {
         return new CommonResultPage(requireGoodsOrdersRelationList,requireGoodsOrdersRelationList.getPageNum(),requireGoodsOrdersRelationList.getTotal(),requireGoodsOrdersRelationList.getPageSize(),requireGoodsOrdersRelationList.getNextPage(),requireGoodsOrdersRelationList.isHasNextPage());
 
     }
+
+    /**
+     *
+     * describe 编辑要货单处理状态
+     * @author V
+     * @date 21/2/2023 上午9:25
+     * @param
+     * @return
+     */
+    @PutMapping("/editRequireGoods")
+    public CommonResult editRequireGoods(@RequestParam("id") Integer id,@RequestParam("status")Integer status){
+        requireGoodsService.editRequireGoods(id,status);
+        return new CommonResult("操作成功");
+    }
+
 }

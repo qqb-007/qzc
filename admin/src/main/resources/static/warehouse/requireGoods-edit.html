@@ -1,0 +1,39 @@
+<meta title="编辑库位" width="900px" args="storeData"/>
+<form role="form" id="storeUserForm" s="valid,form,nda,datac"
+      class="form-horizontal"
+      s-data="storeData"
+      method="put"
+      style="padding: 20px;" action="/api/back/requireGoods/editRequireGoods">
+    <input type="hidden" name="id" s s-data="storeData.id"/>
+    <select class="form-control input-sm" name="status">
+        <option value="">要货单状态</option>
+        <option value="1">待处理</option>
+        <option value="2">已处理</option>
+        <option value="3">已作废</option>
+    </select>
+
+
+</form>
+<script type="text/javascript">
+    // S.on('s-ready', function(){
+    //     S.cascade($province, $city, $district);
+    // })
+    S.meta.btns = [
+        {
+            name: "保存",
+            style: "btn btn-primary",
+            click: function(){
+                return S.S("#storeUserForm").submit().done(function(rs){
+                    S.close(true);
+                });
+            }
+        },
+        {
+            name: "关闭",
+            style: "btn btn-default",
+            click: function(){
+                S.close();
+            }
+        }
+    ]
+</script>

@@ -80,6 +80,10 @@
                     <input autocomplete="off" type="button" value="采购详情" class="btn btn-primary btn-xs"
                            s-click="var that = this; S.popupOpen('/warehouse/requireGoods-detail.html', {storeData: this.parent().data()}).done(function(rs){rs && $purchaseGrid.refresh();})"/>
                 </td>
+                <td class="text-right">
+                    <input autocomplete="off" type="button" value="编辑" class="btn btn-primary btn-xs"
+                           s-click="var that = this; S.popupOpen('/warehouse/requireGoods-edit.html', {storeData: this.parent().data()}).done(function(rs){rs && $purchaseGrid.refresh();})"/>
+                </td>
             </tr>
             </tbody>
             <tfoot>
