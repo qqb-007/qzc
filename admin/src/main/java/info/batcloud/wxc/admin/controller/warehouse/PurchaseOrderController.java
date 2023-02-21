@@ -61,7 +61,8 @@ public class PurchaseOrderController {
    @GetMapping("/getPurchaseList")
     public CommonResultPage getPurchaseList(@RequestParam(value = "orderNo",required = false)String orderNo, @RequestParam(value = "storeId",required = false)Integer storeId,
                                         @RequestParam(value = "page",required = false)Integer page){
-       PageInfo<PreShopProcurement> shopProcurement = purchaseOrderService.getShopProcurement(orderNo, storeId, page);
+       String trim = orderNo.trim();
+       PageInfo<PreShopProcurement> shopProcurement = purchaseOrderService.getShopProcurement(trim, storeId, page);
        return new CommonResultPage(shopProcurement,shopProcurement.getPageNum(),shopProcurement.getTotal(),shopProcurement.getPageSize(),shopProcurement.getNextPage(),shopProcurement.isHasNextPage());
    }
 
@@ -89,8 +90,8 @@ public class PurchaseOrderController {
     */
    @PostMapping("/updatePurchase")
     public CommonResult updatePurchase(@RequestParam("id") Integer id,@RequestParam("data")String data,
-                                       @RequestParam("storeName")String storeName,@RequestParam("logisticsNo")String logisticsNo,
-                                       @RequestParam("arrivalPrice")Double arrivalPrice,@RequestParam("arrivalNum") Integer arrivalNum,
+                                       @RequestParam(value = "storeName",required = false)String storeName,@RequestParam(value = "logisticsNo")String logisticsNo,
+                                       @RequestParam(value = "arrivalPrice",required = false)Double arrivalPrice,@RequestParam(value = "arrivalNum",required = false) Integer arrivalNum,
                                        @RequestParam("storeId")Integer storeId){
        System.out.println(data);
        JSONArray array = JSONArray.parseArray(data);

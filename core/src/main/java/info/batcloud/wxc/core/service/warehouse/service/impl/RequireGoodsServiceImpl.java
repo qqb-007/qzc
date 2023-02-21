@@ -81,4 +81,22 @@ public class RequireGoodsServiceImpl implements RequireGoodsService {
         PageInfo pageInfo=new PageInfo(requireGoodsOrdersRelationList);
         return pageInfo;
     }
+
+    @Override
+    public PageInfo getRequireGoodsByStoreId(Integer storeId, Integer page) {
+        PageHelper.startPage(page,20,"create_time desc");
+        PreRequireGoodsOrders preRequireGoodsOrders=new PreRequireGoodsOrders();
+        preRequireGoodsOrders.setStoreId(storeId);
+        List<PreRequireGoodsOrders> preRequireGoods = preRequireGoodsOrdersDao.queryAll(preRequireGoodsOrders);
+        PageInfo pageInfo=new PageInfo(preRequireGoods);
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo<PreRequireGoodsOrdersRelation> getRequireGoodsById(Integer id,Integer page) {
+        PageHelper.startPage(page,20);
+        List<PreRequireGoodsOrdersRelation> requireDetailInfo = requireGoodsRelationDao.getRequireDetailInfo(id);
+        PageInfo pageInfo=new PageInfo(requireDetailInfo);
+        return pageInfo;
+    }
 }

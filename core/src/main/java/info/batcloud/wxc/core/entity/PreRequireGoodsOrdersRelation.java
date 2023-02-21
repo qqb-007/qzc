@@ -19,6 +19,8 @@ public class PreRequireGoodsOrdersRelation implements Serializable {
   private Integer foodPrice;
   private Long createTime;
   private String date;
+  private String img;
+  private Integer skuId;
 
 
 }

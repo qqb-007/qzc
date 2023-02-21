@@ -38,8 +38,10 @@ public class ReceiptController {
     @GetMapping("/getReceiptList")
     public CommonResultPage getReceiptList(@RequestParam("storeId") Integer storeId, @RequestParam("startTime")String startTime,
                                            @RequestParam("endTime") String endTime, @RequestParam("logisticsNo") String logisticsNo,
-                                           @RequestParam("page")Integer page,@RequestParam("receiptNo") String receiptNo){
-        PageInfo receiptOrderList = receiptService.getReceiptOrderList(storeId, startTime, endTime, logisticsNo, page,receiptNo);
+                                           @RequestParam("page")Integer page,@RequestParam("receiptNo") String receiptNo,
+                                           @RequestParam("status") Integer status){
+        String trim = receiptNo.trim();
+        PageInfo receiptOrderList = receiptService.getReceiptOrderList(storeId, startTime, endTime, logisticsNo, page,trim,status);
         return new CommonResultPage(receiptOrderList,receiptOrderList.getPageNum(),receiptOrderList.getTotal(),receiptOrderList.getPageSize(),receiptOrderList.getNextPage(),receiptOrderList.isHasNextPage());
 
     }

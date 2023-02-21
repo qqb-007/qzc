@@ -27,6 +27,7 @@
 
             <tr>
                 <th>ID</th>
+                <th>商品图片</th>
                 <th>商品名称</th>
                 <th>商品数量</th>
                 <th>商品单价</th>
@@ -45,6 +46,7 @@
             </tr>
             <tr s-loop-role="row" s="datac,row" s-check-role="i">
                 <td name="id"></td>
+                <td s="tpl"><img src="{%=this.img%}" style="max-width: 40px; max-height: 40px;"/></td>
                 <td name="foodName"></td>
                 <td name="foodNum"></td>
                 <td name="foodPrice"></td>

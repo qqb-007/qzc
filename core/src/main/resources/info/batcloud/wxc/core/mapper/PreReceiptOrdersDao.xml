@@ -64,7 +64,7 @@
                 and create_time = #{createTime}
             </if>
         </where>
-        limit #{pageable.offset}, #{pageable.pageSize}
+
     </select>
 
     <!--统计总行数-->
@@ -199,6 +199,9 @@
           </if>
           <if test="storeId !=null and  storeId!='' ">
               and `order`.store_id=#{storeId}
+          </if>
+          <if test="status !=0 and  status!=0 ">
+              and `order`.status=#{status}
           </if>
           <if test="startTime!=0 and endTime!=0 ">
               and `order`.create_time BETWEEN #{startTime} and #{endTime}

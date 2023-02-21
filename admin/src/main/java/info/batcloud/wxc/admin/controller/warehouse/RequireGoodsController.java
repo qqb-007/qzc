@@ -34,7 +34,8 @@ public class RequireGoodsController {
     public CommonResultPage getRequireGoods(@RequestParam("requireNo")String requireNo,@RequestParam("storeId") Integer storeId,
                                             @RequestParam("status") Integer status,@RequestParam("page") Integer page,
                                             @RequestParam("startTime")String startTime,@RequestParam("endTime")String endTime){
-        PageInfo requireGoodsInfo = requireGoodsService.getRequireGoodsInfo(requireNo, storeId, status, page, startTime, endTime);
+        String trim = requireNo.trim();
+        PageInfo requireGoodsInfo = requireGoodsService.getRequireGoodsInfo(trim, storeId, status, page, startTime, endTime);
         return new CommonResultPage(requireGoodsInfo,requireGoodsInfo.getPageNum(),requireGoodsInfo.getTotal(),requireGoodsInfo.getPageSize(),requireGoodsInfo.getNextPage(),requireGoodsInfo.isHasNextPage());
 
     }

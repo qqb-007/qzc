@@ -137,7 +137,7 @@ public class PurchaseOrderServiceImpl  implements PurchaseOrderService {
             preReceiptOrders.setStoreId(storeId);
             preReceiptOrders.setStoreName(storeName);
             preReceiptOrders.setIsDel(0);
-            preReceiptOrders.setStatus(0);
+            preReceiptOrders.setStatus(2);
             preReceiptOrders.setProcurementId(procurementId);
             receiptOrdersDao.insert(preReceiptOrders);
             log.info("---创建收货单成功---");
@@ -156,7 +156,7 @@ public class PurchaseOrderServiceImpl  implements PurchaseOrderService {
     }
     @Override
     public PageInfo<PreShopProcurement> getShopProcurement(String orderNo, Integer storeId, Integer pageNum) {
-        PageHelper.startPage(pageNum,5);
+        PageHelper.startPage(pageNum,20);
         List<PreShopProcurement> preShopProcurements = purchaseOrderDao.selectAllByOrderNo(orderNo, storeId);
         PageInfo<PreShopProcurement> pageInfo=new PageInfo(preShopProcurements);
         return pageInfo;

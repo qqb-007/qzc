@@ -1,6 +1,8 @@
 package info.batcloud.wxc.merchant.api.controller.warehouse;
 
+import com.github.pagehelper.PageInfo;
 import info.batcloud.wxc.core.entity.CommonResult;
+import info.batcloud.wxc.core.entity.CommonResultPage;
 import info.batcloud.wxc.core.service.warehouse.service.PurchaseOrderService;
 import info.batcloud.wxc.core.service.warehouse.service.ReceiptService;
 import org.springframework.web.bind.annotation.*;
@@ -52,4 +54,34 @@ public class ReceiptController {
         purchaseOrderService.updatePurchaseGoodsToApp(id,actualArrivalNum,actualArrivalSumprice);
         return new CommonResult("操作成功");
     }
+    
+    /**
+     *
+     * describe 获取门店收货单列表
+     * @author V
+     * @date 20/2/2023 下午2:51
+     * @param 
+     * @return 
+     */
+    @GetMapping("/getReceiptByStoreId")
+    public CommonResultPage getReceiptByStoreId(@RequestParam("storeId") Integer storeId,@RequestParam("page") Integer page){
+        PageInfo receiptByStoreId = receiptService.getReceiptByStoreId(storeId, page);
+        return new CommonResultPage(receiptByStoreId,receiptByStoreId.getPageNum(),receiptByStoreId.getTotal(),receiptByStoreId.getPageSize(),receiptByStoreId.getNextPage(),receiptByStoreId.isHasNextPage());
+    }
+
+    /**
+     *
+     * describe 获取收货单列表详情列表
+     * @author V
+     * @date 20/2/2023 下午3:23
+     * @param
+     * @return
+     */
+    @GetMapping("/getReceiptById")
+    public CommonResultPage getReceiptById(@RequestParam("id") Integer id,@RequestParam("page") Integer page){
+        PageInfo receiptGoodsById = receiptService.getReceiptGoodsById(id, page);
+        return new CommonResultPage(receiptGoodsById,receiptGoodsById.getPageNum(),receiptGoodsById.getTotal(),receiptGoodsById.getPageSize(),receiptGoodsById.getNextPage(),receiptGoodsById.isHasNextPage());
+    }
+
+
 }
