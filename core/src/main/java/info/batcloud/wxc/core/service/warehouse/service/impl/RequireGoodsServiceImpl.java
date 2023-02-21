@@ -99,4 +99,12 @@ public class RequireGoodsServiceImpl implements RequireGoodsService {
         PageInfo pageInfo=new PageInfo(requireDetailInfo);
         return pageInfo;
     }
+
+    @Override
+    public Integer editRequireGoods(Integer id, Integer status) {
+        PreRequireGoodsOrders preRequireGoodsOrders=new PreRequireGoodsOrders();
+        preRequireGoodsOrders.setId(id);
+        preRequireGoodsOrders.setStatus(status);
+        return  preRequireGoodsOrdersDao.update(preRequireGoodsOrders);
+    }
 }

@@ -10,6 +10,7 @@
         <result property="foodNum" column="food_num" jdbcType="INTEGER"/>
         <result property="foodPrice" column="food_price" jdbcType="NUMERIC"/>
         <result property="createTime" column="create_time" jdbcType="INTEGER"/>
+
     </resultMap>
 
     <!--查询单个-->
@@ -163,6 +164,8 @@
     <delete id="deleteByPurchaseId">
         delete from pre_shop_procurement_relation where shop_procurement_id = #{id}
     </delete>
+
+
 
 </mapper>
 

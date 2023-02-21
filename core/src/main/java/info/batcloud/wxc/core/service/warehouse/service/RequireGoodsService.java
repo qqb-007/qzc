@@ -66,4 +66,14 @@ public interface RequireGoodsService {
       * @return
       */
      PageInfo<PreRequireGoodsOrdersRelation> getRequireGoodsById(Integer id,Integer page);
+
+     /**
+      *
+      * describe 修改要货单状态
+      * @author V
+      * @date 21/2/2023 上午9:33
+      * @param
+      * @return
+      */
+     Integer editRequireGoods(Integer id,Integer status);
 }

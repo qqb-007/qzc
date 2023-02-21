@@ -85,5 +85,8 @@ public interface PreReceiptOrdersDao {
                                            @Param("endTime") Long endTime,@Param("logisticsNo") String logisticsNo,
                                            @Param("receiptNo") String receiptNo,@Param("status")Integer status);
 
+
+    List<PreReceiptOrders> getReceiptListBysku(@Param("storeId") Integer storeId,@Param("skuId") Integer skuId);
+
 }
 

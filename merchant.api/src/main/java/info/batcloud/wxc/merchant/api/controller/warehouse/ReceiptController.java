@@ -5,12 +5,14 @@ import info.batcloud.wxc.core.domain.BusinessResponse;
 import info.batcloud.wxc.core.entity.CommonResult;
 import info.batcloud.wxc.core.entity.CommonResultPage;
 import info.batcloud.wxc.core.helper.SecurityHelper;
+import info.batcloud.wxc.core.entity.PreReceiptOrders;
 import info.batcloud.wxc.core.service.warehouse.service.PurchaseOrderService;
 import info.batcloud.wxc.core.service.warehouse.service.ReceiptService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,4 +96,17 @@ public class ReceiptController {
     }
 
 
+    /**
+     *
+     * describe 获取收货单列表详情 通过sku
+     * @author V
+     * @date 21/2/2023 下午3:39
+     * @param
+     * @return
+     */
+    @GetMapping("/getReceiptListBysku")
+    public CommonResult getReceiptListBysku(@RequestParam("skuId") Integer skuId,@RequestParam("storeId") Integer storeId){
+        List<PreReceiptOrders> receiptListBysku = receiptService.getReceiptListBysku(skuId, storeId);
+        return new CommonResult(receiptListBysku);
+    }
 }
