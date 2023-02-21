@@ -74,6 +74,12 @@ public class ReceiptServiceImpl  implements ReceiptService {
         return pageInfo;
     }
 
+    @Override
+    public List<PreReceiptOrders> getReceiptListBysku(Integer skuId, Integer storeId) {
+
+        return preReceiptOrdersDao.getReceiptListBysku(storeId,skuId);
+    }
+
     //传入指定时间
     public Long convertToTimestamp(String time) {
         if (StringUtils.isEmpty(time)){

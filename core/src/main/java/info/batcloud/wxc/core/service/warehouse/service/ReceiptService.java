@@ -1,6 +1,7 @@
 package info.batcloud.wxc.core.service.warehouse.service;
 
 import com.github.pagehelper.PageInfo;
+import info.batcloud.wxc.core.entity.PreReceiptOrders;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -57,5 +58,15 @@ public interface ReceiptService {
      * @return
      */
      PageInfo getReceiptGoodsById(Integer id,Integer page);
+
+    /**
+     *
+     * describe 获取收货单列表详情 通过sku
+     * @author V
+     * @date 21/2/2023 下午3:39
+     * @param
+     * @return
+     */
+    List<PreReceiptOrders>  getReceiptListBysku(Integer skuId,Integer storeId);
 
 }

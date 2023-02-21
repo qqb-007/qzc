@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * (PreReceiptOrders)实体类
@@ -66,6 +67,7 @@ public class PreReceiptOrders implements Serializable {
 
     private String statusName;
 
+    private List<PreShopProcurementRelation> list;
 
 }
 

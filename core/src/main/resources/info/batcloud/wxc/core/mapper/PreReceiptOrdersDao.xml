@@ -16,6 +16,35 @@
         <result property="createTime" column="create_time" jdbcType="INTEGER"/>
     </resultMap>
 
+    <resultMap type="info.batcloud.wxc.core.entity.PreReceiptOrders" id="ReceiptMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="receiptNo" column="receipt_no" jdbcType="VARCHAR"/>
+        <result property="storeId" column="store_id" jdbcType="INTEGER"/>
+        <result property="storeName" column="store_name" jdbcType="VARCHAR"/>
+        <result property="procurementId" column="procurement_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="arrivePrice" column="arrive_price" jdbcType="NUMERIC"/>
+        <result property="arrivaNum" column="arriva_num" jdbcType="INTEGER"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isDel" column="is_del" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="INTEGER"/>
+        <collection property="list" ofType="info.batcloud.wxc.core.entity.PreShopProcurementRelation">
+            <id property="id" column="id"></id>
+            <result property="foodName" column="food_name"></result>
+            <result property="foodNum" column="food_num"></result>
+            <result property="foodPrice" column="food_price"></result>
+            <result property="actualArrivalNum" column="actual_arrival_num"></result>
+            <result property="actualArrivalSumprice" column="actual_arrival_sumprice"></result>
+            <result property="img" column="img"></result>
+        </collection>
+    </resultMap>
+    <select id="getReceiptListBysku" resultMap="ReceiptMap">
+        select order.receipt_no,rela.food_name,rela.shop_procurement_id,rela.food_num,rela.food_price,
+               rela.actual_arrival_num,rela.actual_arrival_sumprice,rela.img
+        from pre_receipt_orders `order` inner join pre_shop_procurement_relation rela ON  `order`.procurement_id=rela.shop_procurement_id
+        where `rela`.sku_id=#{skuId} and `order`.store_id=#{storeId} and `order`.status=1
+
+    </select>
     <!--查询单个-->
     <select id="queryById" resultMap="PreReceiptOrdersMap">
         select
@@ -27,7 +56,7 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="PreReceiptOrdersMap">
         select
-          id, receipt_no, store_id, store_name, procurement_id, status, arrive_price, arriva_num, remark, is_del, create_time
+          id, receipt_no, store_id, store_name, procurement_id, status,(case status when 1 then '已完成' else '未完成'end)as statusName, arrive_price, arriva_num, remark, is_del, create_time
         from pre_receipt_orders
         <where>
             <if test="id != null">
@@ -212,5 +241,8 @@
       </where>
 
    </select>
+
+
+
 </mapper>
 

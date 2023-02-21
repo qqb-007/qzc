@@ -1,6 +1,7 @@
 package info.batcloud.wxc.core.service.warehouse.dao;
 
 
+import info.batcloud.wxc.core.entity.PreReceiptOrders;
 import info.batcloud.wxc.core.entity.PreShopProcurementRelation;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -87,6 +88,8 @@ public interface PreShopProcurementRelationDao {
     List<PreShopProcurementRelation> getPurchaseRelationByPurchaseIdToReceipt(Integer id);
 
     int deleteByPurchaseId(Integer id);
+
+
 
 }
 
