@@ -41,11 +41,11 @@ public class ReceiptController {
      * @return
      */
     @PostMapping("/updateReceiptInfo")
-    public CommonResult updateReceiptInfo(@RequestParam("id") Integer id,@RequestParam("arrivePrice") Double arrivePrice,
+    public Object updateReceiptInfo(@RequestParam("id") Integer id,@RequestParam("arrivePrice") Double arrivePrice,
                                           @RequestParam("arrivaNum")Integer arrivaNum,@RequestParam("remark")String remark,
                                           @RequestParam("status") Integer status){
         receiptService.updateReceiptOrderToApp(id,arrivePrice,arrivaNum,remark,status);
-        return new CommonResult("操作成功");
+        return BusinessResponse.ok("操作成功");
     }
 
     /**
