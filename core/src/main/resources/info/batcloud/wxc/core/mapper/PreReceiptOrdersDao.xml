@@ -29,17 +29,18 @@
         <result property="isDel" column="is_del" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="INTEGER"/>
         <collection property="list" ofType="info.batcloud.wxc.core.entity.PreShopProcurementRelation">
-            <id property="id" column="id"></id>
+            <id property="id" column="detailId"></id>
             <result property="foodName" column="food_name"></result>
             <result property="foodNum" column="food_num"></result>
             <result property="foodPrice" column="food_price"></result>
             <result property="actualArrivalNum" column="actual_arrival_num"></result>
             <result property="actualArrivalSumprice" column="actual_arrival_sumprice"></result>
             <result property="img" column="img"></result>
+
         </collection>
     </resultMap>
     <select id="getReceiptListBysku" resultMap="ReceiptMap">
-        select order.receipt_no,rela.food_name,rela.shop_procurement_id,rela.food_num,rela.food_price,
+        select rela.id as detailId,order.receipt_no,rela.food_name,rela.shop_procurement_id,rela.food_num,rela.food_price,
                rela.actual_arrival_num,rela.actual_arrival_sumprice,rela.img
         from pre_receipt_orders `order` inner join pre_shop_procurement_relation rela ON  `order`.procurement_id=rela.shop_procurement_id
         where `rela`.sku_id=#{skuId} and `order`.store_id=#{storeId} and `order`.status=2
