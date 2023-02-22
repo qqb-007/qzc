@@ -33,7 +33,7 @@ public interface ReceiptService {
      * @param
      * @return
      */
-    Integer updateReceiptOrderToApp(Integer id,Double arrivePrice,Integer arrivaNum,String remark,Integer status);
+    Integer updateReceiptOrderToApp(Integer id,String remark,Integer status);
 
 
 
