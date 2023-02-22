@@ -16,10 +16,10 @@
         <tr>
             <th>图片</th>
             <th class="text-right">商品名称</th>
-            <th class="text-right">商品编码</th>
-            <th class="text-right">店铺名称</th>
+            <th class="text-right">商品upc编码</th>
+            <!--<th class="text-right">店铺名称</th>-->
             <!--<th class="text-right">是否上架</th>-->
-            <th class="text-right">操作</th>
+            <!--<th class="text-right">操作</th>-->
         </tr>
         <tbody s="loop" s-data-filter="'results'">
         <tr s-loop-role="empty">
@@ -29,25 +29,26 @@
         </tr>
         <tr s-loop-role="row" s="datac">
             <td s="tpl">
-                <img src="{%=this.food.picture%}" style="max-width: 40px; max-height: 40px;"/>
+                <img src="{%=this.picture%}" style="max-width: 40px; max-height: 40px;"/>
                 <input type="hidden" class="food-id" value="{%=this.foodId%}"/>
                 <input type="hidden" class="sale" value="{%=this.sale%}"/>
             </td>
             <td>
-                <div class="text-right" name="food.code" s="tooltip" title="商品编码"></div>
+                <div class="text-right" name="fullName" s="tooltip" title="商品名称"></div>
             </td>
             <td>
-                <div class="text-right" name="food.name" s="tooltip" title="商品名称"></div>
+                <div class="text-right" name="upc" s="tooltip" title="商品编码"></div>
             </td>
-            <td>
-                <div class="text-right" name="storeUser.name" s="tooltip" title="店铺名称"></div>
-            </td>
+
+            <!--<td>-->
+                <!--<div class="text-right" name="storeUser.name" s="tooltip" title="店铺名称"></div>-->
+            <!--</td>-->
             <!--<td>-->
                 <!--<div class="text-right" name="sale" s="tooltip" title="是否上架"></div>-->
             <!--</td>-->
-            <td class="text-right">
-                <input type="button" class="btn btn-xs btn-link" s-click="check(this)" value="删除"/>
-            </td>
+            <!--<td class="text-right">-->
+                <!--<input type="button" class="btn btn-xs btn-link" s-click="check(this)" value="删除"/>-->
+            <!--</td>-->
         </tr>
         </tbody>
         <tfoot>

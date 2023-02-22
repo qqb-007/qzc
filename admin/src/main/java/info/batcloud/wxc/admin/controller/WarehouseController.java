@@ -4,8 +4,10 @@ import com.ctospace.archit.common.pagination.Paging;
 import info.batcloud.wxc.admin.permission.ManagerPermissions;
 import info.batcloud.wxc.admin.permission.annotation.Permission;
 import info.batcloud.wxc.core.dto.WarehouseDTO;
+import info.batcloud.wxc.core.entity.StoreUserFoodSku;
 import info.batcloud.wxc.core.entity.Warehouse;
 import info.batcloud.wxc.core.service.StoreUserFoodService;
+import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import info.batcloud.wxc.core.service.WarehouseService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,9 @@ public class WarehouseController {
 
     @Inject
     StoreUserFoodService storeUserFoodService;
+
+    @Inject
+    StoreUserFoodSkuService storeUserFoodSkuService;
 
     //    @Inject
 //    UserService userService;
@@ -44,14 +49,14 @@ public class WarehouseController {
     }
 
 
-//    @GetMapping("/getWhSufList")
-//    @ResponseBody
-//    public Map<String,Object> getWhSufList(WarehouseService.SearchParam param) {
-//        //Paging<WarehouseDTO> paging = warehouseService.search(param);
-//        Map<String,Object> map = new HashMap<>();
-//        map.put("results",storeUserFoodService.getWhSufList(param.getStoreUserId()));
-//        return map;
-//    }
+    @GetMapping("/getWhSufList")
+    @ResponseBody
+    public Map<String,Object> getWhSufList(WarehouseService.SearchParam param) {
+        //Paging<WarehouseDTO> paging = warehouseService.search(param);
+        Map<String,Object> map = new HashMap<>();
+        map.put("results",storeUserFoodSkuService.getWhSufList(param.getStoreUserId()));
+        return map;
+    }
 
     //
     @PostMapping("")

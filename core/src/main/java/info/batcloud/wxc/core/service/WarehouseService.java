@@ -15,10 +15,10 @@ public interface WarehouseService {
     void update(UpdateParam updateParam);
 
 
-    void bindStoreUserFoodSku(long id, long storeUserFoodSkuId);
+    void bindStoreUserFoodSku(String name, long storeUserFoodSkuId);
 
 
-    void deleteFoodSku(long id, long storeUserFoodSkuId);
+    void deleteFoodSku(String name, long storeUserFoodSkuId);
 
 
     void deleteWarehouse(Long id);

@@ -2,6 +2,7 @@ package info.batcloud.wxc.core.service.impl;
 
 import com.ctospace.archit.common.pagination.Paging;
 import info.batcloud.wxc.core.dto.FoodSkuDTO;
+import info.batcloud.wxc.core.dto.StoreUserFoodDTO;
 import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
 import info.batcloud.wxc.core.entity.*;
 import info.batcloud.wxc.core.helper.PagingHelper;
@@ -48,6 +49,49 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
 
     @Inject
     private StoreUserFoodService storeUserFoodService;
+
+    @Override
+    public List<StoreUserFoodSkuDTO> getWhSufList(long wid) {
+        Warehouse warehouse = warehouseRepository.findOne(wid);
+        List<StoreUserFoodSkuDTO> list = new ArrayList<>();
+        if (StringUtils.isNotBlank(warehouse.getSkuIds())) {
+            String[] split = warehouse.getSkuIds().split(",");
+            for (String s : split) {
+                list.add(toDto(storeUserFoodSkuRepository.findOne(Long.valueOf(s))));
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void storeUpdateSufSku(long sufId, List<String> foodSkuId, List<Integer> stock, List<Integer> boxNums, List<Float> outputPrice, List<Float> boxPrices, List<Integer> minOrderCounts, List<Float> inputPrice) {
+        boolean fb = false;
+        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sufId);
+        for (int i = 0; i < foodSkuId.size(); i++) {
+            StoreUserFoodSku storeUserFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(sufId, Long.valueOf(foodSkuId.get(i)));
+            if (storeUserFood.getSpecialSkuIdList().indexOf(storeUserFoodSku.getFoodSkuId().toString()) != -1) {
+                if (storeUserFood.getSale() && (boxNums.get(i) != storeUserFoodSku.getBoxNum() || boxPrices.get(i) != storeUserFoodSku.getBoxPrice() || minOrderCounts.get(i) != storeUserFoodSku.getMinOrderCount() || stock.get(i) != storeUserFoodSku.getStock() || outputPrice.get(i) != storeUserFoodSku.getOutputPrice())) {
+                    fb = true;
+                }
+            }
+            storeUserFoodSku.setStock(stock.get(i));
+            storeUserFoodSku.setInputPrice(inputPrice.get(i));
+            storeUserFoodSku.setOutputPrice(outputPrice.get(i));
+            storeUserFoodSku.setMinOrderCount(minOrderCounts.get(i));
+            storeUserFoodSku.setBoxPrice(boxPrices.get(i));
+            storeUserFoodSku.setBoxNum(boxNums.get(i));
+            storeUserFoodSkuRepository.save(storeUserFoodSku);
+        }
+
+        StoreUserFoodService.LowPrice lowPrice = storeUserFoodService.getStoreUserFoodPrice(storeUserFood);
+        storeUserFood.setSalePrice(lowPrice.getOutputPrice());
+        storeUserFood.setQuotePrice(lowPrice.getInputPrice());
+        storeUserFoodRepository.save(storeUserFood);
+        if (fb) {
+            //发布商品
+
+        }
+    }
 
     @Override
     public void addNewSkus(long fooSkuId) {
@@ -199,14 +243,17 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
         if (StringUtils.isNotBlank(dto.getWarehouseIds())) {
             String[] split = dto.getWarehouseIds().split(",");
             for (String s : split) {
-                wnames.add(warehouseRepository.findOne(Long.valueOf(s)).getName());
+                Warehouse warehouse = warehouseRepository.findOne(Long.valueOf(s));
+                wnames.add(warehouse.getName());
             }
+            dto.setWarehouseList(wnames);
             dto.setWarehouseNames(String.join("、", wnames));
         } else {
             dto.setWarehouseNames("暂未绑定库位");
         }
-
-        dto.setPicture(foodRepository.findOne(dto.getFoodId()).getPicture());
+        Food food = foodRepository.findOne(dto.getFoodId());
+        dto.setPicture(food.getPicture());
+        dto.setFullName(food.getName() + dto.getName());
         return dto;
     }
 }

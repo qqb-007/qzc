@@ -9,6 +9,9 @@ import info.batcloud.wxc.core.helper.SecurityHelper;
 import info.batcloud.wxc.core.repository.FoodRepository;
 import info.batcloud.wxc.core.repository.StoreUserFoodRepository;
 import info.batcloud.wxc.core.service.StoreUserFoodService;
+import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
+import info.batcloud.wxc.core.service.WarehouseService;
+import jnr.ffi.annotations.In;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +35,12 @@ public class StoreUserFoodController {
 
     @Inject
     private FoodRepository foodRepository;
+
+    @Inject
+    private StoreUserFoodSkuService storeUserFoodSkuService;
+
+    @Inject
+    private WarehouseService warehouseService;
 
     private static final Logger logger = LoggerFactory.getLogger(StoreUserFoodController.class);
 
@@ -57,9 +66,9 @@ public class StoreUserFoodController {
     public Object add(StoreUserFoodService.SaveParam param) {
         param.setFoodSupplierId(SecurityHelper.loginFoodSupplierId());
         Food food = foodRepository.findOne(param.getFoodId());
-        if(food!= null && food.getQuotable()){
+        if (food != null && food.getQuotable()) {
             return BusinessResponse.ok(storeUserFoodService.saveStoreUserFood(SecurityHelper.loginStoreUserId(), param));
-        }else {
+        } else {
             throw new BizException("活动商品请联系客服添加");
         }
 
@@ -84,6 +93,21 @@ public class StoreUserFoodController {
         return BusinessResponse.ok(storeUserFoodService.changeAlterQuotePrice(SecurityHelper.loginStoreUserId(), id, alterQuotePrice));
     }
 
+    @PutMapping("/bindwarehouse/{id}")
+    @PreAuthorize("hasRole('STORE_USER')")
+    public Object bindwarehouse(@PathVariable long id, @RequestParam String wname) {
+        //System.out.println(id + wname);
+        warehouseService.bindStoreUserFoodSku(wname, id);
+        return BusinessResponse.ok("绑定成功");
+    }
+
+    @PutMapping("/jiebang/{id}")
+    @PreAuthorize("hasRole('STORE_USER')")
+    public Object jiebang(@PathVariable long id, @RequestParam String wname) {
+        warehouseService.deleteFoodSku(wname, id);
+        return BusinessResponse.ok("绑定成功");
+    }
+
     @PutMapping("/supplier-alter-quote-price/{id}")
     @PreAuthorize("hasRole('FOOD_SUPPLIER')")
     public Object changeSupplierAlterQuotePrice(@PathVariable long id, @RequestBody SupplierQuotePriceParam param) {
@@ -97,6 +121,13 @@ public class StoreUserFoodController {
         Assert.isTrue(suf.getStoreUser().getId().equals(SecurityHelper.loginStoreUserId()), "");
         storeUserFoodService.setSpecialSkuList(id, specialSkuIdList == null ? new ArrayList<>(0) : specialSkuIdList);
         storeUserFoodService.setEleSkuId(id, eleSkuId);
+        return BusinessResponse.ok(true);
+    }
+
+    @PutMapping("/editSku/{id}")
+    public Object editSku(@PathVariable long id, @RequestParam(required = false) List<String> skuIds,
+                          @RequestParam(required = false) List<Integer> boxNums, @RequestParam(required = false) List<Float> boxPrices, @RequestParam(required = false) List<Float> inputPrices, @RequestParam(required = false) List<Float> outputPrices, @RequestParam(required = false) List<Integer> minOrderCounts, @RequestParam(required = false) List<Integer> stocks) {
+        storeUserFoodSkuService.storeUpdateSufSku(id, skuIds, stocks, boxNums, outputPrices, boxPrices, minOrderCounts, inputPrices);
         return BusinessResponse.ok(true);
     }
 

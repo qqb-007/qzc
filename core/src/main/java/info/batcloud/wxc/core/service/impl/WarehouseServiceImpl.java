@@ -88,9 +88,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void bindStoreUserFoodSku(long id, long storeUserFoodSkuId) {
-        Warehouse warehouse = warehouseRepository.findOne(id);
+    public void bindStoreUserFoodSku(String name, long storeUserFoodSkuId) {
         StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findOne(storeUserFoodSkuId);
+        Warehouse warehouse = warehouseRepository.findByStoreUserIdAndName(userFoodSku.getStoreUserId(), name);
+        if (warehouse == null) {
+            throw new BizException("库位不存在");
+        }
         //判断是否同一个店铺
         if (warehouse.getStoreUser().getId() != userFoodSku.getStoreUserId()) {
             throw new BizException("库位和商品不属于同一个门店，请核对后再进行绑定");
@@ -121,13 +124,17 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void deleteFoodSku(long id, long storeUserFoodSkuId) {
+    public void deleteFoodSku(String name, long storeUserFoodSkuId) {
         //解绑商品  同时商品侧解绑库位
-        Warehouse warehouse = warehouseRepository.findOne(id);
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findOne(storeUserFoodSkuId);
+        Warehouse warehouse = warehouseRepository.findByStoreUserIdAndName(userFoodSku.getStoreUserId(), name);
+        if (warehouse == null) {
+            throw new BizException("库位不存在");
+        }
         warehouse.setSkuIds(deteteString(warehouse.getSkuIds(), String.valueOf(storeUserFoodSkuId)));
         warehouseRepository.save(warehouse);
-        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findOne(storeUserFoodSkuId);
-        userFoodSku.setWarehouseIds(deteteString(userFoodSku.getWarehouseIds(), String.valueOf(id)));
+
+        userFoodSku.setWarehouseIds(deteteString(userFoodSku.getWarehouseIds(), String.valueOf(warehouse.getId())));
         storeUserFoodSkuRepository.save(userFoodSku);
     }
 

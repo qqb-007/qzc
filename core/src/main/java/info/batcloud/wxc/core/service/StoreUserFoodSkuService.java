@@ -3,10 +3,15 @@ package info.batcloud.wxc.core.service;
 import com.ctospace.archit.common.pagination.Paging;
 import com.ctospace.archit.common.pagination.PagingParam;
 import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 public interface StoreUserFoodSkuService {
+
+    List<StoreUserFoodSkuDTO> getWhSufList(long wid);
+
+    void storeUpdateSufSku(long sufId, List<String> foodSkuId, List<Integer> stock, List<Integer> boxNums, List<Float> outputPrice, List<Float> boxPrices, List<Integer> minOrderCounts, List<Float> inputPrice);
 
     void addNewSkus(long fooSkuId);
 

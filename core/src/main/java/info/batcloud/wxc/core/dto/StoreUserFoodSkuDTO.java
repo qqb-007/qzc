@@ -1,7 +1,11 @@
 package info.batcloud.wxc.core.dto;
 
+import java.util.List;
+
 public class StoreUserFoodSkuDTO {
     private Long id;
+
+    private String fullName;
 
     private Long foodId;
 
@@ -16,6 +20,8 @@ public class StoreUserFoodSkuDTO {
     private String warehouseIds;
 
     private String warehouseNames;
+
+    private List<String> warehouseList;
 
     private Integer stock;
 
@@ -41,6 +47,22 @@ public class StoreUserFoodSkuDTO {
     private Integer boxNum;
 
     private Float boxPrice;
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public List<String> getWarehouseList() {
+        return warehouseList;
+    }
+
+    public void setWarehouseList(List<String> warehouseList) {
+        this.warehouseList = warehouseList;
+    }
 
     public String getPicture() {
         return picture;
