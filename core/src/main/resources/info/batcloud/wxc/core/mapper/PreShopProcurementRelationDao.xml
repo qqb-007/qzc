@@ -10,6 +10,8 @@
         <result property="foodNum" column="food_num" jdbcType="INTEGER"/>
         <result property="foodPrice" column="food_price" jdbcType="NUMERIC"/>
         <result property="createTime" column="create_time" jdbcType="INTEGER"/>
+        <result property="actualArrivalNum" column="actual_arrival_num" jdbcType="INTEGER"/>
+        <result property="actualArrivalSumprice" column="actual_arrival_sumprice" jdbcType="INTEGER"/>
 
     </resultMap>
 
@@ -24,7 +26,7 @@
     <!--查询指定行数据-->
     <select id="queryAll" resultMap="PreShopProcurementRelationMap">
         select
-          id, food_id, food_name, shop_procurement_id, food_num as num, food_price as inputPrice, create_time,sku_id,img as foodPicture
+          id, food_id, food_name, shop_procurement_id, food_num as num, food_price as inputPrice, create_time,sku_id,img as foodPicture,actual_arrival_num,actual_arrival_sumprice
         from pre_shop_procurement_relation
         <where>
             <if test="id != null">

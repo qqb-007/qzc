@@ -2,16 +2,13 @@ package info.batcloud.wxc.core.service.warehouse.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.sankuai.meituan.waimai.opensdk.util.StringUtil;
 import info.batcloud.wxc.core.entity.BaseException;
 import info.batcloud.wxc.core.entity.PreReceiptOrders;
 import info.batcloud.wxc.core.entity.PreShopProcurementRelation;
 import info.batcloud.wxc.core.service.warehouse.dao.PreReceiptOrdersDao;
 import info.batcloud.wxc.core.service.warehouse.dao.PreShopProcurementRelationDao;
-import info.batcloud.wxc.core.service.warehouse.dao.PurchaseOrderDao;
 import info.batcloud.wxc.core.service.warehouse.service.ReceiptService;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -20,6 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: ReceiptServiceImpl
@@ -44,12 +43,29 @@ public class ReceiptServiceImpl  implements ReceiptService {
     }
 
     @Override
-    public Integer updateReceiptOrderToApp(Integer id, Double arrivePrice, Integer arrivaNum, String remark,Integer status) {
+    public Integer updateReceiptOrderToApp(Integer id, String remark,Integer status) {
+        PreShopProcurementRelation preShopProcurementRelation=new PreShopProcurementRelation();
+        preShopProcurementRelation.setShopProcurementId(id);
+        AtomicReference<Integer> num= new AtomicReference<>(0);
+        AtomicReference<Double> price= new AtomicReference<>(0.0);
+        List<PreShopProcurementRelation> preShopProcurementRelations = preShopProcurementRelationDao.queryAll(preShopProcurementRelation);
+        List<PreShopProcurementRelation> collect = preShopProcurementRelations.stream().map(v -> {
+            if (v.getActualArrivalNum()==null){
+                v.setActualArrivalNum(0);
+            }
+            if (v.getActualArrivalSumprice()==null){
+                v.setActualArrivalSumprice(0.0);
+            }
+            num.updateAndGet(v1 -> v1 + v.getActualArrivalNum());
+            price.updateAndGet(v1 -> v1 + v.getActualArrivalSumprice()*v.getActualArrivalNum());
+
+            return v;
+        }).collect(Collectors.toList());
         PreReceiptOrders preReceiptOrders=new PreReceiptOrders();
         preReceiptOrders.setId(id);
         preReceiptOrders.setRemark(remark);
-        preReceiptOrders.setArrivePrice(arrivePrice);
-        preReceiptOrders.setArrivaNum(arrivaNum);
+        preReceiptOrders.setArrivePrice(price.get());
+        preReceiptOrders.setArrivaNum(num.get());
         preReceiptOrders.setStatus(status);
         return preReceiptOrdersDao.update(preReceiptOrders);
     }
