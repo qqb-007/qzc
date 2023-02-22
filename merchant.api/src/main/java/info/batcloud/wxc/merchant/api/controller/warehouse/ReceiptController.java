@@ -67,10 +67,10 @@ public class ReceiptController {
      * @date 18/2/2023 下午4:23
      */
     @PostMapping("/updatePurchaseGoodsInfo")
-    public CommonResult updatePurchaseGoodsInfo(@RequestParam("id") Integer id, @RequestParam("actualArrivalNum") Integer actualArrivalNum,
+    public Object updatePurchaseGoodsInfo(@RequestParam("id") Integer id, @RequestParam("actualArrivalNum") Integer actualArrivalNum,
                                                 @RequestParam("actualArrivalSumprice") Double actualArrivalSumprice) {
         purchaseOrderService.updatePurchaseGoodsToApp(id, actualArrivalNum, actualArrivalSumprice);
-        return new CommonResult("操作成功");
+        return BusinessResponse.ok("操作成功");
     }
 
     /**
