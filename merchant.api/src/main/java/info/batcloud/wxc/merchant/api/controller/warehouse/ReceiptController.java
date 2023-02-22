@@ -3,6 +3,7 @@ package info.batcloud.wxc.merchant.api.controller.warehouse;
 import com.github.pagehelper.PageInfo;
 import info.batcloud.wxc.core.domain.BusinessResponse;
 import info.batcloud.wxc.core.dto.FoodSkuDTO;
+import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
 import info.batcloud.wxc.core.entity.CommonResult;
 import info.batcloud.wxc.core.entity.CommonResultPage;
 import info.batcloud.wxc.core.entity.FoodSku;
@@ -11,6 +12,7 @@ import info.batcloud.wxc.core.helper.SecurityHelper;
 import info.batcloud.wxc.core.entity.PreReceiptOrders;
 import info.batcloud.wxc.core.repository.FoodSkuRepository;
 import info.batcloud.wxc.core.service.FoodSkuService;
+import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import info.batcloud.wxc.core.service.warehouse.service.PurchaseOrderService;
 import info.batcloud.wxc.core.service.warehouse.service.ReceiptService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +40,7 @@ public class ReceiptController {
     private PurchaseOrderService purchaseOrderService;
 
     @Resource
-    private FoodSkuService foodSkuService;
+    private StoreUserFoodSkuService storeUserFoodSkuService;
 
     /**
      * describe 修改收货单信息
@@ -114,13 +116,13 @@ public class ReceiptController {
      */
     @GetMapping("/getReceiptListBysku")
     public Object getReceiptListBysku(@RequestParam("skuId") String upc) {
-        FoodSkuDTO foodSku = foodSkuService.getFoodSkuByUpc(upc);
-        if (foodSku == null) {
+        StoreUserFoodSkuDTO foodSkuDTO = storeUserFoodSkuService.getByUpcAndStoreUserId(SecurityHelper.loginStoreUserId().intValue(), upc);
+        if (foodSkuDTO == null) {
             throw new BizException("当前门店不存在此商品，请添加后操作");
         }
-        List<PreReceiptOrders> receiptListBysku = receiptService.getReceiptListBysku(foodSku.getId().intValue(), SecurityHelper.loginStoreUserId().intValue());
+        List<PreReceiptOrders> receiptListBysku = receiptService.getReceiptListBysku(foodSkuDTO.getId().intValue(), SecurityHelper.loginStoreUserId().intValue());
         Map<String, Object> map = new HashMap<>(1);
         map.put("data", new CommonResult(receiptListBysku));
-        return map;
+        return BusinessResponse.ok(map);
     }
 }

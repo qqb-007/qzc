@@ -190,6 +190,9 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     }
 
     private StoreUserFoodSkuDTO toDto(StoreUserFoodSku storeUserFoodSku) {
+        if (storeUserFoodSku == null) {
+            return null;
+        }
         StoreUserFoodSkuDTO dto = new StoreUserFoodSkuDTO();
         BeanUtils.copyProperties(storeUserFoodSku, dto);
         List<String> wnames = new ArrayList<>();
