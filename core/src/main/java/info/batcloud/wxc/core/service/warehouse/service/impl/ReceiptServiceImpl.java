@@ -44,30 +44,34 @@ public class ReceiptServiceImpl  implements ReceiptService {
 
     @Override
     public Integer updateReceiptOrderToApp(Integer id, String remark,Integer status) {
-        PreShopProcurementRelation preShopProcurementRelation=new PreShopProcurementRelation();
-        preShopProcurementRelation.setShopProcurementId(id);
-        AtomicReference<Integer> num= new AtomicReference<>(0);
-        AtomicReference<Double> price= new AtomicReference<>(0.0);
-        List<PreShopProcurementRelation> preShopProcurementRelations = preShopProcurementRelationDao.queryAll(preShopProcurementRelation);
-        List<PreShopProcurementRelation> collect = preShopProcurementRelations.stream().map(v -> {
-            if (v.getActualArrivalNum()==null){
-                v.setActualArrivalNum(0);
-            }
-            if (v.getActualArrivalSumprice()==null){
-                v.setActualArrivalSumprice(0.0);
-            }
-            num.updateAndGet(v1 -> v1 + v.getActualArrivalNum());
-            price.updateAndGet(v1 -> v1 + v.getActualArrivalSumprice()*v.getActualArrivalNum());
-
-            return v;
-        }).collect(Collectors.toList());
-        PreReceiptOrders preReceiptOrders=new PreReceiptOrders();
-        preReceiptOrders.setId(id);
-        preReceiptOrders.setRemark(remark);
-        preReceiptOrders.setArrivePrice(price.get());
-        preReceiptOrders.setArrivaNum(num.get());
-        preReceiptOrders.setStatus(status);
-        return preReceiptOrdersDao.update(preReceiptOrders);
+        try {
+            PreShopProcurementRelation preShopProcurementRelation=new PreShopProcurementRelation();
+            preShopProcurementRelation.setShopProcurementId(id);
+            AtomicReference<Integer> num= new AtomicReference<>(0);
+            AtomicReference<Double> price= new AtomicReference<>(0.0);
+            List<PreShopProcurementRelation> preShopProcurementRelations = preShopProcurementRelationDao.queryAll(preShopProcurementRelation);
+            preShopProcurementRelations.stream().map(v -> {
+                if (v.getActualArrivalNum()==null){
+                    v.setActualArrivalNum(0);
+                }
+                if (v.getActualArrivalSumprice()==null){
+                    v.setActualArrivalSumprice(0.0);
+                }
+                num.updateAndGet(v1 -> v1 + v.getActualArrivalNum());
+                price.updateAndGet(v1 -> v1 + v.getActualArrivalSumprice()*v.getActualArrivalNum());
+                return v;
+            }).collect(Collectors.toList());
+            PreReceiptOrders preReceiptOrders=new PreReceiptOrders();
+            preReceiptOrders.setId(id);
+            preReceiptOrders.setRemark(remark);
+            preReceiptOrders.setArrivePrice(price.get());
+            preReceiptOrders.setArrivaNum(num.get());
+            preReceiptOrders.setStatus(status);
+            return preReceiptOrdersDao.update(preReceiptOrders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException("请联系管理员,系统异常");
+        }
     }
 
     @Override
