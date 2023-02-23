@@ -1014,6 +1014,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void cancelOrderByPlat(Plat plat, String platOrderId, int cancelCode, String cancelReason) {
         Order order = orderRepository.findByPlatAndPlatOrderId(plat, platOrderId);
+        if (order.getStatus() != OrderStatus.CANCELED) {
+            this.syncCancelOrderStock(order.getPlatOrderId(),order.getPlat());
+        }
         order.setStatus(OrderStatus.CANCELED);
         order.setCancelReason(CautionHelper.getCaution(cancelReason));
         order.setCancelReasonCode(cancelCode);
@@ -3550,7 +3553,7 @@ public class OrderServiceImpl implements OrderService {
             return null;
         }
         for (StoreUserFoodSkuDTO sku : list) {
-            if (sku.getFoodSkuId().equals(skuId)) {
+            if (sku.getFoodSkuId().toString().equals(skuId)) {
                 return sku;
             }
         }
@@ -5346,10 +5349,16 @@ public class OrderServiceImpl implements OrderService {
     public void sycnNewOrderStock(String platOrderId, Plat plat) {
         //新订单同步库存
         Order order = orderRepository.findByPlatAndPlatOrderId(plat, platOrderId);
-        List<OrderDetail> detailList = order.getDetailList();
+        Store store = storeRepository.findByCodeAndPlat(order.getAppPoiCode(), plat);
+        List<OrderDetail> detailList = orderDetailRepository.findByOrderId(order.getId());
         for (OrderDetail orderDetail : detailList) {
             if (orderDetail.getOk()) {
-                storeUserFoodSkuService.syncNewOrderStock(orderDetail.getId(), order.getStore().getStoreUser().getId(), plat);
+                try {
+                    storeUserFoodSkuService.syncNewOrderStock(orderDetail.getId(), store.getStoreUser().getId(), plat);
+                } catch (Exception e) {
+                    logger.error("订单库存同步出错");
+                }
+
             }
         }
     }
@@ -5365,8 +5374,6 @@ public class OrderServiceImpl implements OrderService {
                     storeUserFoodSkuService.syncCancelOrderStock(orderDetail.getId(), order.getStore().getStoreUser().getId(), plat);
                 }
             }
-            order.setDadaAccept(true);
-            orderRepository.save(order);
         }
 
     }

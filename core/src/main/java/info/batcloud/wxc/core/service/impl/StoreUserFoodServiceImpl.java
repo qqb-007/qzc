@@ -3558,7 +3558,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 }
 //            req.setPredictCat(1);
                 //req.setBrandName(food.getEleBrandName());
-                req.setUpc(store.getCode() + "_" + storeUserFoodSku.getFoodSkuId());
+                req.setUpc(store.getCode() + "_" + storeUserFood.getFood().getCode());
                 req.setName(storeUserFood.getFood().getName() + storeUserFoodSku.getName());
                 req.setStatus(1); // 上架
                 SkuUpdateRequest.Photo photo = new SkuUpdateRequest.Photo();
@@ -3567,7 +3567,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 req.setPhotos(photos);
                 photo.setIsMaster(1);
                 photo.setUrl(photoUrl);
-                req.setLeftNum(9999);
+                req.setLeftNum(storeUserFoodSku.getStock());
                 Float priceIncrease = storeUserFood.getPriceIncrease();
                 //float quotePrice = foodQuoteSku.getPrice() / (1 + priceIncrease / 100);
                 req.setSalePrice((int) (storeUserFoodSku.getOutputPrice() * 100));
@@ -3617,7 +3617,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
             }
 //            req.setPredictCat(1);
             //req.setBrandName(food.getEleBrandName());
-            req.setUpc(store.getCode() + "_" + storeUserFoodSku.getFoodSkuId());
+            req.setUpc(store.getCode() + "_" + storeUserFood.getFood().getCode());
             req.setName(storeUserFood.getFood().getName() + " " + storeUserFoodSku.getName());
             req.setStatus(1); // 上架
             SkuCreateRequest.Photo photo = new SkuCreateRequest.Photo();
@@ -3657,7 +3657,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 }
 //            req.setPredictCat(1);
                 //req.setBrandName(food.getEleBrandName());
-                req1.setUpc(store.getCode() + "_" + storeUserFoodSku.getFoodSkuId());
+                req1.setUpc(store.getCode() + "_" + storeUserFood.getFood().getCode());
                 req1.setName(storeUserFood.getFood().getName() + " " + storeUserFoodSku.getName());
                 req1.setStatus(1); // 上架
                 //SkuUpdateRequest.Photo photo1 = new SkuUpdateRequest.Photo();
@@ -3666,7 +3666,7 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
                 //req1.setPhotos(photos1);
                 //photo1.setIsMaster(1);
                 //photo1.setUrl(photoUrl);
-                req1.setLeftNum(9999);
+                req1.setLeftNum(storeUserFoodSku.getStock());
                 //Float priceIncrease = storeUserFood.getPriceIncrease();
                 //float quotePrice = foodQuoteSku.getPrice() / (1 + priceIncrease / 100);
                 req.setSalePrice((int) (storeUserFoodSku.getOutputPrice() * 100));

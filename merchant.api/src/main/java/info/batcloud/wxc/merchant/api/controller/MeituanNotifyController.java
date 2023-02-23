@@ -60,9 +60,9 @@ public class MeituanNotifyController {
         try {
             URLDecodeHelper.decode(data);
             MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-            if (!meituanWaimaiService.checkSign(data, setting.getOrderPaidNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
-                return MeituanHelper.ok();
-            }
+//            if (!meituanWaimaiService.checkSign(data, setting.getOrderPaidNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
+//                return MeituanHelper.ok();
+//            }
             if (StringUtils.isEmpty(data.get("order_id"))) {
                 return MeituanHelper.ok();
             }
@@ -92,10 +92,10 @@ public class MeituanNotifyController {
         logger.info("接收到美团订单配送状态改变通知");
         logger.info(data.toString());
         MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-        if (!meituanWaimaiService.checkSign(data, "https://api.wangxiaocai.cn/meituan/notify/order/peisong")) {
-            logger.error("签名错误");
-            return MeituanHelper.ok();
-        }
+//        if (!meituanWaimaiService.checkSign(data, "https://api.wangxiaocai.cn/meituan/notify/order/peisong")) {
+//            logger.error("签名错误");
+//            return MeituanHelper.ok();
+//        }
 
         Boolean p = true;
 
@@ -176,10 +176,10 @@ public class MeituanNotifyController {
     @OrderNotificationTrace(plat = Plat.MEITUAN, type = OrderNotificationType.CANCEL, orderId = "#0.order_id", data = "#0")
     public Object orderCancel(@RequestParam Map<String, String> data, HttpServletRequest request) throws UnsupportedEncodingException {
         URLDecodeHelper.decode(data);
-        MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-        if (!meituanWaimaiService.checkSign(data, setting.getOrderCancelNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
-            return MeituanHelper.ok();
-        }
+        //MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
+//        if (!meituanWaimaiService.checkSign(data, setting.getOrderCancelNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
+//            return MeituanHelper.ok();
+//        }
         Long orderId = Long.valueOf(data.get("order_id"));
         if (orderId == null) {
             return MeituanHelper.ok();
@@ -187,7 +187,7 @@ public class MeituanNotifyController {
         logger.info("接收到订单取消通知" + orderId);
         orderService.cancelOrderByPlat(Plat.MEITUAN, orderId.toString(), Integer.valueOf(data.get("reason_code")), data.get("reason"));
         orderService.printCancelInfo(Plat.MEITUAN, orderId.toString());
-        orderService.syncCancelOrderStock(orderId.toString(), Plat.MEITUAN);
+        //orderService.syncCancelOrderStock(orderId.toString(), Plat.MEITUAN);
         OrderNotificationTraceAspect.TraceResult tr = new OrderNotificationTraceAspect.TraceResult();
         tr.setSuccess(true);
         OrderNotificationTraceAspect.TRACE_RESULT.set(tr);
@@ -198,10 +198,10 @@ public class MeituanNotifyController {
     @OrderNotificationTrace(plat = Plat.MEITUAN, type = OrderNotificationType.FINISH, orderId = "#0.order_id", data = "#0")
     public Object orderFinish(@RequestParam Map<String, String> data, HttpServletRequest request) throws UnsupportedEncodingException {
         URLDecodeHelper.decode(data);
-        MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-        if (!meituanWaimaiService.checkSign(data, setting.getOrderFinishNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
-            return MeituanHelper.ok();
-        }
+//        MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
+////        if (!meituanWaimaiService.checkSign(data, setting.getOrderFinishNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
+////            return MeituanHelper.ok();
+////        }
         if (StringUtils.isEmpty(data.get("order_id"))) {
             return MeituanHelper.ok();
         }
@@ -229,10 +229,10 @@ public class MeituanNotifyController {
     public Object confirmOrder(@RequestParam Map<String, String> data, HttpServletRequest request) {
         try {
             URLDecodeHelper.decode(data);
-            MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-            if (!meituanWaimaiService.checkSign(data, setting.getOrderConfirmNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
-                return MeituanHelper.ok();
-            }
+//            MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
+//            if (!meituanWaimaiService.checkSign(data, setting.getOrderConfirmNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
+//                return MeituanHelper.ok();
+//            }
             if (StringUtils.isEmpty(data.get("order_id"))) {
                 return MeituanHelper.ok();
             }
@@ -271,10 +271,10 @@ public class MeituanNotifyController {
         URLDecodeHelper.decode(data);
         logger.info("接收到美团店铺营业状态改变通知");
         MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-        if (!meituanWaimaiService.checkSign(data, "https://api.wangxiaocai.cn/meituan/notify/shop/status")) {
-            logger.error("签名错误");
-            return MeituanHelper.ok();
-        }
+//        if (!meituanWaimaiService.checkSign(data, "https://api.wangxiaocai.cn/meituan/notify/shop/status")) {
+//            logger.error("签名错误");
+//            return MeituanHelper.ok();
+//        }
         if (StringUtils.isEmpty(data.get("app_poi_code"))) {
             return MeituanHelper.ok();
         }
@@ -297,10 +297,10 @@ public class MeituanNotifyController {
     @OrderNotificationTrace(plat = Plat.MEITUAN, type = OrderNotificationType.REFUND, orderId = "#0.order_id", data = "#0")
     public Object confirmRefund(@RequestParam Map<String, String> data, HttpServletRequest request) throws UnsupportedEncodingException {
         URLDecodeHelper.decode(data);
-        MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-        if (!meituanWaimaiService.checkSign(data, setting.getOrderRefundNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
-            return MeituanHelper.ok();
-        }
+//        MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
+//        if (!meituanWaimaiService.checkSign(data, setting.getOrderRefundNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
+//            return MeituanHelper.ok();
+//        }
         if (StringUtils.isEmpty(data.get("order_id"))) {
             return MeituanHelper.ok();
         }
@@ -323,10 +323,10 @@ public class MeituanNotifyController {
     @OrderNotificationTrace(plat = Plat.MEITUAN, type = OrderNotificationType.PART_REFUND, orderId = "#0.order_id", data = "#0")
     public Object confirmPartRefund(@RequestParam Map<String, String> data, HttpServletRequest request) throws UnsupportedEncodingException {
         URLDecodeHelper.decode(data);
-        MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
-        if (!meituanWaimaiService.checkSign(data, setting.getOrderPartRefundNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
-            return MeituanHelper.ok();
-        }
+//        MeituanWaimaiAppSetting setting = systemSettingService.findActiveSetting(MeituanWaimaiAppSetting.class);
+//        if (!meituanWaimaiService.checkSign(data, setting.getOrderPartRefundNotifyUrl()) && !request.getRequestURL().toString().startsWith("http://dev.")) {
+//            return MeituanHelper.ok();
+//        }
         if (StringUtils.isEmpty(data.get("order_id"))) {
             return MeituanHelper.ok();
         }

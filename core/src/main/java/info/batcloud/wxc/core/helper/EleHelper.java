@@ -26,7 +26,7 @@ public class EleHelper {
 
         String[] s = upc.split("_");
         if (s.length > 1) {
-            return s[1];
+            return s[s.length -1];
         } else {
             return s[0];
         }

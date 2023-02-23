@@ -1,5 +1,6 @@
 package info.batcloud.wxc.core.repository;
 
+import info.batcloud.wxc.core.entity.StoreUserFood;
 import info.batcloud.wxc.core.entity.StoreUserFoodSku;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -14,7 +15,9 @@ public interface StoreUserFoodSkuRepository extends PagingAndSortingRepository<S
 
     List<StoreUserFoodSku> findByFoodSkuId(long foodSkuId);
 
-    StoreUserFoodSku findByStoreUserFoodIdAndFoodSkuId(long storeUserId, long foodSkuId);
+    StoreUserFoodSku findByStoreUserFoodIdAndFoodSkuId(long storeUserFoodId, long foodSkuId);
+
+    StoreUserFoodSku findByStoreUserIdAndFoodSkuId(long storeUserId, long foodSkuId);
 
     void deleteByStoreUserFoodId(long sfuId);
 }

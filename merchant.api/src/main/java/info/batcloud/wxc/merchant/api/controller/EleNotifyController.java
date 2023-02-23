@@ -103,8 +103,8 @@ public class EleNotifyController {
                         break;
                     case 10: // 订单取消
                         orderService.cancelOrderByPlat(Plat.ELE, orderId, 1002, info.getString("reason"));
-                        orderService.printCancelInfo(Plat.ELE, orderId);
-                        orderService.syncCancelOrderStock(orderId, Plat.ELE);
+                        //orderService.printCancelInfo(Plat.ELE, orderId);
+                        //orderService.syncCancelOrderStock(orderId, Plat.ELE);
                         break;
                 }
             } catch (Exception e) {

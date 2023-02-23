@@ -63,7 +63,7 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     @Override
     public void syncNewOrderStock(long orderDetailId, long storeUserId, Plat plat) {
         OrderDetail detail = orderDetailRepository.findOne(orderDetailId);
-        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(storeUserId, Long.valueOf(detail.getSkuId()));
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findByStoreUserIdAndFoodSkuId(storeUserId, Long.valueOf(detail.getSkuId()));
         if (userFoodSku.getStock().intValue() <= detail.getQuantity().floatValue()) {
             userFoodSku.setStock(0);
         } else {
@@ -83,7 +83,7 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     @Override
     public void syncCancelOrderStock(long orderDetailId, long storeUserId, Plat plat) {
         OrderDetail detail = orderDetailRepository.findOne(orderDetailId);
-        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(storeUserId, Long.valueOf(detail.getSkuId()));
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findByStoreUserIdAndFoodSkuId(storeUserId, Long.valueOf(detail.getSkuId()));
         userFoodSku.setStock(userFoodSku.getStock() + detail.getQuantity().intValue());
         storeUserFoodSkuRepository.save(userFoodSku);
         logger.info("更新取消订单库存成功" + plat.getTitle() + userFoodSku.getName());
@@ -361,7 +361,7 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
 
     private boolean isPublishsku(StoreUserFood storeUserFood, String foodSkuId) {
         if (storeUserFood.getSale()) {
-            if (((StringUtils.isNotBlank(storeUserFood.getSpecialSkuIdList())) && (storeUserFood.getSpecialSkuIdList().indexOf(foodSkuId) != -1)) || ((StringUtil.isBlank(storeUserFood.getEleSkuId())) && (storeUserFood.getEleSkuId().equals(foodSkuId)))) {
+            if (((StringUtils.isNotBlank(storeUserFood.getSpecialSkuIdList())) && (storeUserFood.getSpecialSkuIdList().indexOf(foodSkuId) != -1)) || ((StringUtil.isNotBlank(storeUserFood.getEleSkuId())) && (storeUserFood.getEleSkuId().equals(foodSkuId)))) {
                 return true;
             }
         }
