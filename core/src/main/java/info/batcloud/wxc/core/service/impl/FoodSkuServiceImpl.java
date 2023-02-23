@@ -97,7 +97,7 @@ public class FoodSkuServiceImpl implements FoodSkuService {
         foodSku.setBoxPrice(updateParam.getBoxPrice());
         foodSkuRepository.save(foodSku);
         //更改所有门店商品sku信息（但门店可以更改的信息不做修改）
-
+        storeUserFoodSkuService.updateTFoodInfo(foodSku.getId());
 
     }
 

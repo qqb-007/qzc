@@ -9,6 +9,10 @@ import java.util.List;
 
 public interface StoreUserFoodSkuService {
 
+    void receiptStock(long storeUserId, String upc, Integer addStock);
+
+    void updateTFoodInfo(long foodSkuId);
+
     List<StoreUserFoodSkuDTO> getWhSufList(long wid);
 
     void storeUpdateSufSku(long sufId, List<String> foodSkuId, List<Integer> stock, List<Integer> boxNums, List<Float> outputPrice, List<Float> boxPrices, List<Integer> minOrderCounts, List<Float> inputPrice);

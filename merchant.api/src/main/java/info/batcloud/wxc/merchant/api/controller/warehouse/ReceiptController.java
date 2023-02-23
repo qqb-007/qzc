@@ -43,7 +43,6 @@ public class ReceiptController {
     private StoreUserFoodSkuService storeUserFoodSkuService;
 
     /**
-     *
      * describe 修改收货单信息
      *
      * @param
@@ -52,37 +51,36 @@ public class ReceiptController {
      * @date 18/2/2023 下午4:23
      */
     @PostMapping("/updateReceiptInfo")
-    public CommonResult updateReceiptInfo(@RequestParam("id") Integer id,@RequestParam("remark")String remark,
-                                          @RequestParam("status") Integer status){
-        receiptService.updateReceiptOrderToApp(id,remark,status);
+    public CommonResult updateReceiptInfo(@RequestParam("id") Integer id, @RequestParam("remark") String remark,
+                                          @RequestParam("status") Integer status) {
+        receiptService.updateReceiptOrderToApp(id, remark, status);
         return new CommonResult("操作成功");
     }
 
     /**
-     *
      * describe 修改采购订单中收货信息
      *
+     * @param
      * @param
      * @return
      * @author V
      * @date 18/2/2023 下午4:23
-     * @param
-     * @return
      */
     @PostMapping("/updatePurchaseGoodsInfo")
-    public Object updatePurchaseGoodsInfo(@RequestParam("id") Integer id, @RequestParam("actualArrivalNum") Integer actualArrivalNum,
-                                                @RequestParam("actualArrivalSumprice") Double actualArrivalSumprice) {
+    public Object updatePurchaseGoodsInfo(@RequestParam("id") Integer id, @RequestParam("actualArrivalNum") Integer actualArrivalNum, @RequestParam("upc") String upc,
+                                          @RequestParam("actualArrivalSumprice") Double actualArrivalSumprice) {
         purchaseOrderService.updatePurchaseGoodsToApp(id, actualArrivalNum, actualArrivalSumprice);
+        storeUserFoodSkuService.receiptStock(SecurityHelper.loginStoreUserId(), upc, actualArrivalNum);
         return BusinessResponse.ok("操作成功");
     }
 
     /**
-     *
      * describe 获取门店收货单列表
-     * @author V
-     * @date 20/2/2023 下午2:51
+     *
      * @param
      * @return
+     * @author V
+     * @date 20/2/2023 下午2:51
      */
     @GetMapping("/getReceiptByStoreId")
     public Object getReceiptByStoreId(@RequestParam("page") Integer page) {
@@ -93,12 +91,12 @@ public class ReceiptController {
     }
 
     /**
-     *
      * describe 获取收货单列表详情列表
-     * @author V
-     * @date 20/2/2023 下午3:23
+     *
      * @param
      * @return
+     * @author V
+     * @date 20/2/2023 下午3:23
      */
     @GetMapping("/getReceiptById")
     public Object getReceiptById(@RequestParam("id") Integer id, @RequestParam("page") Integer page) {
@@ -110,12 +108,12 @@ public class ReceiptController {
 
 
     /**
-     *
      * describe 获取收货单列表详情 通过sku
-     * @author V
-     * @date 21/2/2023 下午3:39
+     *
      * @param
      * @return
+     * @author V
+     * @date 21/2/2023 下午3:39
      */
     @GetMapping("/getReceiptListBysku")
     public Object getReceiptListBysku(@RequestParam("skuId") String upc) {

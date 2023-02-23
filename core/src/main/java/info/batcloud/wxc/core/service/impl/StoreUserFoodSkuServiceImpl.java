@@ -1,10 +1,12 @@
 package info.batcloud.wxc.core.service.impl;
 
 import com.ctospace.archit.common.pagination.Paging;
+import com.sankuai.meituan.waimai.opensdk.util.StringUtil;
 import info.batcloud.wxc.core.dto.FoodSkuDTO;
 import info.batcloud.wxc.core.dto.StoreUserFoodDTO;
 import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
 import info.batcloud.wxc.core.entity.*;
+import info.batcloud.wxc.core.enums.QuoteStatus;
 import info.batcloud.wxc.core.helper.PagingHelper;
 import info.batcloud.wxc.core.repository.*;
 import info.batcloud.wxc.core.service.FoodSkuService;
@@ -51,6 +53,46 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     private StoreUserFoodService storeUserFoodService;
 
     @Override
+    public void receiptStock(long storeUserId, String upc, Integer addStock) {
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findByStoreUserIdAndUpc(storeUserId, upc);
+        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(userFoodSku.getStoreUserFoodId());
+        String specialSkuIdList = storeUserFood.getSpecialSkuIdList();
+        String eleSkuId = storeUserFood.getEleSkuId();
+        boolean fb = isPublishsku(storeUserFood, userFoodSku.getFoodSkuId().toString());
+        userFoodSku.setStock(userFoodSku.getStock() + addStock);
+        storeUserFoodSkuRepository.save(userFoodSku);
+        if (fb) {
+            storeUserFoodService.publish(storeUserFood.getId(), true);
+        }
+    }
+
+    @Override
+    public void updateTFoodInfo(long foodSkuId) {
+        FoodSku foodSku = foodSkuRepository.findOne(foodSkuId);
+        List<StoreUserFoodSku> userFoodSkuList = storeUserFoodSkuRepository.findByFoodSkuId(foodSkuId);
+        for (StoreUserFoodSku userFoodSku : userFoodSkuList) {
+            boolean fb = false;
+            StoreUserFood storeUserFood = storeUserFoodRepository.findOne(userFoodSku.getStoreUserFoodId());
+            if (isPublishsku(storeUserFood, userFoodSku.getFoodSkuId().toString())) {
+                if (!userFoodSku.getName().equals(foodSku.getName()) || userFoodSku.getWeight().intValue() != foodSku.getWeight().intValue() || !userFoodSku.getSpec().equals(foodSku.getSpec())) {
+                    fb = true;
+                }
+            }
+            userFoodSku.setUpc(foodSku.getUpc());
+            userFoodSku.setName(foodSku.getName());
+            userFoodSku.setWeight(foodSku.getWeight());
+            userFoodSku.setSpec(foodSku.getSpec());
+            userFoodSku.setInputTax(foodSku.getInputTax());
+            userFoodSku.setOutputTax(foodSku.getOutputTax());
+            storeUserFoodSkuRepository.save(userFoodSku);
+            if (fb) {
+                //发布门店商品
+                storeUserFoodService.publish(storeUserFood.getId(), true);
+            }
+        }
+    }
+
+    @Override
     public List<StoreUserFoodSkuDTO> getWhSufList(long wid) {
         Warehouse warehouse = warehouseRepository.findOne(wid);
         List<StoreUserFoodSkuDTO> list = new ArrayList<>();
@@ -65,14 +107,19 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
 
     @Override
     public void storeUpdateSufSku(long sufId, List<String> foodSkuId, List<Integer> stock, List<Integer> boxNums, List<Float> outputPrice, List<Float> boxPrices, List<Integer> minOrderCounts, List<Float> inputPrice) {
+        //微信小程序端修改规格信息
         boolean fb = false;
+        boolean sh = false;
         StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sufId);
         for (int i = 0; i < foodSkuId.size(); i++) {
             StoreUserFoodSku storeUserFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(sufId, Long.valueOf(foodSkuId.get(i)));
-            if (storeUserFood.getSpecialSkuIdList().indexOf(storeUserFoodSku.getFoodSkuId().toString()) != -1) {
-                if (storeUserFood.getSale() && (boxNums.get(i) != storeUserFoodSku.getBoxNum() || boxPrices.get(i) != storeUserFoodSku.getBoxPrice() || minOrderCounts.get(i) != storeUserFoodSku.getMinOrderCount() || stock.get(i) != storeUserFoodSku.getStock() || outputPrice.get(i) != storeUserFoodSku.getOutputPrice())) {
+            if (isPublishsku(storeUserFood, storeUserFoodSku.getFoodSkuId().toString())) {
+                if (boxNums.get(i).intValue() != storeUserFoodSku.getBoxNum().intValue() || boxPrices.get(i).floatValue() != storeUserFoodSku.getBoxPrice().floatValue() || minOrderCounts.get(i).intValue() != storeUserFoodSku.getMinOrderCount().intValue() || stock.get(i).intValue() != storeUserFoodSku.getStock().intValue() || outputPrice.get(i).floatValue() != storeUserFoodSku.getOutputPrice().floatValue()) {
                     fb = true;
                 }
+            }
+            if (storeUserFoodSku.getOutputPrice().floatValue() != outputPrice.get(i).floatValue()) {
+                sh = true;
             }
             storeUserFoodSku.setStock(stock.get(i));
             storeUserFoodSku.setInputPrice(inputPrice.get(i));
@@ -82,14 +129,16 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
             storeUserFoodSku.setBoxNum(boxNums.get(i));
             storeUserFoodSkuRepository.save(storeUserFoodSku);
         }
-
         StoreUserFoodService.LowPrice lowPrice = storeUserFoodService.getStoreUserFoodPrice(storeUserFood);
         storeUserFood.setSalePrice(lowPrice.getOutputPrice());
         storeUserFood.setQuotePrice(lowPrice.getInputPrice());
+        if (sh) {
+            storeUserFood.setQuoteStatus(QuoteStatus.WAIT_VERIFY);
+        }
         storeUserFoodRepository.save(storeUserFood);
         if (fb) {
             //发布商品
-
+            storeUserFoodService.publish(storeUserFood.getId(), true);
         }
     }
 
@@ -123,20 +172,29 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
 
     @Override
     public void adminUpdateSufSku(long sufId, List<Long> foodSkuId, List<Integer> stock, List<Float> inputPrice, List<Float> outputPrice) {
+        //admin端修改门店商品规格信息
+        boolean fb = false;
+        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sufId);
         for (int i = 0; i < foodSkuId.size(); i++) {
             StoreUserFoodSku storeUserFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(sufId, foodSkuId.get(i));
+            if (isPublishsku(storeUserFood, storeUserFoodSku.getFoodSkuId().toString())) {
+                if (stock.get(i).intValue() != storeUserFoodSku.getStock().intValue() || outputPrice.get(i).floatValue() != storeUserFoodSku.getOutputPrice().floatValue()) {
+                    fb = true;
+                }
+            }
             storeUserFoodSku.setStock(stock.get(i));
             storeUserFoodSku.setInputPrice(inputPrice.get(i));
             storeUserFoodSku.setOutputPrice(outputPrice.get(i));
             storeUserFoodSkuRepository.save(storeUserFoodSku);
         }
-        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sufId);
         StoreUserFoodService.LowPrice lowPrice = storeUserFoodService.getStoreUserFoodPrice(storeUserFood);
         storeUserFood.setSalePrice(lowPrice.getOutputPrice());
         storeUserFood.setQuotePrice(lowPrice.getInputPrice());
         storeUserFoodRepository.save(storeUserFood);
         //发布商品
-
+        if (fb) {
+            storeUserFoodService.publish(storeUserFood.getId(), true);
+        }
     }
 
     @Override
@@ -171,23 +229,23 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
 
     @Override
     public void updateSufSku(UpdateParam updateParam) {
-        StoreUserFoodSku sku = storeUserFoodSkuRepository.findOne(updateParam.getId());
-        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sku.getStoreUserFoodId());
-        boolean fb = false;
-        if (storeUserFood.getSale() && (updateParam.getBoxNum() != sku.getBoxNum() || updateParam.getBoxPrice() != sku.getBoxPrice() || updateParam.getMinOrderCount() != sku.getMinOrderCount() || updateParam.getStock() != sku.getStock() || updateParam.getOutputPrice() != sku.getOutputPrice())) {
-            fb = true;
-        }
-        sku.setStock(updateParam.getStock());
-        sku.setInputPrice(updateParam.getInputPrice());
-        sku.setOutputPrice(updateParam.getOutputPrice());
-        sku.setMinOrderCount(updateParam.getMinOrderCount());
-        sku.setBoxNum(updateParam.getBoxNum());
-        sku.setBoxPrice(updateParam.getBoxPrice());
-        storeUserFoodSkuRepository.save(sku);
-        if (fb) {
-            //将商品sku改动发布到平台
-
-        }
+//        StoreUserFoodSku sku = storeUserFoodSkuRepository.findOne(updateParam.getId());
+//        StoreUserFood storeUserFood = storeUserFoodRepository.findOne(sku.getStoreUserFoodId());
+//        boolean fb = false;
+//        if (storeUserFood.getSale() && (updateParam.getBoxNum() != sku.getBoxNum() || updateParam.getBoxPrice() != sku.getBoxPrice() || updateParam.getMinOrderCount() != sku.getMinOrderCount() || updateParam.getStock() != sku.getStock() || updateParam.getOutputPrice() != sku.getOutputPrice())) {
+//            fb = true;
+//        }
+//        sku.setStock(updateParam.getStock());
+//        sku.setInputPrice(updateParam.getInputPrice());
+//        sku.setOutputPrice(updateParam.getOutputPrice());
+//        sku.setMinOrderCount(updateParam.getMinOrderCount());
+//        sku.setBoxNum(updateParam.getBoxNum());
+//        sku.setBoxPrice(updateParam.getBoxPrice());
+//        storeUserFoodSkuRepository.save(sku);
+//        if (fb) {
+//            //将商品sku改动发布到平台
+//
+//        }
     }
 
     @Override
@@ -256,4 +314,15 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
         dto.setFullName(food.getName() + dto.getName());
         return dto;
     }
+
+    private boolean isPublishsku(StoreUserFood storeUserFood, String foodSkuId) {
+        if (storeUserFood.getSale()) {
+            if (((StringUtils.isNotBlank(storeUserFood.getSpecialSkuIdList())) && (storeUserFood.getSpecialSkuIdList().indexOf(foodSkuId) != -1)) || ((StringUtil.isBlank(storeUserFood.getEleSkuId())) && (storeUserFood.getEleSkuId().equals(foodSkuId)))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

@@ -3525,6 +3525,9 @@ public class StoreUserFoodServiceImpl implements StoreUserFoodService {
 //            }
 //        }
         StoreUserFoodSku storeUserFoodSku = this.getEleSku(storeUserFood);
+        if (storeUserFoodSku == null) {
+            throw new BizException("请勾选需要发布的规格");
+        }
         String customSkuId = storeUserFoodSku.getFoodSkuId().toString();
         //将得到的skuid设置成饿了么的skuid
         storeUserFood.setEleSkuId(customSkuId);
