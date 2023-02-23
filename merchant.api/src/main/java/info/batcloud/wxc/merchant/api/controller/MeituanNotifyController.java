@@ -187,11 +187,7 @@ public class MeituanNotifyController {
         logger.info("接收到订单取消通知" + orderId);
         orderService.cancelOrderByPlat(Plat.MEITUAN, orderId.toString(), Integer.valueOf(data.get("reason_code")), data.get("reason"));
         orderService.printCancelInfo(Plat.MEITUAN, orderId.toString());
-        try {
-            orderService.sycnStock(orderId.toString());
-        } catch (Exception e) {
-            logger.error("同步美团商品库存出错", e);
-        }
+        orderService.syncCancelOrderStock(orderId.toString(), Plat.MEITUAN);
         OrderNotificationTraceAspect.TraceResult tr = new OrderNotificationTraceAspect.TraceResult();
         tr.setSuccess(true);
         OrderNotificationTraceAspect.TRACE_RESULT.set(tr);
@@ -244,7 +240,7 @@ public class MeituanNotifyController {
             logger.info("接收到订单确认通知, platOrderId:" + platOrderId);
             orderService.confirmOrderByPlat(Plat.MEITUAN, platOrderId);
             try {
-                orderService.sycnStock(platOrderId);
+                //orderService.sycnStock(platOrderId);
             } catch (Exception e) {
                 logger.error("同步美团商品库存出错", e);
             }

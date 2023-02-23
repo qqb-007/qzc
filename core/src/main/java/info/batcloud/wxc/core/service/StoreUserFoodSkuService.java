@@ -3,11 +3,16 @@ package info.batcloud.wxc.core.service;
 import com.ctospace.archit.common.pagination.Paging;
 import com.ctospace.archit.common.pagination.PagingParam;
 import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
+import info.batcloud.wxc.core.enums.Plat;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 public interface StoreUserFoodSkuService {
+
+    void syncNewOrderStock(long orderDetailId, long storeUserId, Plat plat);
+
+    void syncCancelOrderStock(long orderDetailId, long storeUserId, Plat plat);
 
     void receiptStock(long storeUserId, String upc, Integer addStock);
 

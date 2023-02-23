@@ -6,6 +6,7 @@ import info.batcloud.wxc.core.dto.FoodSkuDTO;
 import info.batcloud.wxc.core.dto.StoreUserFoodDTO;
 import info.batcloud.wxc.core.dto.StoreUserFoodSkuDTO;
 import info.batcloud.wxc.core.entity.*;
+import info.batcloud.wxc.core.enums.Plat;
 import info.batcloud.wxc.core.enums.QuoteStatus;
 import info.batcloud.wxc.core.helper.PagingHelper;
 import info.batcloud.wxc.core.repository.*;
@@ -14,6 +15,8 @@ import info.batcloud.wxc.core.service.StoreUserFoodService;
 import info.batcloud.wxc.core.service.StoreUserFoodSkuService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,7 +53,48 @@ public class StoreUserFoodSkuServiceImpl implements StoreUserFoodSkuService {
     private WarehouseRepository warehouseRepository;
 
     @Inject
+    private OrderDetailRepository orderDetailRepository;
+
+    @Inject
     private StoreUserFoodService storeUserFoodService;
+
+    private static final Logger logger = LoggerFactory.getLogger(StoreUserFoodSkuService.class);
+
+    @Override
+    public void syncNewOrderStock(long orderDetailId, long storeUserId, Plat plat) {
+        OrderDetail detail = orderDetailRepository.findOne(orderDetailId);
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(storeUserId, Long.valueOf(detail.getSkuId()));
+        if (userFoodSku.getStock().intValue() <= detail.getQuantity().floatValue()) {
+            userFoodSku.setStock(0);
+        } else {
+            userFoodSku.setStock(userFoodSku.getStock() - detail.getQuantity().intValue());
+        }
+        storeUserFoodSkuRepository.save(userFoodSku);
+        logger.info("更新新订单库存成功" + plat.getTitle() + userFoodSku.getName());
+        List<Plat> plats = new ArrayList<>();
+        if (plat == Plat.MEITUAN) {
+            plats.add(Plat.ELE);
+        } else if (plat == Plat.ELE) {
+            plats.add(Plat.MEITUAN);
+        }
+        storeUserFoodService.publish(userFoodSku.getStoreUserFoodId(), true, plats);
+    }
+
+    @Override
+    public void syncCancelOrderStock(long orderDetailId, long storeUserId, Plat plat) {
+        OrderDetail detail = orderDetailRepository.findOne(orderDetailId);
+        StoreUserFoodSku userFoodSku = storeUserFoodSkuRepository.findByStoreUserFoodIdAndFoodSkuId(storeUserId, Long.valueOf(detail.getSkuId()));
+        userFoodSku.setStock(userFoodSku.getStock() + detail.getQuantity().intValue());
+        storeUserFoodSkuRepository.save(userFoodSku);
+        logger.info("更新取消订单库存成功" + plat.getTitle() + userFoodSku.getName());
+        List<Plat> plats = new ArrayList<>();
+        if (plat == Plat.MEITUAN) {
+            plats.add(Plat.ELE);
+        } else if (plat == Plat.ELE) {
+            plats.add(Plat.MEITUAN);
+        }
+        storeUserFoodService.publish(userFoodSku.getStoreUserFoodId(), true, plats);
+    }
 
     @Override
     public void receiptStock(long storeUserId, String upc, Integer addStock) {

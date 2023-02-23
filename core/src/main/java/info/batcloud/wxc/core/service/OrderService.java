@@ -20,7 +20,9 @@ import java.util.List;
 
 public interface OrderService {
 
-    void sycnStock(String platOrderId);
+    void sycnNewOrderStock(String platOrderId, Plat plat);
+
+    void syncCancelOrderStock(String platOrderId, Plat plat);
 
     boolean setOrderSelf(long id);
 

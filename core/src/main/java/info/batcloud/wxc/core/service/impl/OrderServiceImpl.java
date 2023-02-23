@@ -964,6 +964,7 @@ public class OrderServiceImpl implements OrderService {
                 //客户端订单默认都是确认接单
                 this.confirmOrderByPlat(Plat.WANTE, order.getPlatOrderId());
             }
+            this.sycnNewOrderStock(order.getPlatOrderId(), order.getPlat());
 
         }
         rs.setSuccess(true);
@@ -5342,14 +5343,32 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void sycnStock(String platOrderId) {
-        Order order = orderRepository.findByPlatAndPlatOrderId(Plat.MEITUAN, platOrderId);
-        StoreUser storeUser = order.getStore().getStoreUser();
+    public void sycnNewOrderStock(String platOrderId, Plat plat) {
+        //新订单同步库存
+        Order order = orderRepository.findByPlatAndPlatOrderId(plat, platOrderId);
         List<OrderDetail> detailList = order.getDetailList();
         for (OrderDetail orderDetail : detailList) {
-            StoreUserFood storeUserFood = storeUserFoodRepository.findByStoreUserIdAndFoodId(storeUser.getId(), orderDetail.getFood().getId());
-            storeUserFoodService.syncStock(storeUserFood.getId());
+            if (orderDetail.getOk()) {
+                storeUserFoodSkuService.syncNewOrderStock(orderDetail.getId(), order.getStore().getStoreUser().getId(), plat);
+            }
         }
+    }
+
+    @Override
+    public void syncCancelOrderStock(String platOrderId, Plat plat) {
+        //订单取消之后库存加回去
+        Order order = orderRepository.findByPlatAndPlatOrderId(plat, platOrderId);
+        if (!order.getDadaAccept()) {
+            List<OrderDetail> detailList = order.getDetailList();
+            for (OrderDetail orderDetail : detailList) {
+                if (orderDetail.getOk()) {
+                    storeUserFoodSkuService.syncCancelOrderStock(orderDetail.getId(), order.getStore().getStoreUser().getId(), plat);
+                }
+            }
+            order.setDadaAccept(true);
+            orderRepository.save(order);
+        }
+
     }
 
     @Override
